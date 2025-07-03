@@ -174,3 +174,10 @@ pnnx*
 
 # calibration image
 calibration_*.npy
+
+# hara
+
+**/*.mp4
+**/*.png
+**/*.jpg
+**/*.pt
