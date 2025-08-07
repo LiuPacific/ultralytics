@@ -1,9 +1,14 @@
 import numpy as np
+import objtracker
+from objdetector import Detector
 import cv2
-from yolov8tracker import yolov8Tracker
 
-VIDEO_PATH = 'hara/hara_example/video/test_person.mp4'
-RESULT_PATH = 'hara/hara_example/video/result.mp4'
+# python .\demo.py
+
+VIDEO_PATH = r'E:\chicken_project\workspace\ultralytics\ultralytics\hara\hara_deep_sort\.video\20250513_111230.mp4'
+
+# VIDEO_PATH = r'G:\project_chicken\code\experiment_deepSORT\video\test_person.mp4'
+RESULT_PATH = 'result.mp4'
 
 class Point:
     def __init__(self, x, y):
@@ -17,7 +22,7 @@ class Detections:
     def add(self, xyxy, confidence, class_id, tracker_id):
         self.detections.append((xyxy, confidence, class_id, tracker_id))
 
-def draw_trail(output_image_frame, trail_points, trail_color, trail_length=50):
+def draw_trail(output_image_frame, trail_points, trail_color, trail_length=500):
     for i in range(len(trail_points)):
         if len(trail_points[i]) > 1:
             for j in range(1, len(trail_points[i])):
@@ -40,6 +45,7 @@ if __name__ == '__main__':
     # Close the video capture
     capture.release()
 
+    detector = Detector()
     capture = cv2.VideoCapture(VIDEO_PATH)
     videoWriter = None
     fps = int(capture.get(5))
@@ -48,18 +54,16 @@ if __name__ == '__main__':
     # Dictionary to store the trail points of each object
     object_trails = {}
 
-    v8Tracker = yolov8Tracker()
-
     while True:
         _, im = capture.read()
         if im is None:
             break
 
         detections = Detections()
-        output_image_frame, list_bboxs = v8Tracker.track(im)
+        output_image_frame, list_bboxs = objtracker.update(detector, im)
 
         for item_bbox in list_bboxs:
-            x1, y1, x2, y2, class_label, confidence, track_id = item_bbox
+            x1, y1, x2, y2, _, track_id = item_bbox
             detections.add((x1, y1, x2, y2), None, None, track_id)
 
         # Add the current object's position to the trail
@@ -79,7 +83,7 @@ if __name__ == '__main__':
         for tracker_id in list(object_trails.keys()):
             if tracker_id not in [item[3] for item in detections.detections]:
                 object_trails.pop(tracker_id)
-
+        
         if videoWriter is None:
             fourcc = cv2.VideoWriter_fourcc(
                 'm', 'p', '4', 'v')  # opencv3.0

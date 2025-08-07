@@ -177,7 +177,12 @@ calibration_*.npy
 
 # hara
 
+**/video/
 **/*.mp4
 **/*.png
 **/*.jpg
 **/*.pt
+**/*.iml
+**/.recordings/
+**/.weights/
+**/.temp/

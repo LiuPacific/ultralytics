@@ -5,7 +5,7 @@ from ultralytics import YOLO
 
 OBJ_LIST = ['person', 'car', 'bus', 'truck']
 #OBJ_LIST = ['person']
-DETECTOR_PATH = 'weights/yolov8s.pt'
+DETECTOR_PATH = 'hara/hara_example/weights/yolov8s.pt'
 
 class baseTracker(object):
     def __init__(self):
