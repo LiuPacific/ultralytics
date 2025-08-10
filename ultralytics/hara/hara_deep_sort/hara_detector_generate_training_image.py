@@ -5,7 +5,7 @@ import torch
 import time
 
 # VIDEO_PATH = r'G:\project_chicken\code\experiment_deepSORT\video\test_person.mp4'
-VIDEO_PATH = r'E:\chicken_project\workspace\ultralytics\ultralytics\hara\hara_deep_sort\.video\20250513_111230.mp4'
+VIDEO_PATH = r'/ultralytics/hara/.video\20250513_111230.mp4'
 
 
 def _xywh_to_xyxy(bbox_xywh, img_height, img_width):

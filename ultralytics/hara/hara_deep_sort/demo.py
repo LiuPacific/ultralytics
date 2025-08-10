@@ -5,7 +5,7 @@ import cv2
 
 # python .\demo.py
 
-VIDEO_PATH = r'E:\chicken_project\workspace\ultralytics\ultralytics\hara\hara_deep_sort\.video\20250513_111230.mp4'
+VIDEO_PATH = r'./.video/20250513_111230.mp4'
 
 # VIDEO_PATH = r'G:\project_chicken\code\experiment_deepSORT\video\test_person.mp4'
 RESULT_PATH = 'result.mp4'
@@ -22,7 +22,7 @@ class Detections:
     def add(self, xyxy, confidence, class_id, tracker_id):
         self.detections.append((xyxy, confidence, class_id, tracker_id))
 
-def draw_trail(output_image_frame, trail_points, trail_color, trail_length=500):
+def draw_trail(output_image_frame, trail_points, trail_color, trail_length=50):
     for i in range(len(trail_points)):
         if len(trail_points[i]) > 1:
             for j in range(1, len(trail_points[i])):
