@@ -52,13 +52,13 @@ def plot_bboxes(image, bboxes, line_thickness=None):
     return image
 
 def update(target_detector, image):
-        _, bboxes = target_detector.detect(image)
+        _, detected_bboxes = target_detector.detect(image)
         bbox_xywh = []
         confs = []
         bboxes2draw = []
-        if len(bboxes):
+        if len(detected_bboxes):
             # Adapt detections to deep sort input format
-            for x1, y1, x2, y2, _, conf in bboxes:
+            for x1, y1, x2, y2, _, conf in detected_bboxes:
                 obj = [
                     int((x1+x2)/2), int((y1+y2)/2),
                     x2-x1, y2-y1
@@ -75,5 +75,20 @@ def update(target_detector, image):
                 bboxes2draw.append(
                     (x1, y1, x2, y2, '', track_id)
                 )
+        plot_all_detections(image, detected_bboxes)
         image = plot_bboxes(image, bboxes2draw)
         return image, bboxes2draw
+
+def plot_all_detections(image, detected_bboxes, line_thickness=None):
+    # Plots one bounding box on image img
+    tl = 5  # line/font thickness
+    color = (0, 128, 128)
+
+    for x1, y1, x2, y2, _, conf in detected_bboxes:
+        c1, c2 = (int(x1), int(y1)), (int(x2), int(y2))
+        cv2.rectangle(image, c1, c2, color, thickness=tl, lineType=cv2.LINE_AA)
+        tf = max(tl - 1, 1)  # font thickness
+        cv2.putText(image, '{}'.format(round(conf.item(),2)), (c1[0], c1[1] + 20), 0, 1,
+                    [225, 255, 0], thickness=tf, lineType=cv2.LINE_AA)
+
+    return image
