@@ -240,5 +240,9 @@ def gate_cost_matrix(
         #KalmanFilter.gating_distance 计算状态分布和测量之间的选通距离
         gating_distance = kf.gating_distance(
             track.mean, track.covariance, measurements, only_position)
-        cost_matrix[row, gating_distance > gating_threshold] = gated_cost
+        # hara change starts:
+        # due to the fusion of chicken detection, the position of the chicken will move dramatically, making the kf doesn't work.
+        # by commenting the following code out, the logic will be based on feature distance.
+        # cost_matrix[row, gating_distance > gating_threshold] = gated_cost
+        # hara change ends;
     return cost_matrix
