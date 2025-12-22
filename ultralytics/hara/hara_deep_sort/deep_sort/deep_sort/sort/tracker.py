@@ -165,4 +165,11 @@ class Tracker:
         self.tracks.append(Track(
             mean, covariance, self._next_id, self.n_init, self.max_age,
             detection.feature))
+        # hara change starts;
+        if self._next_id >=16:
+            # if next id is 16, it means currently we have 15 ids.
+            print("16")
+            # if the detection couldn't match any existing track, it means the track feature's similarity couldn't match the detection's feature.
+
+        # hara change ends;
         self._next_id += 1

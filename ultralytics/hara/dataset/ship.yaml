@@ -1,0 +1,34 @@
+# Ultralytics YOLO 🚀, AGPL-3.0 license
+# DOTA 1.0 dataset https://captain-whu.github.io/DOTA/index.html for object detection in aerial images by Wuhan University
+# Documentation: https://docs.ultralytics.com/datasets/obb/dota-v2/
+# Example usage: yolo train model=yolov8n-obb.pt data=DOTAv1.yaml
+# parent
+# ├── ultralytics
+# └── datasets
+#     └── dota1  ← downloads here (2GB)
+
+# Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
+path: E:/study/obb_ship_case/ship # dataset root dir
+train: images/train # train images (relative to 'path') 1557 images
+val: images/val # val images (relative to 'path') 456 images
+test: images/test # test images (optional) 225 images
+
+# Classes
+names:
+  0: Aircraft Carrier
+  1: Auxiliary Ship
+  2: Cargo
+  3: Commander
+  4: Container Ship
+  5: Cruiser
+  6: Destroyer
+  7: Dock
+  8: Frigate
+  9: Hovercraft
+  10: Landing
+  11: Oil Tanker
+  12: Other Ship
+  13: Other Warship
+  14: RoRo
+  15: Submarine
+  16: Yacht
