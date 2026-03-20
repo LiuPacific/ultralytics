@@ -38,9 +38,9 @@ galleryloader = torch.utils.data.DataLoader(
 
 # net definition
 net = Net(reid=True)
-assert os.path.isfile("../../../.weights/.deep_sort_checkpoint/ckpt.t7"), "Error: no checkpoint file found!"
-print('Loading from checkpoint/ckpt.t7')
-checkpoint = torch.load("../../../.weights/.deep_sort_checkpoint/ckpt.t7")
+assert os.path.isfile("../../../.weights/.deep_sort_checkpoint/ckpt_person.t7"), "Error: no checkpoint file found!"
+print('Loading from checkpoint/ckpt_person.t7')
+checkpoint = torch.load("../../../.weights/.deep_sort_checkpoint/ckpt_person.t7")
 net_dict = checkpoint['net_dict']
 net.load_state_dict(net_dict, strict=False)
 net.eval()

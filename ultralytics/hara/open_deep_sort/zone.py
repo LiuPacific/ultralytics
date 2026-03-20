@@ -3,7 +3,7 @@ import cv2
 import objtracker
 from objdetector import Detector
 
-VIDEO_PATH = r'G:\project_chicken\code\experiment_deepSORT\video\test_person.mp4'
+VIDEO_PATH = './video/test_person.mp4'
 
 class Point:
     def __init__(self, x, y):

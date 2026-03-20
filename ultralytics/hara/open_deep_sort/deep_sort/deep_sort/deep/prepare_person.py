@@ -2,7 +2,7 @@ import os
 from shutil import copyfile
 
 # You only need to change this line to your dataset download path
-download_path = r'G:\project_chicken\code\experiment_deepSORT\Market-1501-v15.09.15'
+download_path = './Market-1501-v15.09.15'
 
 if not os.path.isdir(download_path):
     print('please change the download_path')

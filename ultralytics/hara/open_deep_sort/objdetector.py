@@ -1,10 +1,8 @@
 import torch
 from ultralytics import YOLO
 
-# OBJ_LIST = ['person', 'car', 'bus', 'truck']
-# DETECTOR_PATH = r'G:\project_chicken\code\experiment_deepSORT\weights\yolov8s.pt'
-OBJ_LIST = ['chicken', 'bus']
-DETECTOR_PATH = r'E:\chicken_project\workspace\ultralytics\ultralytics\hara\hara_deep_sort\.weights\best.pt'
+OBJ_LIST = ['person', 'car', 'bus', 'truck']
+DETECTOR_PATH = 'weights/yolov8s.pt'
 
 class baseDet(object):
     def __init__(self):
@@ -22,7 +20,7 @@ class baseDet(object):
         raise EOFError("Undefined model type.")
 
 
-class Detector( baseDet):
+class Detector(baseDet):
     def __init__(self):
         super(Detector, self).__init__()
         self.init_model()

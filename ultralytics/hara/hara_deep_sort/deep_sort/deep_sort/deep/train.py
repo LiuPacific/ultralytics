@@ -57,9 +57,9 @@ print("num_classes = %s" %num_classes)
 start_epoch = 0
 net = Net(num_classes=num_classes)
 if args.resume:
-    assert os.path.isfile("../../../.weights/.deep_sort_checkpoint/ckpt.t7"), "Error: no checkpoint file found!"
-    print('Loading from checkpoint/ckpt.t7')
-    checkpoint = torch.load("../../../.weights/.deep_sort_checkpoint/ckpt.t7")
+    assert os.path.isfile("../../../.weights/.deep_sort_checkpoint/ckpt_person.t7"), "Error: no checkpoint file found!"
+    print('Loading from checkpoint/ckpt_person.t7')
+    checkpoint = torch.load("../../../.weights/.deep_sort_checkpoint/ckpt_person.t7")
     # import ipdb; ipdb.set_trace()
     net_dict = checkpoint['net_dict']
     net.load_state_dict(net_dict)
@@ -137,7 +137,7 @@ def test(epoch):
     acc = 100.*correct/total
     if acc > best_acc:
         best_acc = acc
-        print("Saving parameters to checkpoint/ckpt.t7")
+        print("Saving parameters to checkpoint/ckpt_person.t7")
         checkpoint = {
             'net_dict':net.state_dict(),
             'acc':acc,
@@ -145,7 +145,7 @@ def test(epoch):
         }
         if not os.path.isdir('../../../.weights/.deep_sort_checkpoint'):
             os.mkdir('../../../.weights/.deep_sort_checkpoint')
-        torch.save(checkpoint, '../../../.weights/.deep_sort_checkpoint/ckpt.t7')
+        torch.save(checkpoint, '../../../.weights/.deep_sort_checkpoint/ckpt_person.t7')
 
     return test_loss/len(testloader), 1.- correct/total
 

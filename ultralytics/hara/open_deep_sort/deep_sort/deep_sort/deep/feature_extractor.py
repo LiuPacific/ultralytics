@@ -59,7 +59,7 @@ class Extractor(object):
 
 if __name__ == '__main__':
     img = cv2.imread("demo.jpg")[:,:,(2,1,0)]
-    extr = Extractor("../../../.weights/.deep_sort_checkpoint/ckpt.t7")
+    extr = Extractor("checkpoint/ckpt_person.t7")
     feature = extr(img)
     print(feature.shape)
 

@@ -10,8 +10,6 @@ import torchvision
 
 from model import Net
 
-# python .\train.py --data-dir 'G:\project_chicken\code\experiment_deepSORT\Market-1501-ready2use'
-
 parser = argparse.ArgumentParser(description="Train on market1501")
 parser.add_argument("--data-dir",default='data',type=str)
 parser.add_argument("--no-cuda",action="store_true")
@@ -57,9 +55,9 @@ print("num_classes = %s" %num_classes)
 start_epoch = 0
 net = Net(num_classes=num_classes)
 if args.resume:
-    assert os.path.isfile("../../../.weights/.deep_sort_checkpoint/ckpt.t7"), "Error: no checkpoint file found!"
-    print('Loading from checkpoint/ckpt.t7')
-    checkpoint = torch.load("../../../.weights/.deep_sort_checkpoint/ckpt.t7")
+    assert os.path.isfile("checkpoint/ckpt_person.t7"), "Error: no checkpoint file found!"
+    print('Loading from checkpoint/ckpt_person.t7')
+    checkpoint = torch.load("checkpoint/ckpt_person.t7")
     # import ipdb; ipdb.set_trace()
     net_dict = checkpoint['net_dict']
     net.load_state_dict(net_dict)
@@ -137,15 +135,15 @@ def test(epoch):
     acc = 100.*correct/total
     if acc > best_acc:
         best_acc = acc
-        print("Saving parameters to checkpoint/ckpt.t7")
+        print("Saving parameters to checkpoint/ckpt_person.t7")
         checkpoint = {
             'net_dict':net.state_dict(),
             'acc':acc,
             'epoch':epoch,
         }
-        if not os.path.isdir('../../../.weights/.deep_sort_checkpoint'):
-            os.mkdir('../../../.weights/.deep_sort_checkpoint')
-        torch.save(checkpoint, '../../../.weights/.deep_sort_checkpoint/ckpt.t7')
+        if not os.path.isdir('checkpoint'):
+            os.mkdir('checkpoint')
+        torch.save(checkpoint, 'checkpoint/ckpt_person.t7')
 
     return test_loss/len(testloader), 1.- correct/total
 
@@ -181,7 +179,7 @@ def lr_decay():
         print("Learning rate adjusted to {}".format(lr))
 
 def main():
-    total_epoches = 80
+    total_epoches = 40
     for epoch in range(start_epoch, start_epoch+total_epoches):
         train_loss, train_err = train(epoch)
         test_loss, test_err = test(epoch)
