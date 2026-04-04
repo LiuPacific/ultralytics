@@ -1,6 +1,7 @@
 import subprocess
 from pathlib import Path
 from PIL import Image, ImageDraw
+import os
 
 """
 function:
@@ -151,14 +152,16 @@ def make_side_by_side(image1_path, image2_path, output_path, title_left="Video 1
     canvas.save(output_path)
 
 
-def extract_same_time_frames_with_comparison(video1, video2, output_dir="output_frames"):
+# video1_type: RGB_sick
+def extract_same_time_frames_with_comparison(video1, video1_type, video2, video2_type, chicken_group="",
+                                             output_dir="output_frames"):
     video1 = Path(video1)
     video2 = Path(video2)
     output_dir = Path(output_dir)
 
-    video1_dir = output_dir / video1.stem
-    video2_dir = output_dir / video2.stem
-    compare_dir = output_dir / "comparison"
+    video1_dir = output_dir / (video1.stem + "_" + video1_type)
+    video2_dir = output_dir / (video2.stem + "_" + video2_type)
+    compare_dir = output_dir / (video1.stem + "_comparison_" + chicken_group)
 
     video1_dir.mkdir(parents=True, exist_ok=True)
     video2_dir.mkdir(parents=True, exist_ok=True)
@@ -200,12 +203,60 @@ def extract_same_time_frames_with_comparison(video1, video2, output_dir="output_
     print("Done.")
 
 
-if __name__ == "__main__":
-    video1_path = r"D:\chicken_project\experiment1\thermal_20250828T112000Z_20250828T114000Z.mkv"
-    video2_path = r"D:\chicken_project\experiment1\rgb_20250828T112000Z_20250828T114000Z.mkv"
+def experiment1():
+    video1_path = r"D:\chicken_project\experiment2\RGB_sick\20250825T102000Z_20250825T104000Z.mkv"
+    video2_path = r"D:\chicken_project\experiment2\Thermal sick\20250825T102000Z_20250825T104000Z.mkv"
 
     extract_same_time_frames_with_comparison(
         video1_path,
+        "RGB_sick",
         video2_path,
+        "Thermal_sick",
         output_dir=".captured_frames"
     )
+
+
+def experiment2():
+    dir_path = r"D:\chicken_project\experiment2\RGB_sick"
+    file_names = os.listdir(dir_path)
+
+    for file_name in file_names:
+        video1_type = "RGB_mock"
+        video1_path = os.path.join(r"D:\chicken_project\experiment2", video1_type, file_name)
+        video2_type = "Thermal_mock"
+        video2_path = os.path.join(r"D:\chicken_project\experiment2", video2_type, file_name)
+        chicken_group = "mock"
+        extract_same_time_frames_with_comparison(
+            video1_path,
+            video1_type,
+            video2_path,
+            video2_type,
+            chicken_group,
+            output_dir=".captured_frames"
+        )
+
+
+def experiment22():
+    dir_path = r"D:\chicken_project\experiment2\RGB_sick"
+    file_names = os.listdir(dir_path)
+
+    for file_name in file_names:
+        video1_type = "RGB_sick"
+        video1_path = os.path.join(r"D:\chicken_project\experiment2", video1_type, file_name)
+        video2_type = "Thermal_sick"
+        video2_path = os.path.join(r"D:\chicken_project\experiment2", video2_type, file_name)
+        chicken_group = "sick"
+        extract_same_time_frames_with_comparison(
+            video1_path,
+            video1_type,
+            video2_path,
+            video2_type,
+            chicken_group,
+            output_dir=".captured_frames"
+        )
+
+
+if __name__ == "__main__":
+    # experiment1()
+    experiment2()
+    experiment22()
