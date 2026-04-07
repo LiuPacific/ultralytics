@@ -86,6 +86,9 @@ if __name__ == '__main__':
             videoWriter = cv2.VideoWriter(
                 RESULT_PATH, fourcc, fps, (output_image_frame.shape[1], output_image_frame.shape[0]))
 
+        height, width = output_image_frame.shape[:2]
+        output_image_frame = cv2.resize(output_image_frame, (int(width/3), int(height/3)))
+
         videoWriter.write(output_image_frame)
         cv2.imshow('Demo', output_image_frame)
         cv2.waitKey(1)
