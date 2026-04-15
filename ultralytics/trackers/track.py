@@ -34,7 +34,7 @@ def on_predict_start(predictor: object, persist: bool = False) -> None:
     if hasattr(predictor, "trackers") and persist:
         return
 
-    tracker = check_yaml(predictor.args.tracker)
+    tracker = check_yaml(predictor.args.tracker_obb)
     cfg = IterableSimpleNamespace(**YAML.load(tracker))
 
     if cfg.tracker_type not in {"bytetrack", "botsort"}:

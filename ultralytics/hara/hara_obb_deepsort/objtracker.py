@@ -1,16 +1,16 @@
 from deep_sort.utils.parser import get_config
-from deep_sort.deep_sort import DeepSort
+from utils.deep_sort_obb import DeepSortOBB
 import torch
 import cv2
 import numpy as np
 
 cfg = get_config()
 cfg.merge_from_file("deep_sort/configs/deep_sort.yaml")
-deepsort = DeepSort(cfg.DEEPSORT.REID_CKPT,
-                    max_dist=cfg.DEEPSORT.MAX_DIST, min_confidence=cfg.DEEPSORT.MIN_CONFIDENCE,
-                    nms_max_overlap=cfg.DEEPSORT.NMS_MAX_OVERLAP, max_iou_distance=cfg.DEEPSORT.MAX_IOU_DISTANCE,
-                    max_age=cfg.DEEPSORT.MAX_AGE, n_init=cfg.DEEPSORT.N_INIT, nn_budget=cfg.DEEPSORT.NN_BUDGET,
-                    use_cuda=True)
+deepsort = DeepSortOBB(cfg.DEEPSORT.REID_CKPT,
+                      max_dist=cfg.DEEPSORT.MAX_DIST, min_confidence=cfg.DEEPSORT.MIN_CONFIDENCE,
+                      nms_max_overlap=cfg.DEEPSORT.NMS_MAX_OVERLAP, max_iou_distance=cfg.DEEPSORT.MAX_IOU_DISTANCE,
+                      max_age=cfg.DEEPSORT.MAX_AGE, n_init=cfg.DEEPSORT.N_INIT, nn_budget=cfg.DEEPSORT.NN_BUDGET,
+                      use_cuda=True, use_rotated_features=True)
 
 
 def plot_bboxes(image, bboxes, line_thickness=None):
@@ -52,43 +52,45 @@ def plot_bboxes(image, bboxes, line_thickness=None):
     return image
 
 def update(target_detector, image):
-        _, detected_bboxes = target_detector.detect(image)
-        bbox_xywh = []
-        confs = []
-        bboxes2draw = []
-        if len(detected_bboxes):
-            # Adapt detections to deep sort input format
-            for x1, y1, x2, y2, _, conf in detected_bboxes:
-                obj = [
-                    int((x1+x2)/2), int((y1+y2)/2),
-                    x2-x1, y2-y1
-                ]
-                bbox_xywh.append(obj)
-                confs.append(conf)
-            xywhs = torch.Tensor(bbox_xywh)
-            confss = torch.Tensor(confs)
+    detections = target_detector.detect(image)
+    obb_list = []
+    confs = []
+    bboxes2draw = []
 
-            # Pass detections to deepsort
-            outputs = deepsort.update(xywhs, confss, image)
-            for value in list(outputs):
-                x1,y1,x2,y2,track_id = value
-                bboxes2draw.append(
-                    (x1, y1, x2, y2, '', track_id)
-                )
-        plot_all_detections(image, detected_bboxes)
-        image = plot_bboxes(image, bboxes2draw)
-        return image, bboxes2draw
+    if len(detections):
+        for detection in detections:
+            # detection is (bbox, label, confidence) where bbox is (4, 2) corner points
+            bbox_corners, label, conf = detection
+            obb_list.append(bbox_corners)
+            confs.append(conf)
 
-def plot_all_detections(image, detected_bboxes, line_thickness=None):
-    # Plots one bounding box on image img
+        # Pass OBB detections to deepsort
+        outputs = deepsort.update(obb_list, confs, image)
+        for value in list(outputs):
+            x1, y1, x2, y2, track_id = value
+            bboxes2draw.append((x1, y1, x2, y2, '', track_id))
+
+    plot_all_obb_detections(image, detections)
+    image = plot_bboxes(image, bboxes2draw)
+    return image, bboxes2draw
+
+def plot_all_obb_detections(image, detections, line_thickness=None):
+    # Plots OBB detections on image
     tl = 5  # line/font thickness
     color = (0, 128, 128)
 
-    for x1, y1, x2, y2, _, conf in detected_bboxes:
-        c1, c2 = (int(x1), int(y1)), (int(x2), int(y2))
-        cv2.rectangle(image, c1, c2, color, thickness=tl, lineType=cv2.LINE_AA)
+    for detection in detections:
+        bbox_corners, label, conf = detection
+        # Draw OBB as polygon
+        pts = np.array(bbox_corners, np.int32).reshape((-1, 1, 2))
+        cv2.polylines(image, [pts], True, color, thickness=tl, lineType=cv2.LINE_AA)
+
+        # Add confidence text
+        # Use centroid as text position
+        center_x = int(np.mean(bbox_corners[:, 0]))
+        center_y = int(np.mean(bbox_corners[:, 1]))
         tf = max(tl - 1, 1)  # font thickness
-        cv2.putText(image, '{}'.format(round(conf.item(),2)), (c1[0], c1[1] + 20), 0, 1,
+        cv2.putText(image, f'{label} {conf:.2f}', (center_x, center_y), 0, 1,
                     [225, 255, 0], thickness=tf, lineType=cv2.LINE_AA)
 
     return image

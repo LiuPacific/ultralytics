@@ -1,0 +1,15 @@
+DEEPSORT:
+  REID_CKPT: "E:/chicken_project/workspace/ultralytics/ultralytics/hara/hara_deep_sort/.weights/.deep_sort_checkpoint/ckpt_person.t7"
+#  MAX_DIST: 0.2
+  MAX_DIST: 0.5
+#  MIN_CONFIDENCE: 0.3
+  MIN_CONFIDENCE: 0.2
+  NMS_MAX_OVERLAP: 0.5
+  MAX_IOU_DISTANCE: 0.7
+#  MAX_IOU_DISTANCE: 1
+#  MAX_AGE: 70
+  MAX_AGE: 600
+#  N_INIT: 3
+  N_INIT: 30 # avoid generating new track
+  NN_BUDGET: 100
+  

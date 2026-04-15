@@ -1,6 +1,7 @@
 import cv2
 from objdetector import Detector
 import numpy as np
+import objtracker
 
 VIDEO_PATH = r'D:\chicken_project\experiment3obb\prediction\mock_20250825T232000Z_20250825T234000Z_prediction.mkv'
 RESULT_PATH = 'result.mp4'
@@ -53,6 +54,14 @@ if __name__ == '__main__':
         _, im = capture.read()
         if im is None:
             break
+
+        detections = Detections()
+        output_image_frame, list_bboxs = objtracker.update(detector, im)
+
+
+
+
+
 
         # detections = Detections()
         # output_image_frame, list_bboxs = objtracker.update(detector, im)
