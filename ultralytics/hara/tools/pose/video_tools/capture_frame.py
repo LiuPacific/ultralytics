@@ -173,7 +173,7 @@ def extract_same_time_frames_with_comparison(video1, video1_type, video2, video2
 
     k = 0
     while True:
-        time_sec = 60 * k + 1  # 00:01, 01:01, 02:01, ...
+        time_sec = 10 * k + 1  # 00:01, 00:11, 00:21, ...
         if time_sec > max_time:
             break
 
@@ -216,8 +216,8 @@ def experiment1():
     )
 
 
-def experiment2():
-    dir_path = r"D:\chicken_project\experiment2\RGB_sick"
+def experiment2mock():
+    dir_path = r"D:\chicken_project\experiment2\RGB_mock"
     file_names = os.listdir(dir_path)
 
     for file_name in file_names:
@@ -236,7 +236,7 @@ def experiment2():
         )
 
 
-def experiment22():
+def experiment2sick():
     dir_path = r"D:\chicken_project\experiment2\RGB_sick"
     file_names = os.listdir(dir_path)
 
@@ -258,5 +258,5 @@ def experiment22():
 
 if __name__ == "__main__":
     # experiment1()
-    experiment2()
-    experiment22()
+    experiment2mock()
+    experiment2sick()

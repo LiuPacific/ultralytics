@@ -93,7 +93,7 @@ def update(target_detector: ObbDetector, image):
 def plot_all_detections(image, obb_detections, line_thickness=None):
     # Plots one bounding box on image img
     tl = 5  # line/font thickness
-    color = (0, 128, 128)
+    color = (0, 0, 128)
 
     # for x1, y1, x2, y2, _, conf in detected_bboxes:
     #     c1, c2 = (int(x1), int(y1)), (int(x2), int(y2))
@@ -115,6 +115,6 @@ def plot_all_detections(image, obb_detections, line_thickness=None):
         center_y = int(np.mean(xyxyxyxy[:, 1]))
         tf = max(tl - 1, 1)  # font thickness
         cv2.putText(image, f'{label} {conf:.2f}', (center_x, center_y), 0, 1,
-                    [225, 255, 0], thickness=tf, lineType=cv2.LINE_AA)
+                    [0, 255, 0], thickness=tf, lineType=cv2.LINE_AA)
 
     return image

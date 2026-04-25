@@ -130,9 +130,9 @@ def main():
     # --------------------------------------------------------
     # User settings
     # --------------------------------------------------------
-    csv_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\tools\pose\video_tools\.captured_frames\registrar\readme.csv"
-    image1_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\tools\pose\video_tools\.captured_frames\registrar\rgb_frame_00_00_01.png"
-    image2_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\tools\pose\video_tools\.captured_frames\registrar\thermal_00_00_01.png"
+    csv_path = r"/ultralytics/hara/tools/pose/video_tools/registrar/.data/readme.csv"
+    image1_path = r"/ultralytics/hara/tools/pose/video_tools/registrar/.data/rgb_frame_00_00_01.png"
+    image2_path = r"/ultralytics/hara/tools/pose/video_tools/registrar/.data/thermal_00_00_01.png"
 
     img1 = cv2.imread(image1_path)
     img2 = cv2.imread(image2_path)

@@ -3,7 +3,7 @@ from obj_obb_detector import ObbDetector
 import numpy as np
 import objtracker
 
-VIDEO_PATH = r'D:\chicken_project\experiment3obb\prediction\sick_20250825T102000Z_20250825T104000Z_training.mkv'
+VIDEO_PATH = r'D:\chicken_project\experiment2\RGB_mock\20250825T102000Z_20250825T104000Z.mkv'
 RESULT_PATH = 'result.mp4'
 
 
@@ -21,7 +21,7 @@ class OBBDetections:
         self.detections.append((xyxyxyxy, confidence, class_id, tracker_id))
 
 
-def draw_trail(output_image_frame, trail_points, trail_color, trail_length=50):
+def draw_trail(output_image_frame, trail_points, trail_color, trail_length=330):
     for i in range(len(trail_points)):
         if len(trail_points[i]) > 1:
             for j in range(1, len(trail_points[i])):
@@ -79,7 +79,7 @@ if __name__ == '__main__':
                 object_trails[track_id] = [(center.x, center.y)]
 
         # Draw the trail for each object
-        trail_colors = [(255, 0, 255)] * len(object_trails)  # Red color for all trails
+        trail_colors = [(255, 0, 0)] * len(object_trails)  # Red color for all trails
         draw_trail(output_image_frame, list(object_trails.values()), trail_colors)
 
         # Remove trails of objects that are not detected in the current frame
@@ -95,10 +95,10 @@ if __name__ == '__main__':
 
         videoWriter.write(output_image_frame)
 
-        height, width = output_image_frame.shape[:2]
-        output_image_frame = cv2.resize(output_image_frame, (int(width/3), int(height/3)))
-        cv2.imshow('Demo', output_image_frame)
-        cv2.waitKey(1)
+        # height, width = output_image_frame.shape[:2]
+        # output_image_frame = cv2.resize(output_image_frame, (int(width/3), int(height/3)))
+        # cv2.imshow('Demo', output_image_frame)
+        # cv2.waitKey(1)
 
 
     capture.release()
