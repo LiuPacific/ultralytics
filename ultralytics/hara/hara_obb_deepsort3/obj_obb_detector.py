@@ -5,7 +5,8 @@ import numpy as np
 # OBJ_LIST = ['person', 'car', 'bus', 'truck']
 # DETECTOR_PATH = r'G:\project_chicken\code\experiment_deepSORT\weights\yolov8s.pt'
 OBJ_LIST = ['chicken']
-DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolov8m-obb-chicken.pt'
+# DETECTOR_PATH = r'/ultralytics/hara/weights/yolov8m-obb-chicken-0401.pt'
+DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolov8m-obb-chicken-0426.pt'
 
 class baseDet(object):
     def __init__(self):
