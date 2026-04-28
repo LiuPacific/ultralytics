@@ -3,6 +3,7 @@ import os
 print(os.getcwd())
 
 import numpy as np
+import math
 from .obb_utils import xyxyxyxy_to_xywhr, xywhr_to_xyxyxyxy, obb_to_xyxy_aligned
 
 
@@ -67,7 +68,7 @@ class DetectionOBB(object):
         return self.xywhr[:2].copy()
 
     def get_angle(self):
-        """Get the rotation angle of the OBB in degrees."""
+        """Get the rotation angle of the OBB in radians."""
         return self.xywhr[4]
 
     def get_dimensions(self):
@@ -78,7 +79,7 @@ class DetectionOBB(object):
     def from_xywhr(cls, xywhr, confidence, feature):
         """Create OBBDetection from xywhr format."""
         xyxyxyxy = xywhr_to_xyxyxyxy(*xywhr)
-        return cls(xyxyxyxy, confidence, feature)
+        return cls(xyxyxyxy, xywhr, confidence, feature)
 
     def __repr__(self):
         return f"OBBDetection(xywhr={self.xywhr}, confidence={self.confidence:.3f})"

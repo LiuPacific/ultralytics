@@ -6,13 +6,15 @@ import numpy as np
 # DETECTOR_PATH = r'G:\project_chicken\code\experiment_deepSORT\weights\yolov8s.pt'
 OBJ_LIST = ['chicken']
 # DETECTOR_PATH = r'/ultralytics/hara/weights/yolov8m-obb-chicken-0401.pt'
-DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolov8m-obb-chicken-0426.pt'
+# DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolov8m-obb-chicken-0426.pt'
+DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolov8m-obb-chicken-0426-1280.pt'
 
 class baseDet(object):
     def __init__(self):
-        self.img_size = 1024
+        self.img_size = 1280
         self.conf = 0.25
         self.iou = 0.70
+        # self.iou = 0.90
 
     def init_model(self):
         raise EOFError("Undefined model type.")
@@ -49,7 +51,7 @@ class ObbDetector(baseDet):
         for xyxyxyxy, xywhr, conf, cls_id in zip(obb_xyxyxyxy,obb_xywhr, obb_conf,obb_cls):
             # bbox = np.array(xyxyxyxy, dtype=np.int32).reshape((-1,1,2))
             xyxyxyxy = np.array(xyxyxyxy, dtype=np.int32)
-            xywhr = np.array(xywhr, dtype=np.int32)
+            xywhr = np.array([int(xywhr[0]), int(xywhr[1]), int(xywhr[2]), int(xywhr[3]), xywhr[4]])
             lbl = self.names[cls_id]
             if not lbl in OBJ_LIST:
                 continue
@@ -57,5 +59,4 @@ class ObbDetector(baseDet):
                 (xyxyxyxy, xywhr, lbl, conf)
             )
         return pred_boxes
-
 

@@ -1,6 +1,7 @@
 # vim: expandtab:ts=4:sw=4
 import numpy as np
 import scipy.linalg
+import math
 
 
 """
@@ -51,7 +52,6 @@ class KalmanFilterOBB(object):
         self._std_weight_position = 1. / 20
         self._std_weight_velocity = 1. / 160
         self._std_weight_angle = 1. / 180  # Additional weight for angle uncertainty
-
     def initiate(self, measurement):
         """Create track from unassociated measurement.
 
@@ -78,12 +78,12 @@ class KalmanFilterOBB(object):
             float(2 * self._std_weight_position * measurement[3]),  # cy uncertainty
             float(2 * self._std_weight_position * measurement[2]),  # w uncertainty
             float(2 * self._std_weight_position * measurement[3]),  # h uncertainty
-            float(2 * self._std_weight_angle * 180),               # angle uncertainty (in degrees)
+            float(2 * self._std_weight_angle * math.pi),            # angle uncertainty (in radians)
             float(10 * self._std_weight_velocity * measurement[2]), # vcx uncertainty
             float(10 * self._std_weight_velocity * measurement[3]), # vcy uncertainty
             float(10 * self._std_weight_velocity * measurement[2]), # vw uncertainty
             float(10 * self._std_weight_velocity * measurement[3]), # vh uncertainty
-            float(10 * self._std_weight_angle * 180)                # vangle uncertainty
+            float(10 * self._std_weight_angle * math.pi)             # vangle uncertainty
         ]
         covariance = np.diag(np.square(std))
         return mean, covariance
@@ -111,14 +111,14 @@ class KalmanFilterOBB(object):
             float(self._std_weight_position * mean[3]),  # cy
             float(self._std_weight_position * mean[2]),  # w
             float(self._std_weight_position * mean[3]),  # h
-            float(self._std_weight_angle * 180)          # angle
+            float(self._std_weight_angle * math.pi)      # angle
         ]
         std_vel = [
             float(self._std_weight_velocity * mean[2]),  # vcx
             float(self._std_weight_velocity * mean[3]),  # vcy
             float(self._std_weight_velocity * mean[2]),  # vw
             float(self._std_weight_velocity * mean[3]),  # vh
-            float(self._std_weight_angle * 180)          # vangle
+            float(self._std_weight_angle * math.pi)      # vangle
         ]
 
         motion_cov = np.diag(np.square(np.r_[std_pos, std_vel]))
@@ -152,7 +152,7 @@ class KalmanFilterOBB(object):
             float(self._std_weight_position * mean[3]),  # cy
             float(self._std_weight_position * mean[2]),  # w
             float(self._std_weight_position * mean[3]),  # h
-            float(self._std_weight_angle * 180)          # angle
+            float(self._std_weight_angle * math.pi)      # angle
         ]
 
         innovation_cov = np.diag(np.square(std))
@@ -194,8 +194,8 @@ class KalmanFilterOBB(object):
         # Innovation: measurement - projected_mean
         innovation = measurement - projected_mean
 
-        # Handle angle wrapping (ensure angle difference is within -180 to 180 degrees)
-        innovation[4] = ((innovation[4] + 180) % 360) - 180
+        # Handle angle wrapping (ensure angle difference is within -pi to pi radians)
+        innovation[4] = ((innovation[4] + math.pi) % (2 * math.pi)) - math.pi
 
         # Update mean and covariance
         new_mean = mean + np.dot(innovation, kalman_gain.T)
@@ -242,7 +242,7 @@ class KalmanFilterOBB(object):
 
         # Handle angle wrapping for full measurements
         if not only_position and measurements.shape[1] > 4:
-            d[:, 4] = ((d[:, 4] + 180) % 360) - 180
+            d[:, 4] = ((d[:, 4] + math.pi) % (2 * math.pi)) - math.pi
 
         z = scipy.linalg.solve_triangular(
             cholesky_factor, d.T, lower=True, check_finite=False,

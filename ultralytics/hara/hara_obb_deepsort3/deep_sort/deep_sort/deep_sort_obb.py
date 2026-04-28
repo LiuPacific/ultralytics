@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import math
 
 from .deep.feature_extractor import Extractor
 from .sort.nn_matching import NearestNeighborDistanceMetric
@@ -68,9 +69,8 @@ class DeepSORTOBB(object):
                 continue
 
             xywhr = track.to_xywhr()
-            # xyxyxyxy = obb_utils.xywhr_to_xyxyxyxy(*xywhr)
             track_id = track.track_id
-            outputs.append(np.array([*xywhr, track_id], dtype=int))
+            outputs.append(np.array([*xywhr, track_id], dtype=float))
 
         if len(outputs) > 0:
             outputs = np.stack(outputs, axis=0)

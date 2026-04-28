@@ -10,7 +10,7 @@ def xyxyxyxy_to_xywhr(obb_points):
         obb_points: numpy array of shape (4, 2) representing 4 corner points [x1,y1, x2,y2, x3,y3, x4,y4]
 
     Returns:
-        tuple: (center_x, center_y, width, height, angle) where angle is in degrees
+        tuple: (center_x, center_y, width, height, radian)
     """
     if isinstance(obb_points, list):
         obb_points = np.array(obb_points).reshape(4, 2)
@@ -28,15 +28,10 @@ def xyxyxyxy_to_xywhr(obb_points):
     # Vector from point 0 to point 1 represents the width direction
     dx = obb_points[1][0] - obb_points[0][0]
     dy = obb_points[1][1] - obb_points[0][1]
-    angle = math.degrees(math.atan2(dy, dx))
+    radian = math.atan2(dy, dx)
 
-    # Ensure angle is between -90 and 90 degrees (standard OBB convention)
-    if angle > 90:
-        angle -= 180
-    elif angle < -90:
-        angle += 180
-
-    return center_x, center_y, width, height, angle
+    # No need to normalize angle since atan2 returns -pi to pi
+    return center_x, center_y, width, height, radian
 
 # def xywhr_to_xyxyxyxy(xywhr):
 #     return xywhr_to_xyxyxyxy(xywhr[0],xywhr[1],xywhr[2],xywhr[3],xywhr[4])
@@ -48,13 +43,13 @@ def xywhr_to_xyxyxyxy(center_x, center_y, width, height, angle):
     Args:
         center_x, center_y: center coordinates
         width, height: dimensions
-        angle: rotation angle in degrees
+        angle: rotation angle in radians
 
     Returns:
         numpy array: shape (4, 2) representing 4 corner points
     """
-    # Convert angle to radians
-    angle_rad = math.radians(angle)
+    # Angle is already in radians
+    angle_rad = angle
 
     # Calculate half dimensions
     half_width = width / 2
@@ -134,16 +129,16 @@ def rotated_iou(box1, box2):
     """
     # Convert to OpenCV rotated rectangle format if needed
     if len(box1) == 5:  # xywhr format
-        rect1 = ((box1[0], box1[1]), (box1[2], box1[3]), box1[4])
+        rect1 = ((box1[0], box1[1]), (box1[2], box1[3]), math.degrees(box1[4]))
     else:  # xyxyxyxy format
-        center_x, center_y, w, h, angle = xyxyxyxy_to_xywhr(box1)
-        rect1 = ((center_x, center_y), (w, h), angle)
+        center_x, center_y, w, h, radian = xyxyxyxy_to_xywhr(box1)
+        rect1 = ((center_x, center_y), (w, h), math.degrees(radian))
 
     if len(box2) == 5:  # xywhr format
-        rect2 = ((box2[0], box2[1]), (box2[2], box2[3]), box2[4])
+        rect2 = ((box2[0], box2[1]), (box2[2], box2[3]), math.degrees(box2[4]))
     else:  # xyxyxyxy format
-        center_x, center_y, w, h, angle = xyxyxyxy_to_xywhr(box2)
-        rect2 = ((center_x, center_y), (w, h), angle)
+        center_x, center_y, w, h, radian = xyxyxyxy_to_xywhr(box2)
+        rect2 = ((center_x, center_y), (w, h), math.degrees(radian))
 
     # Use OpenCV to calculate intersection
     try:
@@ -219,14 +214,14 @@ def extract_obb_crop(image, obb_points, padding=0):
     crop = image[y_min:y_max, x_min:x_max]
 
     # Calculate transformation to align OBB
-    center_x, center_y, width, height, angle = xyxyxyxy_to_xywhr(obb_points)
+    center_x, center_y, width, height, radian = xyxyxyxy_to_xywhr(obb_points)
 
     # Adjust center coordinates relative to crop
     center_x_crop = center_x - x_min
     center_y_crop = center_y - y_min
 
     # Create rotation matrix
-    rotation_matrix = cv2.getRotationMatrix2D((center_x_crop, center_y_crop), angle, 1.0)
+    rotation_matrix = cv2.getRotationMatrix2D((center_x_crop, center_y_crop), math.degrees(radian), 1.0)
 
     # Apply rotation
     rotated_crop = cv2.warpAffine(crop, rotation_matrix, (crop.shape[1], crop.shape[0]))
@@ -243,3 +238,69 @@ def extract_obb_crop(image, obb_points, padding=0):
     final_crop = rotated_crop[y1:y2, x1:x2]
 
     return final_crop
+
+def test_rotated_iou():
+    """Comprehensive test function for rotated IoU calculation."""
+    print("Testing rotated_iou function...")
+
+    # Test case 1: Identical boxes (should be 1.0)
+    box1 = (100, 100, 50, 20, 0)  # cx, cy, w, h, angle in radians
+    box2 = (100, 100, 50, 20, 0)
+    iou = rotated_iou(box1, box2)
+    print(f"Identical boxes IoU: {iou} (expected: 1.0)")
+    assert abs(iou - 1.0) < 1e-6, f"Expected 1.0, got {iou}"
+
+    # Test case 2: Slightly offset boxes (partial overlap)
+    box1 = (100, 100, 50, 20, 0)
+    box2 = (120, 100, 50, 20, 0)  # 20 pixel overlap
+    iou = rotated_iou(box1, box2)
+    print(f"Offset boxes IoU: {iou} (expected: ~0.43)")
+    assert 0.4 < iou < 0.45, f"Expected ~0.43, got {iou}"
+
+    # Test case 3: Rotated boxes (45 degrees)
+    box1 = (100, 100, 50, 20, 0)
+    box2 = (100, 100, 50, 20, math.radians(45))  # 45 degrees in radians
+    iou = rotated_iou(box1, box2)
+    print(f"45° rotated boxes IoU: {iou} (expected: > 0)")
+    assert iou > 0, f"Expected > 0, got {iou}"
+
+    # Test case 4: No overlap
+    box1 = (100, 100, 50, 20, 0)
+    box2 = (200, 200, 50, 20, 0)
+    iou = rotated_iou(box1, box2)
+    print(f"No overlap IoU: {iou} (expected: 0.0)")
+    assert abs(iou - 0.0) < 1e-6, f"Expected 0.0, got {iou}"
+
+    # Test case 5: Different sizes
+    box1 = (100, 100, 40, 30, 0)
+    box2 = (100, 100, 60, 20, 0)
+    iou = rotated_iou(box1, box2)
+    print(f"Different sizes IoU: {iou} (expected: > 0)")
+    assert iou > 0, f"Expected > 0, got {iou}"
+
+    # Test case 6: Test with xyxyxyxy format
+    # Create OBB corner points for a box at (100,100) with w=50, h=20, angle=0
+    corners1 = xywhr_to_xyxyxyxy(100, 100, 50, 20, 0)
+    corners2 = xywhr_to_xyxyxyxy(110, 100, 50, 20, 0)
+    iou = rotated_iou(corners1, corners2)
+    print(f"xyxyxyxy format IoU: {iou} (expected: ~0.67)")
+    assert 0.6 < iou < 0.7, f"Expected ~0.67, got {iou}"
+
+    # Test case 7: Edge case - very small overlap
+    box1 = (100, 100, 50, 20, 0)
+    box2 = (149, 100, 50, 20, 0)  # Just touching
+    iou = rotated_iou(box1, box2)
+    print(f"Touching boxes IoU: {iou} (expected: ~0.0)")
+    assert iou < 0.1, f"Expected ~0.0, got {iou}"
+
+    # Test case 8: 90 degree rotation
+    box1 = (100, 100, 50, 20, 0)
+    box2 = (100, 100, 50, 20, math.radians(90))
+    iou = rotated_iou(box1, box2)
+    print(f"90° rotated boxes IoU: {iou} (expected: > 0)")
+    assert iou > 0, f"Expected > 0, got {iou}"
+
+    print("All tests passed!")
+
+if __name__ == "__main__":
+    test_rotated_iou()
