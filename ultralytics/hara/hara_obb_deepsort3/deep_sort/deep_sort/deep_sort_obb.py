@@ -10,6 +10,7 @@ from .sort.tracker_obb import TrackerOBB
 from .sort.kalman_filter_obb import KalmanFilterOBB
 from .sort import obb_utils
 
+
 # __all__ = ['DeepSort'] # __all__ 提供了暴露接口用的”白名单“
 
 class DeepSORTOBB(object):
@@ -30,7 +31,6 @@ class DeepSORTOBB(object):
         self.kalman_filter = KalmanFilterOBB()
         self.tracker_obb = TrackerOBB(metric, max_iou_distance=max_iou_distance, max_age=max_age,
                                       n_init=n_init, kalman_filter=self.kalman_filter)
-
 
     def update(self, xyxyxyxy_list, xywhr_list, confidences, ori_img):
         """
@@ -70,12 +70,12 @@ class DeepSORTOBB(object):
 
             xywhr = track.to_xywhr()
             track_id = track.track_id
-            outputs.append(np.array([*xywhr, track_id], dtype=float))
+            # outputs.append(track_id)
+            outputs.append(np.array([*xywhr, track_id, track.get_position_history()], dtype=object))
 
         if len(outputs) > 0:
             outputs = np.stack(outputs, axis=0)
         return outputs
-
 
     def _get_features_obb(self, xyxyxyxy_list, ori_img):
         """
@@ -264,5 +264,3 @@ class DeepSORTOBB(object):
 #         else:
 #             features = np.array([])
 #         return features
-
-

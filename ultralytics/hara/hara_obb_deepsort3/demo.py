@@ -22,14 +22,15 @@ class OBBDetections:
         self.detections.append((xyxyxyxy, confidence, class_id, tracker_id))
 
 
-def draw_trail(output_image_frame, trail_points, trail_color, trail_length=630):
-    for i in range(len(trail_points)):
-        if len(trail_points[i]) > 1:
-            for j in range(1, len(trail_points[i])):
-                cv2.line(output_image_frame, (int(trail_points[i][j - 1][0]), int(trail_points[i][j - 1][1])),
-                         (int(trail_points[i][j][0]), int(trail_points[i][j][1])), trail_color[i], thickness=3)
-        if len(trail_points[i]) > trail_length:
-            trail_points[i].pop(0)  # Remove the oldest point from the trail
+
+# def draw_trail(output_image_frame, trail_points, trail_color, trail_length=630):
+#     for i in range(len(trail_points)):
+#         if len(trail_points[i]) > 1:
+#             for j in range(1, len(trail_points[i])):
+#                 cv2.line(output_image_frame, (int(trail_points[i][j - 1][0]), int(trail_points[i][j - 1][1])),
+#                          (int(trail_points[i][j][0]), int(trail_points[i][j][1])), trail_color[i], thickness=3)
+#         if len(trail_points[i]) > trail_length:
+#             trail_points[i].pop(0)  # Remove the oldest point from the trail
 
 
 if __name__ == '__main__':
@@ -60,33 +61,13 @@ if __name__ == '__main__':
             break
         detections = OBBDetections()
 
-        output_image_frame, list_bboxs = objtracker.update(detector, im)
+        output_image_frame, tracks2draw = objtracker.update(detector, im)
 
 
-        for item_bbox in list_bboxs:
-            xyxyxyxy,_, track_id = item_bbox
-            detections.add(xyxyxyxy, None, None, track_id)
+        # for track2draw in tracks2draw:
+        #     xyxyxyxy,_, track_id = track2draw
+        #     detections.add(xyxyxyxy, None, None, track_id)
 
-        # Add the current object's position to the trail
-        for xyxyxyxy, _, _, track_id in detections.detections:
-            x1=xyxyxyxy[0][0]
-            y1=xyxyxyxy[0][1]
-            x3=xyxyxyxy[2][0]
-            y3=xyxyxyxy[2][1]
-            center = Point(x=(x1+x3)/2, y=(y1+y3)/2)
-            if track_id in object_trails:
-                object_trails[track_id].append((center.x, center.y))
-            else:
-                object_trails[track_id] = [(center.x, center.y)]
-
-        # Draw the trail for each object
-        trail_colors = [(255, 0, 0)] * len(object_trails)  # Red color for all trails
-        draw_trail(output_image_frame, list(object_trails.values()), trail_colors)
-
-        # Remove trails of objects that are not detected in the current frame
-        for tracker_id in list(object_trails.keys()):
-            if tracker_id not in [item[3] for item in detections.detections]:
-                object_trails.pop(tracker_id)
 
         if videoWriter is None:
             fourcc = cv2.VideoWriter_fourcc(

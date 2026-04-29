@@ -1,5 +1,6 @@
 # vim: expandtab:ts=4:sw=4
 from .obb_utils import xywhr_to_xyxyxyxy
+from collections import deque
 
 
 class TrackState:
@@ -38,6 +39,9 @@ class TrackOBB:
 
         self._n_init = n_init
         self._max_age = max_age
+
+        # Store position history for the last 300 frames
+        self.position_history = deque(maxlen=300)
 
     def to_tlwh(self):
         """Get current position in axis-aligned bounding box format `(top left x, top left y,
@@ -110,6 +114,9 @@ class TrackOBB:
         if self.state == TrackState.Tentative and self.hits >= self._n_init:
             self.state = TrackState.Confirmed
 
+        # Store current position in history
+        self.position_history.append(self.to_xywhr())
+
     def mark_missed(self):
         """Mark this track as missed (no association at the current time step)."""
         if self.state == TrackState.Tentative:
@@ -128,3 +135,13 @@ class TrackOBB:
     def is_deleted(self):
         """Returns True if this track is dead and should be deleted."""
         return self.state == TrackState.Deleted
+
+    def get_position_history(self) -> list:
+        """Get the list of previous positions (last 300 frames).
+
+        Returns
+        -------
+        list
+            List of xywhr positions from the last 300 frames.
+        """
+        return list(self.position_history)

@@ -1,12 +1,10 @@
 from __future__ import absolute_import
 import numpy as np
-import sys
-import os
-# sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__))))
 
 from .iou_matching_obb import obb_iou_cost, iou_cost_fallback
 from .track_obb import TrackOBB, TrackState
 from .linear_assignment_obb import gate_cost_matrix_obb, matching_cascade, min_cost_matching
+from scipy.optimize import linear_sum_assignment
 
 
 class TrackerOBB:
@@ -52,6 +50,9 @@ class TrackerOBB:
 
         self.tracks = [t for t in self.tracks if not t.is_deleted()]
 
+        # Perform track re-identification
+        self._reidentify_tracks()
+
         # Update distance metric.
         active_targets = [t.track_id for t in self.tracks if t.is_confirmed()]
         features, targets = [], []
@@ -70,9 +71,11 @@ class TrackerOBB:
             targets = np.array([tracks[i].track_id for i in track_indices])
 
             cost_matrix = self.metric.distance(features, targets)
+            cost_matrix.fill(1.0)
             cost_matrix = gate_cost_matrix_obb(
                 self.kf, cost_matrix, tracks, dets, track_indices,
                 detection_indices)
+
 
             return cost_matrix
 
@@ -119,3 +122,55 @@ class TrackerOBB:
             mean, covariance, self._next_id, self.n_init, self.max_age,
             detection.feature))
         self._next_id += 1
+
+    def _reidentify_tracks(self):
+        """Re-identify tracks that disappeared and reappeared using position history."""
+        # Find new tracks that have existed for exactly 3 frames
+        # duplicate detections exist more than 3 frames
+        new_tracks = [t for t in self.tracks if t.age == 3]
+
+        if not new_tracks:
+            return
+
+        # Find unmatched tracks that have been unmatched for exactly 3 frames
+        unmatched_tracks = [t for t in self.tracks if t.time_since_update > 1 and t not in new_tracks]
+
+        if not unmatched_tracks:
+            return
+
+        # Create cost matrix: distance between last position of unmatched and first position of new
+        num_unmatched = len(unmatched_tracks)
+        num_new = len(new_tracks)
+        cost_matrix = np.full((num_unmatched, num_new), np.inf)
+
+        for i, unmatched_track in enumerate(unmatched_tracks):
+            # Last position of unmatched track
+            history = unmatched_track.get_position_history()
+            if history:
+                unmatched_center = history[-1][:2]  # cx, cy of last position
+            else:
+                unmatched_center = unmatched_track.to_xywhr()[:2]  # fallback
+            for j, new_track in enumerate(new_tracks):
+                # First position of new track
+                history = new_track.get_position_history()
+                if history:
+                    new_center = history[0][:2]  # cx, cy of first position
+                else:
+                    new_center = new_track.to_xywhr()[:2]  # fallback
+                distance = np.linalg.norm(unmatched_center - new_center)
+                cost_matrix[i, j] = distance
+
+        # Use Hungarian algorithm to find optimal assignment
+        row_ind, col_ind = linear_sum_assignment(cost_matrix)
+
+        # Reassign IDs for matches below distance threshold
+        distance_threshold = 100.0  # pixels
+        for r, c in zip(row_ind, col_ind):
+            if cost_matrix[r, c] < distance_threshold:
+                old_track = unmatched_tracks[r]
+                new_track = new_tracks[c]
+                print(f"Re-identifying track {new_track.track_id} as {old_track.track_id}")
+                new_track.track_id = old_track.track_id
+                # Remove the old unmatched track
+                old_track.state = TrackState.Deleted
+                self.tracks.remove(old_track)

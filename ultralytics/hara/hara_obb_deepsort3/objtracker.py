@@ -29,7 +29,7 @@ def update(target_detector: ObbDetector, image):
     xyxyxyxy_list = []
     xywhr_list = []
     conf_list = []
-    bboxes2draw = []
+    tracks2draw = []
     if len(obb_detections):
         # Adapt detections to deep sort input format
         for detection in obb_detections:
@@ -39,18 +39,31 @@ def update(target_detector: ObbDetector, image):
             conf_list.append(conf)
 
         # Pass detections to deepsort
-        outputs = deepsort_obb.update(xyxyxyxy_list,xywhr_list, conf_list, image)
+        tracks_detected = deepsort_obb.update(xyxyxyxy_list,xywhr_list, conf_list, image)
 
-        for value in list(outputs):
-            x,y,w,h,r, track_id = value
+        for track_detected in list(tracks_detected):
+            """
+            track_detected: x y w h r track_id, [[xywhr],[xywhr]...[new xywhr]]"""
+            x,y,w,h,r, track_id, track_history_positions= track_detected
             xyxyxyxy = obb_utils.xywhr_to_xyxyxyxy(x,y,w,h,r)
-            bboxes2draw.append(
-                (xyxyxyxy, '', track_id) # xyxyxyxy, class_id, track_id
+            tracks2draw.append(
+                (xyxyxyxy, '', track_id, track_history_positions) # xyxyxyxy, class_id, track_id
             )
-    plot_all_detections(image, obb_detections)
-    image = plot_bboxes(image, bboxes2draw)
-    return image, bboxes2draw
+    image = plot_all_detections(image, obb_detections)
+    image = plot_bboxes(image, tracks2draw)
+    image = draw_trail(image, tracks2draw)
+    return image, tracks2draw
 
+# hara TODO: track length
+def draw_trail(image, track2draw, trail_length=630):
+    for track2draw in track2draw:
+        track_history_positions = track2draw[3]
+        if len(track_history_positions) > 1:
+            for i in range(1, len(track_history_positions)):
+                cv2.line(image, (int(track_history_positions[i-1][0]), int(track_history_positions[i-1][1])),
+                         (int(track_history_positions[i][0]), int(track_history_positions[i][1])),
+                         (255, 0, 0), thickness=3)
+    return image
 
 def plot_all_detections(image, obb_detections, line_thickness=None):
     # Plots one bounding box on image img
@@ -93,7 +106,7 @@ def plot_bboxes(image, bboxes2draw, line_thickness=None):
     """
     tl = 5  # line/font thickness
     color = (0, 0, 256)
-    for (xyxyxyxy, cls_id, track_id) in bboxes2draw:
+    for (xyxyxyxy, cls_id, track_id, _) in bboxes2draw:
         # Draw OBB as polygon
         pts = np.array(xyxyxyxy, np.int32).reshape((-1, 1, 2))
         cv2.polylines(image, [pts], True, color, thickness=tl, lineType=cv2.LINE_AA)
