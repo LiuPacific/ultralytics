@@ -1,14 +1,10 @@
-
-
-import os
 import cv2
-import math
 import random
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from typing import Tuple, Optional, List
+from typing import Tuple
 
 import torch
 import torch.nn as nn
@@ -335,7 +331,7 @@ def main():
     # Training loop
     # --------------------------------------------------------
     best_test_loss = float("inf")
-    best_model_path = "../best_mapper_model.pth"
+    best_model_path = "../pose/video_tools/best_mapper_model.pth"
 
     train_losses = []
     test_losses = []
@@ -425,7 +421,7 @@ def main():
         src_points=src_points_test,
         pred_points_img2=pred_points_test,
         gt_points_img2=gt_points_test,
-        output_path="../test_point_comparison.png",
+        output_path="../pose/video_tools/test_point_comparison.png",
         label_prefix="t"
     )
 
@@ -439,7 +435,7 @@ def main():
         img1_size=img1_size,
         img2_size=img2_size,
         grid_step=120,
-        output_path="../dense_grid_mapping.png",
+        output_path="../pose/video_tools/dense_grid_mapping.png",
         device=device
     )
 

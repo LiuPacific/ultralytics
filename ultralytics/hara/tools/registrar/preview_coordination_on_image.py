@@ -5,10 +5,10 @@ import numpy as np
 # =========================
 # 1. File paths
 # =========================
-csv_file = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\tools\pose\video_tools\registrar\.data\20250825T164000Z_20250825T170000Z_mock\20250825T164000Z_20250825T170000Z_RGB.csv"
-img1_file = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\tools\pose\video_tools\registrar\.data\20250825T164000Z_20250825T170000Z_mock\rgb_frame_00_01_01.png"
-img2_file = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\tools\pose\video_tools\registrar\.data\20250825T164000Z_20250825T170000Z_mock\thermal_frame_00_01_01.png"
-output_file = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\tools\pose\video_tools\registrar\.data\20250825T164000Z_20250825T170000Z_mock\comparison_thermal_frame_00_01_01.png"
+csv_file = r"/ultralytics/hara/tools/registrar/.data/20250825T164000Z_20250825T170000Z_mock/20250825T164000Z_20250825T170000Z_RGB.csv"
+img1_file = r"/ultralytics/hara/tools/registrar/.data/20250825T164000Z_20250825T170000Z_mock/rgb_frame_00_01_01.png"
+img2_file = r"/ultralytics/hara/tools/registrar/.data/20250825T164000Z_20250825T170000Z_mock/thermal_frame_00_01_01.png"
+output_file = r"/ultralytics/hara/tools/registrar/.data/20250825T164000Z_20250825T170000Z_mock/comparison_thermal_frame_00_01_01.png"
 
 # =========================
 # 2. Read data

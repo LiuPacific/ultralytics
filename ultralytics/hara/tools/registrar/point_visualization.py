@@ -120,6 +120,6 @@ if __name__ == '__main__':
         src_points=left_points,
         pred_points_img2=right_points,
         gt_points_img2=right_points, # here I put the prediction adn ground truth the same.
-        output_path="../test.png",
+        output_path="../pose/video_tools/test.png",
         label_prefix="t"
     )

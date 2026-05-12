@@ -4,8 +4,8 @@ import numpy as np
 import objtracker
 
 # VIDEO_PATH = r'D:\chicken_project\experiment2\RGB_mock\20250825T102000Z_20250825T104000Z.mkv'
-VIDEO_PATH = r'D:\chicken_project\experiment5reid\mock_20250826T000000Z_20250826T002000Z.mkv'
-RESULT_PATH = 'mock_20250826T000000Z_20250826T002000Z_track630_1280.mp4'
+VIDEO_PATH = r'D:\chicken_project\experiment5reid\sick_20250826T000000Z_20250826T002000Z.mkv'
+RESULT_PATH = 'sick_20250826T000000Z_20250826T002000Z.mkv_track630_1280.mp4'
 
 
 class Point:

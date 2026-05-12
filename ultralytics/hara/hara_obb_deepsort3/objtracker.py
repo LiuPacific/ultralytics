@@ -50,8 +50,8 @@ def update(target_detector: ObbDetector, image):
                 (xyxyxyxy, '', track_id, track_history_positions) # xyxyxyxy, class_id, track_id
             )
     image = plot_all_detections(image, obb_detections)
-    image = plot_bboxes(image, tracks2draw)
     image = draw_trail(image, tracks2draw)
+    image = plot_bboxes(image, tracks2draw)
     return image, tracks2draw
 
 # hara TODO: track length
