@@ -4,8 +4,8 @@ import numpy as np
 import objtracker
 
 # VIDEO_PATH = r'D:\chicken_project\experiment2\RGB_mock\20250825T102000Z_20250825T104000Z.mkv'
-VIDEO_PATH = r'D:\chicken_project\experiment5reid\sick_20250826T000000Z_20250826T002000Z.mkv'
-RESULT_PATH = 'sick_20250826T000000Z_20250826T002000Z.mkv_track630_1280.mp4'
+# VIDEO_PATH = r'F:\20251002\RGB_mock\20251006T230000Z_20251007T000000Z.mkv'
+# RESULT_PATH = 'mock_20251006T230000Z_20251007T000000Z.mp4'
 
 
 class Point:
@@ -33,7 +33,7 @@ class OBBDetections:
 #             trail_points[i].pop(0)  # Remove the oldest point from the trail
 
 
-if __name__ == '__main__':
+def main():
     # Initialize video capture to get video properties
     capture = cv2.VideoCapture(VIDEO_PATH)
     if not capture.isOpened():
@@ -86,5 +86,18 @@ if __name__ == '__main__':
     capture.release()
     videoWriter.release()
     cv2.destroyAllWindows()
+
+if __name__ == '__main__':
+    # VIDEO_PATH = r'F:\20251002\RGB_mock\20251007T000000Z_20251007T010000Z.mkv'
+    # RESULT_PATH = 'mock_20251007T000000Z_20251007T010000Z.mp4'
+    # main()
+
+    VIDEO_PATH = r'F:\20251002\RGB_mock\20251006T230000Z_20251007T000000Z.mkv'
+    RESULT_PATH = 'mock_20251006T230000Z_20251007T000000Z_tracking.mp4'
+    main()
+
+    # VIDEO_PATH = r'F:\20251130\RGB_mock\20251217T000000Z_20251217T003000Z.mkv'
+    # RESULT_PATH = 'sick_20251217T000000Z_20251217T003000Z.mp4'
+    # main()
 
 

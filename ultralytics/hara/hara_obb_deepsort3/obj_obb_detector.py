@@ -9,7 +9,7 @@ from scipy.optimize import linear_sum_assignment
 OBJ_LIST = ['chicken']
 # DETECTOR_PATH = r'/ultralytics/hara/weights/yolov8m-obb-chicken-0401.pt'
 # DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolov8m-obb-chicken-0426.pt'
-DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolov8m-obb-chicken-0426-1280.pt'
+DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolov8m-obb-chicken-0520.pt'
 
 class baseDet(object):
     def __init__(self):
@@ -84,6 +84,12 @@ class ObbDetector(baseDet):
             lbl = self.names[cls_id]
             if not lbl in OBJ_LIST:
                 continue
+
+            # Filter by the pen boundary
+            # if not (470 <= xywhr[0] <= 1900 and 670 <= xywhr[1] <= 1600):
+            if  (xywhr[0] >  2000) or xywhr[0]<150:
+                continue
+
             # Filter by bbox area (min: 13000, max: 120000 pixels)
             if not self._filter_by_area(xywhr):
                 continue
@@ -92,7 +98,7 @@ class ObbDetector(baseDet):
             )
 
         # If there are more than 15 detections, we can apply a selection strategy here (e.g., based on confidence or spatial distribution)
-        if len(pred_boxes)>15 and len(self.bbox_history[-1])==15:
+        if len(pred_boxes)>15 and len(self.bbox_history) > 0 and len(self.bbox_history[-1])==15:
             prev_points = np.array([[box[1][0],box[1][1]] for box in self.bbox_history[-1]])  # shape: (15, 2)
             curr_points = np.array([[box[1][0], box[1][1]] for box in pred_boxes])  # shape: (m, 2)
             curr_scores = np.array([box[3] for box in pred_boxes])  # shape: (m,)
@@ -102,6 +108,9 @@ class ObbDetector(baseDet):
             )
             # Update pred_boxes to only include the selected points
             pred_boxes = [pred_boxes[i] for i in selected_indices]
+        else:
+            print(f"Current frame has {len(pred_boxes)} detections, which is not more than 15 or no previous frame with 15 detections to compare with. Skipping selection step.")
+
         # Update frame memory with current detections
         self._update_frame_memory(pred_boxes)
 

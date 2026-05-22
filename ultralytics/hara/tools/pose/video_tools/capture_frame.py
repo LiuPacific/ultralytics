@@ -217,14 +217,14 @@ def experiment1():
 
 
 def experiment2mock():
-    dir_path = r"D:\chicken_project\experiment2\RGB_mock"
+    dir_path = r"F:\20251002\RGB_mock"
     file_names = os.listdir(dir_path)
 
     for file_name in file_names:
         video1_type = "RGB_mock"
-        video1_path = os.path.join(r"D:\chicken_project\experiment2", video1_type, file_name)
+        video1_path = os.path.join(r"F:\20251002", video1_type, file_name)
         video2_type = "Thermal_mock"
-        video2_path = os.path.join(r"D:\chicken_project\experiment2", video2_type, file_name)
+        video2_path = os.path.join(r"F:\20251002", video2_type, file_name)
         chicken_group = "mock"
         extract_same_time_frames_with_comparison(
             video1_path,
@@ -237,14 +237,14 @@ def experiment2mock():
 
 
 def experiment2sick():
-    dir_path = r"D:\chicken_project\experiment2\RGB_sick"
+    dir_path = r"F:\20251130\RGB_sick"
     file_names = os.listdir(dir_path)
 
     for file_name in file_names:
         video1_type = "RGB_sick"
-        video1_path = os.path.join(r"D:\chicken_project\experiment2", video1_type, file_name)
+        video1_path = os.path.join(r"F:\20251130", video1_type, file_name)
         video2_type = "Thermal_sick"
-        video2_path = os.path.join(r"D:\chicken_project\experiment2", video2_type, file_name)
+        video2_path = os.path.join(r"F:\20251130", video2_type, file_name)
         chicken_group = "sick"
         extract_same_time_frames_with_comparison(
             video1_path,
@@ -259,4 +259,4 @@ def experiment2sick():
 if __name__ == "__main__":
     # experiment1()
     experiment2mock()
-    experiment2sick()
+    # experiment2sick()
