@@ -71,7 +71,7 @@ class TrackerOBB:
             targets = np.array([tracks[i].track_id for i in track_indices])
 
             cost_matrix = self.metric.distance(features, targets)
-            cost_matrix.fill(1.0)
+            # cost_matrix.fill(1.0)
             cost_matrix = gate_cost_matrix_obb(
                 self.kf, cost_matrix, tracks, dets, track_indices,
                 detection_indices)

@@ -3,8 +3,8 @@ import sys
 import os
 
 
-from ultralytics.hara.hara_obb_deepsort3.deep_sort.deep_sort.sort import linear_assignment_obb
-from ultralytics.hara.hara_obb_deepsort3.deep_sort.deep_sort.sort.obb_utils import rotated_iou, xyxyxyxy_to_xywhr
+from ultralytics.hara.hara_obb_deepsort4.deep_sort.deep_sort.sort import linear_assignment_obb
+from ultralytics.hara.hara_obb_deepsort4.deep_sort.deep_sort.sort.obb_utils import rotated_iou, xyxyxyxy_to_xywhr
 
 
 def obb_iou_xywhr(bbox_xywhr, candidates_xywhr):

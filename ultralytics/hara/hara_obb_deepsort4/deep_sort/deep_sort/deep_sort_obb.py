@@ -134,7 +134,8 @@ class DeepSORTOBB(object):
 
         if im_crops:
             # features = self.extractor(im_crops)
-            features = self.extractor.extract(im_crops)
+            # TODO hara: check RGB BGR
+            features = self.extractor.extract_numpy_BGR(im_crops, len(im_crops))
         else:
             features = np.array([])
 

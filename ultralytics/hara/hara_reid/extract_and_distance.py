@@ -58,8 +58,8 @@ def main():
 
 
 def main_distance():
-    output = Path("./outputs")
-    model_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_reid\outputs\best_osnet.pth"
+    output = Path("outputs_ward")
+    model_path = r"/ultralytics/hara/hara_reid/outputs_ward\best_osnet.pth"
     extractor = ChickenFeatureExtractor(model_path)
 
     track_paths = list_images(
@@ -92,7 +92,7 @@ def main_distance():
 
 
 def main_feature():
-    model_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_reid\outputs\best_osnet.pth"
+    model_path = r"/ultralytics/hara/hara_reid/outputs_ward\best_osnet.pth"
     extractor = ChickenFeatureExtractor(model_path)
 
     track_paths = list_images(
@@ -103,13 +103,13 @@ def main_feature():
     print(track_features)
 
 def main_feature_numpy():
-    model_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_reid\outputs\best_osnet.pth"
+    model_path = r"/ultralytics/hara/hara_reid/outputs_ward\best_osnet.pth"
     extractor = ChickenFeatureExtractor(model_path)
 
     frame_bgr = cv2.imread(r"D:\chicken_project\experiment5reid\reid_training\prepared_reid\val\id_1\id_1_8_RGB_mock_frame_00_01_01.png")
     # crop_bgr = frame[y1:y2, x1:x2]
     frame_rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
-    feature = extractor.extract_numpy([frame_rgb], batch_size=1, target_height=256, target_width=128)
+    feature = extractor.extract_numpy_BGR([frame_rgb], batch_size=1, target_height=256, target_width=128)
     print(feature.shape)
     print(feature)
 

@@ -14,7 +14,7 @@
 
 # training
 
-yolo train data=C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/hara_obb_deepsort3/chicken.yaml model=C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/weights/yolov8m-obb.pt epochs=200 imgsz=1280 batch=16 workers=4 name=yolov8m-obb-chicken-0520
+yolo train data=C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/hara_obb_deepsort4/chicken.yaml model=C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/weights/yolov8m-obb.pt epochs=200 imgsz=1280 batch=16 workers=4 name=yolov8m-obb-chicken-0520
 
 # prediction
 

@@ -1,13 +1,14 @@
 from pathlib import Path
 from typing import List, Tuple, Dict
 
+import cv2
 import torch
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
 
 from utils import resize_with_padding_pixel
-
+import random
 
 class ChickenReIDDataset(Dataset):
     def __init__(self, root: str, input_h: int, input_w: int, use_padding: bool = True, augment: bool = False, label_map: Dict[str, int] = None):
@@ -52,6 +53,8 @@ class ChickenReIDDataset(Dataset):
 
     def _preprocess(self, img: Image.Image) -> Image.Image:
         img = img.convert("RGB")
+        if random.random() < 0.5:
+            img = img.rotate(180)
         if self.use_padding:
             return resize_with_padding_pixel(img, self.input_h, self.input_w)
         return img.resize((self.input_w, self.input_h), Image.BICUBIC)

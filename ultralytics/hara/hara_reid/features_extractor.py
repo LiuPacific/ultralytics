@@ -54,10 +54,17 @@ class ChickenFeatureExtractor:
             feats.append(f.cpu().numpy())
         return np.concatenate(feats, axis=0)
 
-    def preprocess_numpy(self, img: np.ndarray, target_height: int = 256, target_width: int = 128) -> torch.Tensor:
+    def preprocess_numpy_BGR(self, img: np.ndarray, target_height: int = 256, target_width: int = 128) -> torch.Tensor:
         """
-        img should be RGB numpy image: [H, W, 3]
+        img should be BGR numpy image: [H, W, 3]
+        height should be less than width
         """
+        # to vertical image:
+        if img.shape[0]<img.shape[1]:
+            img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB, img)
+
 
         if img.ndim == 2:
             img = np.stack([img, img, img], axis=-1)
@@ -81,12 +88,13 @@ class ChickenFeatureExtractor:
         return numpy_to_tensor(img)
 
     @torch.no_grad()
-    def extract_numpy(self, images: List[np.ndarray], batch_size: int = 32, target_height: int = 256,
-                target_width: int = 128) -> np.ndarray:
+    def extract_numpy_BGR(self, images: List[np.ndarray], batch_size: int = 32, target_height: int = 256,
+                          target_width: int = 128) -> np.ndarray:
         """
         Input:
             images: list of RGB numpy crops from YOLO
                     each image shape = [H, W, 3]
+
 
         Output:
             features: numpy array, shape [N, 512]
@@ -97,7 +105,7 @@ class ChickenFeatureExtractor:
             batch_imgs = images[i:i + batch_size]
 
             x = torch.stack(
-                [self.preprocess_numpy(img, target_height=target_height, target_width=target_width) for img in
+                [self.preprocess_numpy_BGR(img, target_height=target_height, target_width=target_width) for img in
                  batch_imgs],
                 dim=0
             ).to(self.device)

@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_distances
 
-from features import ChickenFeatureExtractor, list_images
+from features_extractor import ChickenFeatureExtractor, list_images
 from utils import load_config, ensure_dir
 
 
