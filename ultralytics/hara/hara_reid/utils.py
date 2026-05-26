@@ -41,7 +41,7 @@ def parse_chicken_filename(path: str) -> Optional[Dict]:
     return d
 
 
-def resize_with_padding_pil(img: Image.Image, target_h: int, target_w: int) -> Image.Image:
+def resize_with_padding_pixel(img: Image.Image, target_h: int, target_w: int) -> Image.Image:
     """Keep aspect ratio, then pad to target_h x target_w."""
     img = img.convert("RGB")
     w, h = img.size

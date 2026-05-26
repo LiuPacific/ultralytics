@@ -8,7 +8,7 @@ from torchvision import transforms
 from tqdm import tqdm
 
 from model import build_osnet
-from utils import resize_with_padding_pil, get_device
+from utils import resize_with_padding_pixel, get_device
 
 
 class ChickenFeatureExtractor:
@@ -33,7 +33,7 @@ class ChickenFeatureExtractor:
     def preprocess(self, path: str) -> torch.Tensor:
         img = Image.open(path).convert("RGB")
         if self.cfg["use_padding"]:
-            img = resize_with_padding_pil(img, self.cfg["input_height"], self.cfg["input_width"])
+            img = resize_with_padding_pixel(img, self.cfg["input_height"], self.cfg["input_width"])
         else:
             img = img.resize((self.cfg["input_width"], self.cfg["input_height"]), Image.BICUBIC)
         return self.tf(img)

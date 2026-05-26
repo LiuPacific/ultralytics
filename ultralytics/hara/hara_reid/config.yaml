@@ -1,5 +1,5 @@
-raw_image_dir: "./raw_images"          # put your id_55_12_RGB_mock_frame_00_03_21.png files here
-prepared_dir: "./prepared_reid"
+raw_image_dir: "D:/chicken_project/experiment5reid/reid_training/combination_id_croped"          # put your id_55_12_RGB_mock_frame_00_03_21.png files here
+prepared_dir: "D:/chicken_project/experiment5reid/reid_training/prepared_reid"
 output_dir: "./outputs"
 
 # OSNet commonly uses H=256, W=128 for ReID. Padding keeps chicken shape.
@@ -25,3 +25,4 @@ train_ratio: 0.70
 val_ratio: 0.15
 test_ratio: 0.15
 seed: 42
+

@@ -6,7 +6,7 @@ from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
 
-from utils import resize_with_padding_pil
+from utils import resize_with_padding_pixel
 
 
 class ChickenReIDDataset(Dataset):
@@ -53,7 +53,7 @@ class ChickenReIDDataset(Dataset):
     def _preprocess(self, img: Image.Image) -> Image.Image:
         img = img.convert("RGB")
         if self.use_padding:
-            return resize_with_padding_pil(img, self.input_h, self.input_w)
+            return resize_with_padding_pixel(img, self.input_h, self.input_w)
         return img.resize((self.input_w, self.input_h), Image.BICUBIC)
 
     def __getitem__(self, idx):
