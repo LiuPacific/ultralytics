@@ -13,23 +13,29 @@ def crop_obb_with_x_anylabeling_points(image, points):
 
     p0, p1, p2, p3 = pts
 
-    height_1 = np.linalg.norm(p1 - p0)
-    height_2 = np.linalg.norm(p2 - p3)
-    crop_height = int(round(max(height_1, height_2)))
-
-    width_1 = np.linalg.norm(p2 - p1)
-    width_2 = np.linalg.norm(p3 - p0)
+    width_1 = np.linalg.norm(p1 - p0)
+    width_2 = np.linalg.norm(p2 - p3)
     crop_width = int(round(max(width_1, width_2)))
+
+    height_1 = np.linalg.norm(p2 - p1)
+    height_2 = np.linalg.norm(p3 - p0)
+    crop_height = int(round(max(height_1, height_2)))
 
     if crop_width <= 0 or crop_height <= 0:
         raise ValueError("Invalid OBB size.")
 
     dst = np.array([
-        [0, crop_height - 1],              # p0
-        [0, 0],                            # p1
-        [crop_width - 1, 0],               # p2
-        [crop_width - 1, crop_height - 1]  # p3
+        [0, 0],
+        [crop_width - 1, 0],
+        [crop_width - 1, crop_height - 1],
+        [0, crop_height - 1],
     ], dtype="float32")
+    # dst = np.array([
+    #     [0, crop_height - 1],              # p0
+    #     [0, 0],                            # p1
+    #     [crop_width - 1, 0],               # p2
+    #     [crop_width - 1, crop_height - 1]  # p3
+    # ], dtype="float32")
 
     M = cv2.getPerspectiveTransform(pts, dst)
 
@@ -74,12 +80,7 @@ def crop_chickens_from_one_json(json_path, image_dir, output_dir):
 
         cropped = crop_obb_with_x_anylabeling_points(image, points)
 
-        # Important:
-        # Your current cropped chickens face left.
-        # Rotate 90 degrees clockwise to make them face upward.
-        cropped = cv2.rotate(cropped, cv2.ROTATE_90_CLOCKWISE)
-
-        save_name = f"{image_stem}_id_{label}_shape_{i}.png"
+        save_name = f"id_{label}_{image_stem}.png"
         save_path = output_dir / save_name
 
         cv2.imwrite(str(save_path), cropped)
@@ -101,10 +102,14 @@ def batch_crop_chickens(json_dir, image_dir, output_dir):
         )
 
 
-
 if __name__ == "__main__":
-    json_dir = r"D:\chicken_project\experiment5reid\image_crop_experiment"
-    image_dir = r"D:\chicken_project\experiment5reid\image_crop_experiment"
-    output_dir = r"D:\chicken_project\experiment5reid\image_crop_experiment\out"
+    # json_dir = r"D:\chicken_project\experiment5reid\image_crop_experiment"
+    # image_dir = r"D:\chicken_project\experiment5reid\image_crop_experiment"
+    # output_dir = r"D:\chicken_project\experiment5reid\image_crop_experiment\out"
+    json_dir = r"D:\chicken_project\experiment5reid\reid_training\combination_id"
+    image_dir = r"D:\chicken_project\experiment5reid\reid_training\combination_id"
+    output_dir = r"D:\chicken_project\experiment5reid\reid_training\combination_id_croped"
 
     batch_crop_chickens(json_dir, image_dir, output_dir)
+
+

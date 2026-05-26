@@ -183,6 +183,7 @@ calibration_*.npy
 **/*.jpg
 **/*.pt
 **/*.iml
+**/*.pth
 **/.recordings/
 **/.weights/
 **/.temp/

@@ -5,16 +5,18 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_distances
 
-from features import ChickenFeatureExtractor, list_images
+from features_extractor import ChickenFeatureExtractor, list_images
 from utils import load_config, ensure_dir
 
+import cv2
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="config.yaml")
     parser.add_argument("--checkpoint", default=None)
     parser.add_argument("--track_dir", required=True, help="Existing track crop images, e.g. prepared_reid/test/id_55")
-    parser.add_argument("--detection_dir", required=True, help="New detection crop images, e.g. prepared_reid/test/id_56")
+    parser.add_argument("--detection_dir", required=True,
+                        help="New detection crop images, e.g. prepared_reid/test/id_56")
     args = parser.parse_args()
 
     cfg = load_config(args.config)
@@ -28,8 +30,10 @@ def main():
         raise RuntimeError("track_dir and detection_dir must both contain images.")
 
     extractor = ChickenFeatureExtractor(ckpt)
-    track_features = extractor.extract(track_paths, batch_size=cfg["batch_size"])
-    detection_features = extractor.extract(detection_paths, batch_size=cfg["batch_size"])
+    track_features = extractor.extract(track_paths, batch_size=cfg["batch_size"], target_height=cfg["input_height"],
+                                       target_width=cfg["input_width"])
+    detection_features = extractor.extract(detection_paths, batch_size=cfg["batch_size"],
+                                           target_height=cfg["input_height"], target_width=cfg["input_width"])
 
     # This is the final result needed by DeepSORT.
     cost_matrix = cosine_distances(track_features, detection_features)
@@ -51,16 +55,19 @@ def main():
     print("cosine distance around 0.08 -> very similar")
     print("cosine distance around 0.45 -> probably different")
     print("cosine distance around 0.80 -> very different")
+
 
 def main_distance():
     output = Path("./outputs")
     model_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_reid\outputs\best_osnet.pth"
     extractor = ChickenFeatureExtractor(model_path)
 
-    track_paths = list_images(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_reid\hara_distance_test\track")
-    detection_paths = list_images(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_reid\hara_distance_test\detection")
-    track_features = extractor.extract(track_paths, batch_size=32)
-    detection_features = extractor.extract(detection_paths, batch_size=32)
+    track_paths = list_images(
+        r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_reid\hara_distance_test\track")
+    detection_paths = list_images(
+        r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_reid\hara_distance_test\detection")
+    track_features = extractor.extract(track_paths, batch_size=32, target_height=256, target_width=128)
+    detection_features = extractor.extract(detection_paths, batch_size=32, target_height=256, target_width=128)
 
     # This is the final result needed by DeepSORT.
     cost_matrix = cosine_distances(track_features, detection_features)
@@ -83,16 +90,28 @@ def main_distance():
     print("cosine distance around 0.45 -> probably different")
     print("cosine distance around 0.80 -> very different")
 
+
 def main_feature():
     model_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_reid\outputs\best_osnet.pth"
     extractor = ChickenFeatureExtractor(model_path)
 
-    track_paths = list_images(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_reid\hara_distance_test\track")
-    track_features = extractor.extract(track_paths, batch_size=32)
+    track_paths = list_images(
+        r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_reid\hara_distance_test\track")
+    track_features = extractor.extract(track_paths, batch_size=32, target_height=256, target_width=128)
     print("---")
     print(track_features.shape)
     print(track_features)
 
+def main_feature_numpy():
+    model_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_reid\outputs\best_osnet.pth"
+    extractor = ChickenFeatureExtractor(model_path)
+
+    frame_bgr = cv2.imread(r"D:\chicken_project\experiment5reid\reid_training\prepared_reid\val\id_1\id_1_8_RGB_mock_frame_00_01_01.png")
+    # crop_bgr = frame[y1:y2, x1:x2]
+    frame_rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
+    feature = extractor.extract_numpy([frame_rgb], batch_size=1, target_height=256, target_width=128)
+    print(feature.shape)
+    print(feature)
 
 if __name__ == "__main__":
-    main_feature()
+    main_feature_numpy()

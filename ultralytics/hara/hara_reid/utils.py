@@ -8,7 +8,7 @@ import numpy as np
 import torch
 import yaml
 from PIL import Image, ImageOps
-
+import cv2
 
 FILENAME_RE = re.compile(
     r"^id_(?P<chicken_id>\d+)_(?P<month>\d+)_(?P<modality>RGB|T|Thermal|thermal)_(?P<group>sick|mock)_(?P<frame>.+)\.(png|jpg|jpeg)$",
@@ -55,6 +55,51 @@ def resize_with_padding_pixel(img: Image.Image, target_h: int, target_w: int) ->
     pad_right = target_w - new_w - pad_left
     pad_bottom = target_h - new_h - pad_top
     return ImageOps.expand(img, border=(pad_left, pad_top, pad_right, pad_bottom), fill=(0, 0, 0))
+
+
+def resize_with_padding_numpy(img: np.ndarray, target_h: int, target_w: int) -> np.ndarray:
+    """
+    Input:
+        img: RGB numpy image, shape [H, W, 3]
+    Output:
+        padded RGB numpy image, shape [target_h, target_w, 3]
+    """
+    h, w = img.shape[:2]
+
+    scale = min(target_w / w, target_h / h)
+    new_w = int(round(w * scale))
+    new_h = int(round(h * scale))
+
+    resized = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_CUBIC)
+
+    canvas = np.zeros((target_h, target_w, 3), dtype=np.uint8)
+
+    top = (target_h - new_h) // 2
+    left = (target_w - new_w) // 2
+
+    canvas[top:top + new_h, left:left + new_w] = resized
+
+    return canvas
+
+
+def numpy_to_tensor(img: np.ndarray) -> torch.Tensor:
+    """
+    Input:
+        RGB numpy image, shape [H, W, 3], value 0-255
+    Output:
+        torch tensor, shape [3, H, W], normalized
+    """
+    img = img.astype(np.float32) / 255.0
+
+    mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+    std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
+
+    img = (img - mean) / std
+
+    # HWC -> CHW
+    img = img.transpose(2, 0, 1)
+
+    return torch.from_numpy(img).float()
 
 
 def get_device() -> torch.device:
