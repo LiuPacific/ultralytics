@@ -7,8 +7,8 @@ from PIL import Image
 from torchvision import transforms
 from tqdm import tqdm
 
-from model import build_osnet
-from utils import resize_with_padding_pixel, get_device, resize_with_padding_numpy, numpy_to_tensor
+from ultralytics.hara.hara_reid.model import build_osnet
+from ultralytics.hara.hara_reid.utils import resize_with_padding_pixel, get_device, resize_with_padding_numpy, numpy_to_tensor
 
 import cv2
 
