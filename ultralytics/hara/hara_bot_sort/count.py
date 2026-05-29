@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from yolov8tracker import yolov8Tracker
+from yolov8tracker import yolov11Tracker
 
 VIDEO_PATH = './video/test_person.mp4'
 
@@ -95,7 +95,7 @@ if __name__ == '__main__':
     crossing_ids = set()  # 用于存储已经穿越线的检测对象的ID
     capture = cv2.VideoCapture(VIDEO_PATH)
     
-    v8Tracker = yolov8Tracker()
+    v8Tracker = yolov11Tracker()
 
     # Dictionary to store the trail points of each object
     object_trails = {}

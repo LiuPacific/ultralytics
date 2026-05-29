@@ -3,10 +3,11 @@ import numpy as np
 import cv2
 from ultralytics import YOLO
 
-# OBJ_LIST = ['person', 'car', 'bus', 'truck']
+OBJ_LIST = ['person', 'car', 'bus', 'truck']
 # DETECTOR_PATH = '.weights/yolov8s.pt'
-OBJ_LIST = ['chicken', 'bus']
-DETECTOR_PATH = r'E:\chicken_project\workspace\ultralytics\ultralytics\hara\hara_deep_sort\.weights\best.pt'
+# OBJ_LIST = ['chicken', 'bus']
+DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolo11l.pt'
+# DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolov8s.pt'
 
 
 class baseTracker(object):
@@ -53,9 +54,9 @@ def draw_bboxes(im, pred_boxes):
 
     return im
 
-class yolov8Tracker(baseTracker):
+class yolov11Tracker(baseTracker):
     def __init__(self):
-        super(yolov8Tracker, self).__init__()
+        super(yolov11Tracker, self).__init__()
         self.init_model()
 
     def init_model(self):

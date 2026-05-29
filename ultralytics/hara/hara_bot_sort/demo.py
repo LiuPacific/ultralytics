@@ -1,11 +1,11 @@
 import numpy as np
 import cv2
-from yolov8tracker import yolov8Tracker
+from yolov11tracker import yolov11Tracker
 
 # VIDEO_PATH = '.video/test_person.mp4'
 # RESULT_PATH = '.video/result.mp4'
-VIDEO_PATH = r'E:\chicken_project\workspace\ultralytics\ultralytics\hara\hara_deep_sort\.video\20250513_111230.mp4'
-RESULT_PATH = '.video/result_chicken.mp4'
+VIDEO_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\.video\test_person.mp4'
+RESULT_PATH = 'result_1.mp4'
 
 class Point:
     def __init__(self, x, y):
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     # Dictionary to store the trail points of each object
     object_trails = {}
 
-    v8Tracker = yolov8Tracker()
+    v8Tracker = yolov11Tracker()
 
     while True:
         _, im = capture.read()
