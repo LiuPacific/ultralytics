@@ -50,7 +50,7 @@ if __name__ == '__main__':
     # Dictionary to store the trail points of each object
     object_trails = {}
 
-    v8Tracker = yolov11Tracker()
+    v11Tracker = yolov11Tracker()
 
     while True:
         _, im = capture.read()
@@ -58,7 +58,7 @@ if __name__ == '__main__':
             break
 
         detections = Detections()
-        output_image_frame, list_bboxs = v8Tracker.track(im)
+        output_image_frame, list_bboxs = v11Tracker.track(im)
 
         for item_bbox in list_bboxs:
             x1, y1, x2, y2, class_label, confidence, track_id = item_bbox
