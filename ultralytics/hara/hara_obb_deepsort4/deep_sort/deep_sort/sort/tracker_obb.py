@@ -5,6 +5,7 @@ from .iou_matching_obb import obb_iou_cost, iou_cost_fallback
 from .track_obb import TrackOBB, TrackState
 from .linear_assignment_obb import gate_cost_matrix_obb, matching_cascade, min_cost_matching
 from scipy.optimize import linear_sum_assignment
+from sklearn.metrics.pairwise import cosine_distances
 
 
 class TrackerOBB:
@@ -27,6 +28,7 @@ class TrackerOBB:
 
         self.tracks = []
         self._next_id = 1
+        self.frame_id = 0  # Global frame counter (incremented each update)
 
     def predict(self):
         """Propagate track state distributions one time step forward."""
@@ -35,12 +37,15 @@ class TrackerOBB:
 
     def update(self, detections):
         """Perform measurement update and track management for OBB detections."""
+        # Increment global frame counter
+        self.frame_id += 1
+
         # Run matching cascade.
         matches, unmatched_tracks, unmatched_detections = self._match(detections)
 
         # Update track set.
         for track_idx, detection_idx in matches:
-            self.tracks[track_idx].update(self.kf, detections[detection_idx])
+            self.tracks[track_idx].update(self.kf, detections[detection_idx], self.frame_id)
 
         for track_idx in unmatched_tracks:
             self.tracks[track_idx].mark_missed()
@@ -52,6 +57,9 @@ class TrackerOBB:
 
         # Perform track re-identification
         self._reidentify_tracks()
+        
+        # Perform track re-identification by ReID (appearance features)
+        self._reidentify_tracks_by_ReID()
 
         # Update distance metric.
         active_targets = [t.track_id for t in self.tracks if t.is_confirmed()]
@@ -120,7 +128,7 @@ class TrackerOBB:
         mean, covariance = self.kf.initiate(xywhr)
         self.tracks.append(TrackOBB(
             mean, covariance, self._next_id, self.n_init, self.max_age,
-            detection.feature))
+            detection.feature, self.frame_id))
         self._next_id += 1
 
     def _reidentify_tracks(self):
@@ -132,7 +140,7 @@ class TrackerOBB:
         if not new_tracks:
             return
 
-        # Find unmatched tracks that have been unmatched for exactly 3 frames
+        # Find unmatched tracks that disappeared more than 1 frame ago and are not new tracks
         unmatched_tracks = [t for t in self.tracks if t.time_since_update > 1 and t not in new_tracks]
 
         if not unmatched_tracks:
@@ -164,13 +172,135 @@ class TrackerOBB:
         row_ind, col_ind = linear_sum_assignment(cost_matrix)
 
         # Reassign IDs for matches below distance threshold
-        distance_threshold = 100.0  # pixels
+        distance_threshold = 500.0  # pixels
         for r, c in zip(row_ind, col_ind):
             if cost_matrix[r, c] < distance_threshold:
                 old_track = unmatched_tracks[r]
                 new_track = new_tracks[c]
                 print(f"Re-identifying track {new_track.track_id} as {old_track.track_id}")
+
+                # Merge old track into new track, then delete the old one
+                old_track.merge_with(new_track)
                 new_track.track_id = old_track.track_id
-                # Remove the old unmatched track
                 old_track.state = TrackState.Deleted
                 self.tracks.remove(old_track)
+    
+    def _reidentify_tracks_by_ReID(self):
+        """
+        Re-identify lost tracks by comparing appearance features with new tracks.
+        
+        Process:
+        1. Find unmatched tracks that have been lost for 6 seconds (180 frames at 30 FPS)
+        2. Find new tracks that have been alive for 5 seconds (150 frames at 30 FPS)
+        3. Compare appearance features using cosine similarity
+        4. Use Hungarian algorithm to assign new tracks to lost tracks based on feature similarity
+        
+        Parameters
+        ----------
+        FPS : int
+            Frames per second (used to convert time thresholds)
+        """
+        FPS = 30  # Default FPS for chicken tracking
+        
+        # Time thresholds
+        lost_track_threshold = int(4 * FPS)      # 120 frames at 30 FPS
+        track_top_age_to_be_fresh = int(3 * FPS)          # 90 frames at 30 FPS
+        
+        # Find lost tracks (unmatched for 6 seconds)
+        lost_tracks = [t for t in self.tracks 
+                      if t.time_since_update >= lost_track_threshold 
+                      and t.is_confirmed()]
+        
+        if not lost_tracks:
+            return
+        
+        # Find new tracks (alive for at least 5 seconds)
+        new_tracks = [t for t in self.tracks 
+                     if t.age <= track_top_age_to_be_fresh
+                     and t.is_confirmed()
+                     and t.time_since_update == 0
+                      and t.track_id>15]  # Currently matched //TODO hara: to delete
+        
+        if not new_tracks:
+            return
+        
+        num_lost = len(lost_tracks)
+        num_new = len(new_tracks)
+        
+        # Build cost matrix using appearance feature similarity (cosine distance)
+        cost_matrix = np.full((num_lost, num_new), np.inf)
+        
+        for i, lost_track in enumerate(lost_tracks):
+            lost_features = lost_track.get_appearance_features()
+            # Always get position history (may be empty) for spatial fallback
+            lost_history = lost_track.get_position_history()
+
+            for j, new_track in enumerate(new_tracks):
+                new_features = new_track.get_appearance_features()
+                # Always get position history (may be empty) for spatial fallback
+                new_history = new_track.get_position_history()
+
+                # Calculate feature-based cost (cosine distance) using sklearn
+                if lost_features and new_features:
+                    try:
+                        # Build 2D arrays of flattened features
+                        lost_arr = np.vstack([f['feature'].flatten() for f in lost_features])
+                        new_arr = np.vstack([f['feature'].flatten() for f in new_features])
+
+                        # Compute pairwise cosine distances and take the minimum
+                        dists = cosine_distances(lost_arr.astype(float), new_arr.astype(float))
+                        cost_matrix[i, j] = float(np.min(dists))
+                    except Exception:
+                        # Fallback to previous pairwise method if something goes wrong
+                        similarity_scores = []
+                        for lost_feat_data in lost_features:
+                            lost_feat = lost_feat_data['feature']
+                            for new_feat_data in new_features:
+                                new_feat = new_feat_data['feature']
+                                lost_feat_flat = lost_feat.flatten() if hasattr(lost_feat, 'flatten') else lost_feat
+                                new_feat_flat = new_feat.flatten() if hasattr(new_feat, 'flatten') else new_feat
+                                lost_feat_norm = lost_feat_flat / (np.linalg.norm(lost_feat_flat) + 1e-8)
+                                new_feat_norm = new_feat_flat / (np.linalg.norm(new_feat_flat) + 1e-8)
+                                similarity = np.dot(lost_feat_norm, new_feat_norm)
+                                distance = 1.0 - similarity
+                                similarity_scores.append(distance)
+                        if similarity_scores:
+                            cost_matrix[i, j] = min(similarity_scores)
+                else:
+                    print("---------features not available-----")
+                    return
+                    # # Fallback to spatial distance if features not available
+                    # if lost_history and new_history:
+                    #     lost_center = np.array(lost_history[-1][:2])
+                    #     new_center = np.array(new_history[0][:2])
+                    #     spatial_distance = np.linalg.norm(lost_center - new_center)
+                    #     # Normalize spatial distance (scale to [0, 1])
+                    #     cost_matrix[i, j] = spatial_distance / 1000.0  # 1000 pixel threshold
+
+        # Use Hungarian algorithm to find optimal assignment
+
+        row_ind, col_ind = linear_sum_assignment(cost_matrix)
+        
+        # Reassign IDs for matches below similarity threshold
+        # Cosine distance threshold: 0.5 (corresponds to ~60 degree angle or 0.5 similarity)
+        similarity_threshold = 0.7
+        matched_new_track_indices = set()
+        
+        for r, c in zip(row_ind, col_ind):
+            if cost_matrix[r, c] < similarity_threshold and cost_matrix[r, c] != np.inf:
+                lost_track = lost_tracks[r]
+                new_track = new_tracks[c]
+                
+                # Merge the lost track with the new track
+                print(f"ReID: Reconnecting track {new_track.track_id} with lost track {lost_track.track_id}")
+                
+                # Merge old track history (positions & features) into new track
+                lost_track.merge_with(new_track)
+
+                # Transfer the old track ID to the new track
+                new_track.track_id = lost_track.track_id
+                
+                # Mark the lost track as deleted
+                lost_track.state = TrackState.Deleted
+                
+                matched_new_track_indices.add(c)

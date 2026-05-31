@@ -24,7 +24,7 @@ class TrackOBB:
     """
 
     def __init__(self, mean, covariance, track_id, n_init, max_age,
-                 feature=None):
+                 feature=None, frame_id=0):
         self.mean = mean
         self.covariance = covariance
         self.track_id = track_id
@@ -40,8 +40,18 @@ class TrackOBB:
         self._n_init = n_init
         self._max_age = max_age
 
+        # Global frame tracking
+        self.frame_id_start = frame_id  # When this track was created
+        self.frame_id_last_update = frame_id  # Last frame this track was updated
+
         # Store position history for the last 300 frames
         self.position_history = deque(maxlen=300)
+
+        # Store appearance features at global frame intervals (max 10 features)
+        # Each entry: {'frame_id': int, 'feature': ndarray}
+        self.appearance_features = deque(maxlen=10)
+        self._feature_sample_interval = 30  # Sample feature every 30 global frames
+        self._last_sampled_frame_id = frame_id  # Last frame where feature was sampled
 
     def to_tlwh(self):
         """Get current position in axis-aligned bounding box format `(top left x, top left y,
@@ -99,9 +109,18 @@ class TrackOBB:
         self.age += 1
         self.time_since_update += 1
 
-    def update(self, kf, detection):
+    def update(self, kf, detection, frame_id=0):
         """Perform Kalman filter measurement update step and update the feature
         cache.
+
+        Parameters
+        ----------
+        kf : KalmanFilterOBB
+            Kalman filter instance
+        detection : DetectionOBB
+            Detection to update with
+        frame_id : int
+            Global frame ID from the video
         """
         # Convert OBB detection to xywhr format for Kalman filter
         measurement = detection.to_xywhr()
@@ -116,6 +135,17 @@ class TrackOBB:
 
         # Store current position in history
         self.position_history.append(self.to_xywhr())
+
+        # Update last update frame ID
+        self.frame_id_last_update = frame_id
+
+        # Sample appearance features at global frame intervals (every 30 frames of video)
+        if detection.feature is not None and (frame_id - self._last_sampled_frame_id) >= self._feature_sample_interval:
+            self.appearance_features.append({
+                'frame_id': frame_id,
+                'feature': detection.feature.copy()
+            })
+            self._last_sampled_frame_id = frame_id
 
     def mark_missed(self):
         """Mark this track as missed (no association at the current time step)."""
@@ -145,3 +175,47 @@ class TrackOBB:
             List of xywhr positions from the last 300 frames.
         """
         return list(self.position_history)
+    
+    def get_appearance_features(self) -> list:
+        """Get the stored appearance features (sampled at global frame intervals, max 10 features).
+        
+        Returns
+        -------
+        list
+            List of dictionaries containing 'frame_id' and 'feature' keys.
+        """
+        return list(self.appearance_features)
+    
+    def merge_with(self, new_track):
+        """Merge this (old) track with a new track discovered later.
+        
+        Keeps the old track's historical position and appearance features,
+        but uses the new track's current state (mean, covariance, etc.).
+        
+        Parameters
+        ----------
+        new_track : TrackOBB
+            The newly discovered track to merge with
+        """
+        # Prepend old position history to new track's history
+        # (to preserve the complete temporal history)
+        new_track.position_history.extendleft(reversed(list(self.position_history)))
+        
+        # Prepend old appearance features to new track's features
+        new_track.appearance_features.extendleft(reversed(list(self.appearance_features)))
+        
+        # Keep the earlier frame_id_start (from the old track)
+        if self.frame_id_start < new_track.frame_id_start:
+            new_track.frame_id_start = self.frame_id_start
+        
+        # Accumulate hits and age from old track
+        new_track.hits += self.hits
+        new_track.age += self.age
+        
+        # Keep the older ID start
+        if hasattr(self, 'frame_id_last_update'):
+            # If old track had more recent update, keep that reference
+            # but new track's frame_id_last_update is what matters for continuity
+            pass
+
+

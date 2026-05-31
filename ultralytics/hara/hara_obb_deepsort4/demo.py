@@ -13,13 +13,13 @@ class Point:
         self.x = x
         self.y = y
 
-
-class OBBDetections:
-    def __init__(self):
-        self.detections = []
-
-    def add(self, xyxyxyxy, confidence, class_id, tracker_id):
-        self.detections.append((xyxyxyxy, confidence, class_id, tracker_id))
+#
+# class OBBDetections:
+#     def __init__(self):
+#         self.detections = []
+#
+#     def add(self, xyxyxyxy, confidence, class_id, tracker_id):
+#         self.detections.append((xyxyxyxy, confidence, class_id, tracker_id))
 
 
 
@@ -59,7 +59,7 @@ def main():
         _, im = capture.read()
         if im is None:
             break
-        detections = OBBDetections()
+        # detections = OBBDetections()
 
         output_image_frame, tracks2draw = objtracker.update(detector, im)
 
@@ -100,4 +100,6 @@ if __name__ == '__main__':
     # RESULT_PATH = 'sick_20251217T000000Z_20251217T003000Z.mp4'
     # main()
 
-
+    # VIDEO_PATH = r'F:\20251002\RGB_mock\seg1.mp4'
+    # RESULT_PATH = 'seg1_0_tracking.mp4'
+    # main()

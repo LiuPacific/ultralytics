@@ -58,7 +58,7 @@ def gate_cost_matrix_obb(
         gating_distance = kf.gating_distance(
             track.mean, track.covariance, measurements, only_position)
         # TODO hara: take the gate away.
-        # cost_matrix[row, gating_distance > gating_threshold] = gated_cost
+        cost_matrix[row, gating_distance > gating_threshold] = gated_cost
     return cost_matrix
 
 
