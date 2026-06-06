@@ -69,7 +69,7 @@ class ObbDetector(baseDet):
             self.bbox_history.pop(0)
         self.bbox_history.append(pred_boxes)
 
-    def detect(self, im, x_min=470, x_max=1900, y_min=100, y_max=1600):
+    def detect(self, im, x_min=270, x_max=1900, y_min=100, y_max=1600):
         res = self.model.predict(im, imgsz=self.img_size, conf=self.conf,
                                  iou=self.iou, device=self.device)
 

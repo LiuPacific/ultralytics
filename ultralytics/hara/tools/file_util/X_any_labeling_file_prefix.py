@@ -3,9 +3,9 @@ import json
 import os
 
 # Change this to your folder path
-folder = Path(r"D:\chicken_project\experiment5reid\reid_training\combination\20251217T000000Z_20251217T003000Z_RGB_sick")
+folder = Path(r"D:\chicken_project\experiment5reid\reid_training\combination_id\12_RGB_sick")
 
-prefix = "12_RGB_sick_"
+prefix = "12_RGB_sick"
 
 # Step 1: Update imagePath inside JSON files
 for json_file in folder.glob("*.json"):
@@ -34,3 +34,5 @@ for file in folder.iterdir():
             else:
                 os.rename(file, new_path)
                 print(f"Renamed: {file.name} -> {new_name}")
+
+
