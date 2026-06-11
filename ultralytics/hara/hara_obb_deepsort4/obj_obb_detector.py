@@ -10,7 +10,7 @@ OBJ_LIST = ['chicken']
 # DETECTOR_PATH = r'/ultralytics/hara/weights/yolov8m-obb-chicken-0401.pt'
 # DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolov8m-obb-chicken-0426.pt'
 # DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolov8m-obb-chicken-0520.pt'
-DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolo11l-obb-chicken-0528.pt'
+DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolo11l-obb-chicken-0607.pt'
 
 
 class baseDet(object):

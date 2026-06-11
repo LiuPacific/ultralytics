@@ -12,12 +12,14 @@ from .sort import obb_utils
 
 from ultralytics.hara.hara_reid import features_extractor
 
+
 # __all__ = ['DeepSort'] # __all__ 提供了暴露接口用的”白名单“
 
 class DeepSORTOBB(object):
     def __init__(self, model_path, max_dist=0.2, min_confidence=0.3, nms_max_overlap=1.0,
-                 max_iou_distance=0.7, max_age=70, n_init=3, nn_budget=100, use_cuda=True,
-                 use_rotated_features=True):
+                 max_iou_distance=0.7, max_age=70, n_init=3, nn_budget=100, use_cuda=True, MAX_ID_POOL=15,
+                 use_rotated_features=True, reconnection_distance_threshold=400,
+                 reuse_id_assignment_distance_threshold=200):
         self.min_confidence = min_confidence
         self.nms_max_overlap = nms_max_overlap
         self.use_rotated_features = use_rotated_features
@@ -31,7 +33,9 @@ class DeepSORTOBB(object):
         # Use OBB Kalman filter instead of standard one
         self.kalman_filter = KalmanFilterOBB()
         self.tracker_obb = TrackerOBB(metric, max_iou_distance=max_iou_distance, max_age=max_age,
-                                      n_init=n_init, kalman_filter=self.kalman_filter)
+                                      n_init=n_init, kalman_filter=self.kalman_filter, MAX_ID_POOL=MAX_ID_POOL,
+                                      reconnection_distance_threshold=reconnection_distance_threshold,
+                                      reuse_id_assignment_distance_threshold=reuse_id_assignment_distance_threshold)
 
     def update(self, xyxyxyxy_list, xywhr_list, confidences, ori_img):
         """

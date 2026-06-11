@@ -89,12 +89,12 @@ if __name__ == '__main__':
     # RESULT_PATH = 'mock_20251007T000000Z_20251007T010000Z_tracking.mp4'
     # main()
 
-    # VIDEO_PATH = r'F:\20251130\RGB_sick\20251217T000000Z_20251217T003000Z.mkv'
-    # RESULT_PATH = 'sick_20251217T000000Z_20251217T003000Z_tracking_reid.mp4'
-    # main()
-    VIDEO_PATH = r'F:\20251002\RGB_sick\20251007T000000Z_20251007T010000Z.mkv'
-    RESULT_PATH = 'sick_20251007T000000Z_20251007T010000Z_tracking_reid.mp4'
+    VIDEO_PATH = r'F:\20251130\RGB_sick\20251217T000000Z_20251217T003000Z.mkv'
+    RESULT_PATH = 'sick_20251217T000000Z_20251217T003000Z_tracking_reid.mp4'
     main()
+    # VIDEO_PATH = r'F:\20251002\RGB_sick\20251007T000000Z_20251007T010000Z.mkv'
+    # RESULT_PATH = 'sick_20251007T000000Z_20251007T010000Z_tracking_reid.mp4'
+    # main()
 
     # VIDEO_PATH = r'F:\20251002\RGB_mock\20251006T230000Z_20251007T000000Z.mkv'
     # RESULT_PATH = 'mock_20251006T230000Z_20251007T000000Z_tracking.mp4'
@@ -105,10 +105,10 @@ if __name__ == '__main__':
     # main()
     #
     # VIDEO_PATH = r'F:\20251002\RGB_mock\seg1.mp4'
-    # RESULT_PATH = 'seg1_1_tracking.mp4'
+    # RESULT_PATH = 'seg1_2_tracking.mp4'
     # main()
-
-    # VIDEO_PATH = r'D:\chicken_project\experiment5reid\mock_20250826T000000Z_20250826T002000Z.mkv'
+    #
+    # VIDEO_PATH = r'F:\20250903\recordings_RGB_mock\20250826T000000Z_20250826T002000Z.mkv'
     # RESULT_PATH = 'mock_20250826T000000Z_20250826T002000Z_tracking_reid.mp4'
     # main()
     #

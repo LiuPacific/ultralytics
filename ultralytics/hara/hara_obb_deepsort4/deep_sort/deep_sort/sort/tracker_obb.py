@@ -13,13 +13,16 @@ class TrackerOBB:
     Extended tracker for OBB (Oriented Bounding Box) detections.
     """
 
-    def __init__(self, metric, max_iou_distance=0.7, max_age=70, n_init=3, kalman_filter=None, use_rotated_iou=True):
+    def __init__(self, metric, max_iou_distance=0.7, max_age=70, n_init=3, kalman_filter=None, use_rotated_iou=True,
+                 MAX_ID_POOL=0, reconnection_distance_threshold=400, reuse_id_assignment_distance_threshold=200):
         self.metric = metric
         self.max_iou_distance = max_iou_distance
         self.max_age = max_age
         self.n_init = n_init
         self.use_rotated_iou = use_rotated_iou
-
+        self.MAX_ID_POOL = MAX_ID_POOL
+        self.reconnection_distance_threshold = reconnection_distance_threshold
+        self.reuse_id_assignment_distance_threshold = reuse_id_assignment_distance_threshold
         if kalman_filter is not None:
             self.kf = kalman_filter
         else:
@@ -40,6 +43,9 @@ class TrackerOBB:
         # Increment global frame counter
         self.frame_id += 1
 
+        if self.frame_id >=40 and self.frame_id <=42:
+            print("---")
+
         # Run matching cascade.
         matches, unmatched_tracks, unmatched_detections = self._match(detections)
 
@@ -51,13 +57,18 @@ class TrackerOBB:
             self.tracks[track_idx].mark_missed()
 
         for detection_idx in unmatched_detections:
-            self._initiate_track(detections[detection_idx])
+            if self.MAX_ID_POOL == 0:  # if MAX_ID_POOL is 0, initiate tracks with new sequential IDs (original behavior)
+                self._initiate_track(detections[detection_idx])
+            else:  # If MAX_ID_POOL is not 0, we will only initiate new tracks with ID less than self.MAX_ID_POOL
+                self._initiate_track_MAX_ID_POOL(detections[detection_idx], MAX_ID_POOL=self.MAX_ID_POOL)
 
-        self.tracks = [t for t in self.tracks if not t.is_deleted()]
+        # If MAX_ID_POOL is 0, use original behavior (delete tracks after max_age)
+        if self.MAX_ID_POOL == 0:
+            self.tracks = [t for t in self.tracks if not t.is_deleted()]
 
         # Perform track re-identification
         self._reidentify_tracks()
-        
+
         # Perform track re-identification by ReID (appearance features)
         self._reidentify_tracks_by_ReID()
 
@@ -83,7 +94,6 @@ class TrackerOBB:
             cost_matrix = gate_cost_matrix_obb(
                 self.kf, cost_matrix, tracks, dets, track_indices,
                 detection_indices)
-
 
             return cost_matrix
 
@@ -131,6 +141,172 @@ class TrackerOBB:
             detection.feature, self.frame_id))
         self._next_id += 1
 
+    def _initiate_track_MAX_ID_POOL(self, detection, MAX_ID_POOL=15):
+        """
+        Initiate a new track for a detection, but reuse track IDs from a fixed pool
+        of IDs (1..MAX_ID_POOL) when possible. If there are already MAX_ID_POOL
+        active (not deleted) tracks with IDs in the pool, do NOT create a new
+        track (this avoids creating > MAX_ID_POOL simultaneous tracks). When
+        possible, prefer to reuse an ID from a missed track (time_since_update>0).
+        """
+
+        # For OBB detections, convert to xywhr format for Kalman filter
+        xywhr = detection.to_xywhr()
+        mean, covariance = self.kf.initiate(xywhr)
+
+        if self.frame_id == 40:
+            print("---")
+
+        # Determine currently used IDs within the pool (active & not deleted)
+        used_ids = set([t.track_id for t in self.tracks if not t.is_deleted() and 1 <= t.track_id <= MAX_ID_POOL])
+
+        # # Count active (not deleted) tracks within pool
+        # active_count = len(used_ids)
+        #
+        # # If pool is full, do not create a new track
+        # if active_count >= MAX_ID_POOL:
+        #     # No available ID in the pool; skip creating a new track
+        #     # This prevents creating spurious duplicate tracks when many detections
+        #     # fall on the same object and the pool is saturated.
+        #     # Optionally, could attempt to match/merge here; keep simple and skip.
+        #     # print("Track pool full: skipping initiation of a new track")
+        #     return
+
+        # Try to find a deleted/missed track to reuse its ID based on spatial proximity
+        # Prefer deleted tracks (those that exceeded max_age and were marked deleted),
+        # matching by the last known position. If none within threshold, try missed
+        # (time_since_update>0) tracks by distance. Do NOT remove deleted tracks from
+        # the list — we keep them as history for future matching.
+        reuse_id = None
+
+        # detection center for distance comparisons
+        try:
+            detection_center = np.array(xywhr[:2], dtype=float)
+        except Exception as e:
+            print("exception ", e)
+            return
+            # detection_center = np.array([0.0, 0.0], dtype=float)
+
+        # both deleted and missed are considered equally.
+        missed_candidates = [t for t in self.tracks if 1 <= t.track_id <= MAX_ID_POOL and t.time_since_update > 0]
+        best_candidate = None
+        best_dist = np.inf
+        for t in missed_candidates:
+            hist = t.get_position_history()
+            if hist:
+                last_center = np.array(hist[-1][:2], dtype=float)
+            else:
+                try:
+                    last_center = np.array(t.to_xywhr()[:2], dtype=float)
+                except Exception as e:
+                    print("exception ", e)
+                    continue
+            dist = np.linalg.norm(last_center - detection_center)
+            if dist < best_dist:
+                best_dist = dist
+                best_candidate = t
+
+        if best_candidate is not None and best_dist < self.reuse_id_assignment_distance_threshold:
+            reuse_id = best_candidate.track_id
+
+
+
+        # # 1) Consider deleted tracks first
+        # deleted_candidates = [t for t in self.tracks if t.is_deleted() and 1 <= t.track_id <= MAX_ID_POOL]
+        # best_candidate = None
+        # best_dist = np.inf
+        # for t in deleted_candidates:
+        #     hist = t.get_position_history()
+        #     if hist:
+        #         last_center = np.array(hist[-1][:2], dtype=float)
+        #     else:
+        #         # fallback to track's current state if history not available
+        #         try:
+        #             last_center = np.array(t.to_xywhr()[:2], dtype=float)
+        #         except Exception as e:
+        #             print("exception ", e)
+        #             continue
+        #     dist = np.linalg.norm(last_center - detection_center)
+        #     if dist < best_dist:
+        #         best_dist = dist
+        #         best_candidate = t
+        #
+        # if best_candidate is not None and best_dist < self.reuse_id_assignment_distance_threshold:  #
+        #     reuse_id = best_candidate.track_id
+        #
+        # # 2) Fallback: consider missed (un-deleted) candidates and pick nearest by distance
+        # if reuse_id is None:
+        #     missed_candidates = [t for t in self.tracks if
+        #                          (not t.is_deleted()) and 1 <= t.track_id <= MAX_ID_POOL and t.time_since_update > 0]
+        #     best_candidate = None
+        #     best_dist = np.inf
+        #     for t in missed_candidates:
+        #         hist = t.get_position_history()
+        #         if hist:
+        #             last_center = np.array(hist[-1][:2], dtype=float)
+        #         else:
+        #             try:
+        #                 last_center = np.array(t.to_xywhr()[:2], dtype=float)
+        #             except Exception as e:
+        #                 print("exception ", e)
+        #                 continue
+        #         dist = np.linalg.norm(last_center - detection_center)
+        #         if dist < best_dist:
+        #             best_dist = dist
+        #             best_candidate = t
+        #
+        #     if best_candidate is not None and best_dist < self.reuse_id_assignment_distance_threshold:
+        #         reuse_id = best_candidate.track_id
+
+        # if reuse_id is None:
+        #     return
+        # self.tracks.append(
+        #     TrackOBB(mean, covariance, reuse_id, self.n_init, self.max_age, detection.feature, self.frame_id)
+        # )
+
+        # If we didn't reuse an ID, pick the smallest unused ID in pool
+        if reuse_id is None:
+            for i in range(1, MAX_ID_POOL + 1):
+                if i not in used_ids:
+                    reuse_id = i
+                    break
+
+        # Fallback: if reuse_id still None (shouldn't happen), use next id
+        # if reuse_id is None:
+        #     reuse_id = self._next_id
+        if reuse_id is None:
+            return
+
+        # Create new track with temporary ID first
+        temp_id = self._next_id
+        new_track = TrackOBB(
+            mean, covariance, temp_id, self.n_init, self.max_age,
+            detection.feature, self.frame_id)
+        self.tracks.append(new_track)
+        self._next_id += 1
+
+        # Find the old track with reuse_id to merge into new_track
+        old_track = None
+        if reuse_id is not None:
+            for t in self.tracks:
+                if t.track_id == reuse_id and t != new_track:
+                    old_track = t
+                    break
+
+        # If we found an old track with the reuse_id, merge it into new_track
+        if old_track is not None:
+            print(f"Reusing track ID {reuse_id}: merging old track into new detection")
+            # Merge old track history into new track
+            old_track.merge_with(new_track)
+            # Transfer the old track ID to new track
+            new_track.track_id = old_track.track_id
+            # Mark the old track as deleted
+            old_track.state = TrackState.Deleted
+            self.tracks.remove(old_track)
+        else:
+            # No old track to merge; just use the reuse_id directly
+            new_track.track_id = reuse_id
+
     def _reidentify_tracks(self):
         """Re-identify tracks that disappeared and reappeared using position history."""
         # Find new tracks that have existed for exactly 3 frames
@@ -172,9 +348,8 @@ class TrackerOBB:
         row_ind, col_ind = linear_sum_assignment(cost_matrix)
 
         # Reassign IDs for matches below distance threshold
-        distance_threshold = 500.0  # pixels
         for r, c in zip(row_ind, col_ind):
-            if cost_matrix[r, c] < distance_threshold:
+            if cost_matrix[r, c] < self.reconnection_distance_threshold:
                 old_track = unmatched_tracks[r]
                 new_track = new_tracks[c]
                 print(f"Re-identifying track {new_track.track_id} as {old_track.track_id}")
@@ -184,7 +359,7 @@ class TrackerOBB:
                 new_track.track_id = old_track.track_id
                 old_track.state = TrackState.Deleted
                 self.tracks.remove(old_track)
-    
+
     def _reidentify_tracks_by_ReID(self):
         """
         Re-identify lost tracks by comparing appearance features with new tracks.
@@ -201,35 +376,34 @@ class TrackerOBB:
             Frames per second (used to convert time thresholds)
         """
         FPS = 30  # Default FPS for chicken tracking
-        
+
         # Time thresholds
-        lost_track_threshold = int(4 * FPS)      # 120 frames at 30 FPS
-        track_top_age_to_be_fresh = int(3 * FPS)          # 90 frames at 30 FPS
-        
+        lost_track_threshold = int(4 * FPS)  # 120 frames at 30 FPS
+        track_top_age_to_be_fresh = int(3 * FPS)  # 90 frames at 30 FPS
+
         # Find lost tracks (unmatched for 6 seconds)
-        lost_tracks = [t for t in self.tracks 
-                      if t.time_since_update >= lost_track_threshold 
-                      and t.is_confirmed()]
-        
+        lost_tracks = [t for t in self.tracks
+                       if t.time_since_update >= lost_track_threshold
+                       and t.is_confirmed()]
+
         if not lost_tracks:
             return
-        
+
         # Find new tracks (alive for at least 5 seconds)
-        new_tracks = [t for t in self.tracks 
-                     if t.age <= track_top_age_to_be_fresh
-                     and t.is_confirmed()
-                     and t.time_since_update == 0
-                      and t.track_id>15]  # Currently matched //TODO hara: to delete
-        
+        new_tracks = [t for t in self.tracks
+                      if t.age <= track_top_age_to_be_fresh
+                      and t.is_confirmed()
+                      and t.time_since_update == 0]
+
         if not new_tracks:
             return
-        
+
         num_lost = len(lost_tracks)
         num_new = len(new_tracks)
-        
+
         # Build cost matrix using appearance feature similarity (cosine distance)
         cost_matrix = np.full((num_lost, num_new), np.inf)
-        
+
         for i, lost_track in enumerate(lost_tracks):
             lost_features = lost_track.get_appearance_features()
             # Always get position history (may be empty) for spatial fallback
@@ -280,27 +454,27 @@ class TrackerOBB:
         # Use Hungarian algorithm to find optimal assignment
 
         row_ind, col_ind = linear_sum_assignment(cost_matrix)
-        
+
         # Reassign IDs for matches below similarity threshold
-        # Cosine distance threshold: 0.5 (corresponds to ~60 degree angle or 0.5 similarity)
-        similarity_threshold = 0.7
+        # Cosine distance threshold: 0.3 (corresponds to ~60 degree angle or 0.3 similarity)
+        similarity_threshold = 0.3
         matched_new_track_indices = set()
-        
+
         for r, c in zip(row_ind, col_ind):
             if cost_matrix[r, c] < similarity_threshold and cost_matrix[r, c] != np.inf:
                 lost_track = lost_tracks[r]
                 new_track = new_tracks[c]
-                
+
                 # Merge the lost track with the new track
                 print(f"ReID: Reconnecting track {new_track.track_id} with lost track {lost_track.track_id}")
-                
+
                 # Merge old track history (positions & features) into new track
                 lost_track.merge_with(new_track)
 
                 # Transfer the old track ID to the new track
                 new_track.track_id = lost_track.track_id
-                
+
                 # Mark the lost track as deleted
                 lost_track.state = TrackState.Deleted
-                
+
                 matched_new_track_indices.add(c)
