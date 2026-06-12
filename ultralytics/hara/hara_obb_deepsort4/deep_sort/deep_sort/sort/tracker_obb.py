@@ -43,7 +43,10 @@ class TrackerOBB:
         # Increment global frame counter
         self.frame_id += 1
 
-        if self.frame_id >=40 and self.frame_id <=42:
+        # 201 gating distance 0.6
+        # 203 5.79
+        # 204
+        if self.frame_id >=200 and self.frame_id <=204:
             print("---")
 
         # Run matching cascade.
@@ -89,8 +92,10 @@ class TrackerOBB:
             features = np.array([dets[i].feature for i in detection_indices])
             targets = np.array([tracks[i].track_id for i in track_indices])
 
-            cost_matrix = self.metric.distance(features, targets)
-            # cost_matrix.fill(1.0)
+            cost_matrix = np.ones((len(targets), len(features)))
+            if features[0] is not None:
+                cost_matrix = self.metric.distance(features, targets)
+
             cost_matrix = gate_cost_matrix_obb(
                 self.kf, cost_matrix, tracks, dets, track_indices,
                 detection_indices)
@@ -461,7 +466,8 @@ class TrackerOBB:
         matched_new_track_indices = set()
 
         for r, c in zip(row_ind, col_ind):
-            if cost_matrix[r, c] < similarity_threshold and cost_matrix[r, c] != np.inf:
+            # if cost_matrix[r, c] < similarity_threshold and cost_matrix[r, c] != np.inf:
+            if cost_matrix[r, c] < similarity_threshold and cost_matrix[r, c] != np.inf and cost_matrix[r, c] < self.reconnection_distance_threshold:
                 lost_track = lost_tracks[r]
                 new_track = new_tracks[c]
 

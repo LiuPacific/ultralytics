@@ -19,10 +19,11 @@ class DeepSORTOBB(object):
     def __init__(self, model_path, max_dist=0.2, min_confidence=0.3, nms_max_overlap=1.0,
                  max_iou_distance=0.7, max_age=70, n_init=3, nn_budget=100, use_cuda=True, MAX_ID_POOL=15,
                  use_rotated_features=True, reconnection_distance_threshold=400,
-                 reuse_id_assignment_distance_threshold=200):
+                 reuse_id_assignment_distance_threshold=200, use_reid=False):
         self.min_confidence = min_confidence
         self.nms_max_overlap = nms_max_overlap
         self.use_rotated_features = use_rotated_features
+        self.use_reid = use_reid
         self.extractor = features_extractor.ChickenFeatureExtractor(model_path)
         # self.extractor = Extractor(model_path, use_cuda=use_cuda)
 
@@ -57,11 +58,16 @@ class DeepSORTOBB(object):
         self.height, self.width = ori_img.shape[:2]
 
         # Extract features from OBB crops
-        features = self._get_features_obb(xyxyxyxy_list, ori_img)
-
-        # Create OBB detection objects
-        detections = [DetectionOBB(xyxyxyxy_list[i], xywhr_list[i], conf, features[i])
-                      for i, conf in enumerate(confidences) if conf > self.min_confidence]
+        detections = []
+        if self.use_reid:
+            features = self._get_features_obb(xyxyxyxy_list, ori_img)
+            # Create OBB detection objects
+            detections = [DetectionOBB(xyxyxyxy_list[i], xywhr_list[i], conf, features[i])
+                          for i, conf in enumerate(confidences) if conf > self.min_confidence]
+        else:
+            # Create OBB detection objects without features
+            detections = [DetectionOBB(xyxyxyxy_list[i], xywhr_list[i], conf, None)
+                          for i, conf in enumerate(confidences) if conf > self.min_confidence]
 
         # Update tracker
         self.tracker_obb.predict()

@@ -8,6 +8,9 @@ INFTY_COST = 1e+5
 
 # Extended chi2inv95 for OBB (5 degrees of freedom)
 chi2inv95_obb = 11.070  # 95% quantile of chi-square distribution with 5 df
+chi2inv70_obb = 6.0644  # 70% quantile of chi-square distribution with 5 df
+chi2inv60_obb = 5.1319  # 60% quantile of chi-square distribution with 5 df
+chi2inv50_obb = 4.3515  # 50% quantile of chi-square distribution with 5 df
 
 
 def gate_cost_matrix_obb(
@@ -48,7 +51,10 @@ def gate_cost_matrix_obb(
         Returns the modified cost matrix.
     """
     gating_dim = 2 if only_position else 5  # 5 dimensions for OBB: cx, cy, w, h, angle
-    gating_threshold = chi2inv95_obb if gating_dim == 5 else kf.chi2inv95.get(gating_dim, 9.4877)
+    # gating_threshold = chi2inv95_obb if gating_dim == 5 else kf.chi2inv95.get(gating_dim, 9.4877)
+    # gating_threshold = chi2inv70_obb if gating_dim == 5 else kf.chi2inv70.get(gating_dim, 6.0644)
+    # gating_threshold = chi2inv60_obb if gating_dim == 5 else kf.chi2inv60.get(gating_dim, 6.0644)
+    gating_threshold = chi2inv50_obb if gating_dim == 5 else kf.chi2inv50.get(gating_dim, 6.0644)
 
     measurements = np.asarray(
         [detections[i].to_xywhr() for i in detection_indices])

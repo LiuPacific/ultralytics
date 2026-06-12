@@ -19,9 +19,13 @@ deepsort_obb = DeepSORTOBB(cfg.DEEPSORT.REID_CKPT,
                            max_dist=cfg.DEEPSORT.MAX_DIST, min_confidence=cfg.DEEPSORT.MIN_CONFIDENCE,
                            nms_max_overlap=cfg.DEEPSORT.NMS_MAX_OVERLAP, max_iou_distance=cfg.DEEPSORT.MAX_IOU_DISTANCE,
                            max_age=cfg.DEEPSORT.MAX_AGE, n_init=cfg.DEEPSORT.N_INIT, nn_budget=cfg.DEEPSORT.NN_BUDGET,
-                           use_cuda=True)
-
-
+                           use_cuda=True,
+                           MAX_ID_POOL=cfg.DEEPSORT.MAX_ID_POOL,
+                           reconnection_distance_threshold=cfg.DEEPSORT.RECONNECTION_DISTANCE_THRESHOLD,
+                           reuse_id_assignment_distance_threshold=cfg.DEEPSORT.REUSE_ID_ASSIGNMENT_DISTANCE_THRESHOLD,
+                           use_reid=cfg.DEEPSORT.USE_REID,
+                           use_rotated_features=cfg.DEEPSORT.USE_ROTATED_FEATURES
+                           )
 
 
 def update(target_detector: ObbDetector, image):
@@ -40,31 +44,62 @@ def update(target_detector: ObbDetector, image):
             conf_list.append(conf)
 
         # Pass detections to deepsort
-        tracks_detected = deepsort_obb.update(xyxyxyxy_list,xywhr_list, conf_list, image)
+        tracks_detected = deepsort_obb.update(xyxyxyxy_list, xywhr_list, conf_list, image)
 
         for track_detected in list(tracks_detected):
             """
             track_detected: x y w h r track_id, [[xywhr],[xywhr]...[new xywhr]]"""
-            x,y,w,h,r, track_id, track_history_positions= track_detected
-            xyxyxyxy = obb_utils.xywhr_to_xyxyxyxy(x,y,w,h,r)
+            x, y, w, h, r, track_id, track_history_positions = track_detected
+            xyxyxyxy = obb_utils.xywhr_to_xyxyxyxy(x, y, w, h, r)
             tracks2draw.append(
-                (xyxyxyxy, '', track_id, track_history_positions) # xyxyxyxy, class_id, track_id
+                (xyxyxyxy, '', track_id, track_history_positions)  # xyxyxyxy, class_id, track_id
             )
 
     image = draw_trail(image, tracks2draw)
     image = plot_bboxes(image, tracks2draw)
     return image, tracks2draw
 
+
+# Dark BGR colors for around 15 tracks
+DARK_COLORS = [
+    (0, 0, 139),  # dark red
+    (0, 100, 0),  # dark green
+    (139, 0, 0),  # dark blue
+    (0, 140, 140),  # dark yellow/cyan-like
+    (139, 0, 139),  # dark magenta
+    (139, 139, 0),  # dark cyan
+    (0, 69, 139),  # dark orange
+    (75, 0, 130),  # indigo
+    (47, 79, 79),  # dark slate gray
+    (85, 107, 47),  # dark olive green
+    (128, 0, 0),  # navy
+    (0, 128, 128),  # teal
+    (72, 61, 139),  # dark slate blue
+    (34, 139, 34),  # forest green
+    (25, 25, 112),  # midnight blue
+]
+
+
 # TODO hara: track length
-def draw_trail(image, track2draw, trail_length=630):
-    for track2draw in track2draw:
+def draw_trail(image, tracks2draw, trail_length=630):
+    for track2draw in tracks2draw:
         track_history_positions = track2draw[3]
-        if len(track_history_positions) > 1:
-            for i in range(1, len(track_history_positions)):
-                cv2.line(image, (int(track_history_positions[i-1][0]), int(track_history_positions[i-1][1])),
-                         (int(track_history_positions[i][0]), int(track_history_positions[i][1])),
-                         (255, 0, 0), thickness=3)
+        track_id = track2draw[2]
+
+        if len(track_history_positions) == 0:
+            return image
+
+        # use only recent trail points.
+        if len(track_history_positions) > trail_length:
+            track_history_positions = track_history_positions[-trail_length:]
+        # assign a different color to each track:
+        for i in range(1, len(track_history_positions)):
+            pt1 = (int(track_history_positions[i - 1][0]), int(track_history_positions[i - 1][1]))
+            pt2 = (int(track_history_positions[i][0]), int(track_history_positions[i][1]))
+            cv2.line(image, pt1, pt2, DARK_COLORS[track_id % len(DARK_COLORS)], thickness=3)
+
     return image
+
 
 def plot_all_detections(image, obb_detections, line_thickness=None):
     # Plots one bounding box on image img
@@ -97,6 +132,7 @@ def plot_all_detections(image, obb_detections, line_thickness=None):
 
     return image
 
+
 # plot bboxes that are in the tracker
 def plot_bboxes(image, bboxes2draw, line_thickness=None):
     """
@@ -121,9 +157,6 @@ def plot_bboxes(image, bboxes2draw, line_thickness=None):
                     [0, 255, 0], thickness=tf, lineType=cv2.LINE_AA)
 
     return image
-
-
-
 
 # plot bbox with line restriction check. When the detection is out of the line, it will show different color.
 # def plot_bboxes(image, bboxes, line_thickness=None):
