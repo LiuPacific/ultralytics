@@ -13,3 +13,4 @@ DEEPSORT:
   N_INIT: 30 # avoid generating new track
   NN_BUDGET: 100
   USE_REID: False
+

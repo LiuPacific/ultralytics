@@ -19,7 +19,7 @@ class DeepSORTOBB(object):
     def __init__(self, model_path, max_dist=0.2, min_confidence=0.3, nms_max_overlap=1.0,
                  max_iou_distance=0.7, max_age=70, n_init=3, nn_budget=100, use_cuda=True, MAX_ID_POOL=15,
                  use_rotated_features=True, reconnection_distance_threshold=400,
-                 reuse_id_assignment_distance_threshold=200, use_reid=False, use_optimization=False):
+                 reuse_id_assignment_distance_threshold=200, use_reid=False):
         self.min_confidence = min_confidence
         self.nms_max_overlap = nms_max_overlap
         self.use_rotated_features = use_rotated_features
@@ -27,7 +27,6 @@ class DeepSORTOBB(object):
         if use_reid:
             self.extractor = features_extractor.ChickenFeatureExtractor(model_path)
         # self.extractor = Extractor(model_path, use_cuda=use_cuda)
-        self.use_optimization = use_optimization
 
         max_cosine_distance = max_dist
         nn_budget = 100

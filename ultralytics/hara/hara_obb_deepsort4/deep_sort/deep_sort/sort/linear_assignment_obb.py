@@ -3,6 +3,7 @@
 import numpy as np
 from scipy.optimize import linear_sum_assignment as linear_assignment
 from ultralytics.hara.hara_obb_deepsort4.deep_sort.deep_sort.sort.kalman_filter_obb import KalmanFilterOBB
+from ultralytics.hara.hara_obb_deepsort4.deep_sort.configs.common_cfg import  cfg
 
 INFTY_COST = 1e+5
 
@@ -51,10 +52,12 @@ def gate_cost_matrix_obb(
         Returns the modified cost matrix.
     """
     gating_dim = 2 if only_position else 5  # 5 dimensions for OBB: cx, cy, w, h, angle
-    # gating_threshold = chi2inv95_obb if gating_dim == 5 else kf.chi2inv95.get(gating_dim, 9.4877)
-    # gating_threshold = chi2inv70_obb if gating_dim == 5 else kf.chi2inv70.get(gating_dim, 6.0644)
-    # gating_threshold = chi2inv60_obb if gating_dim == 5 else kf.chi2inv60.get(gating_dim, 6.0644)
-    gating_threshold = chi2inv50_obb if gating_dim == 5 else kf.chi2inv50.get(gating_dim, 6.0644)
+
+    gating_threshold = chi2inv95_obb if gating_dim == 5 else kf.chi2inv95.get(gating_dim, 9.4877)
+    # if cfg.DEEPSORT.USE_OPTIMIZATION:
+    #     gating_threshold = chi2inv50_obb if gating_dim == 5 else kf.chi2inv50.get(gating_dim, 6.0644)
+        # gating_threshold = chi2inv70_obb if gating_dim == 5 else kf.chi2inv70.get(gating_dim, 6.0644)
+        # gating_threshold = chi2inv60_obb if gating_dim == 5 else kf.chi2inv60.get(gating_dim, 6.0644)
 
     measurements = np.asarray(
         [detections[i].to_xywhr() for i in detection_indices])
@@ -63,8 +66,10 @@ def gate_cost_matrix_obb(
         track = tracks[track_idx]
         gating_distance = kf.gating_distance(
             track.mean, track.covariance, measurements, only_position)
-        # TODO hara: take the gate away.
+
         cost_matrix[row, gating_distance > gating_threshold] = gated_cost
+        if cfg.DEEPSORT.USE_OPTIMIZATION:
+            cost_matrix[row, gating_distance > gating_threshold] = gated_cost
     return cost_matrix
 
 
@@ -217,6 +222,7 @@ def matching_cascade(
     unmatched_detections = detection_indices
     matches = []
     # 由小到大依次对每个level的tracks做匹配
+    # 级联匹配：首先匹配time_since_update=1的tracks，如果还有未匹配的detections，再匹配time_since_update=2的tracks，以此类推，直到达到cascade_depth或没有未匹配的detections为止。
     for level in range(cascade_depth):
         # 如果没有detections，退出循环
         if len(unmatched_detections) == 0:  # No detections left
