@@ -1,4 +1,4 @@
-from deep_sort.utils.parser import get_config
+
 import torch
 import cv2
 import numpy as np
@@ -6,15 +6,16 @@ import numpy as np
 from ultralytics.hara.hara_obb_deepsort4.deep_sort.deep_sort.deep_sort_obb import DeepSORTOBB
 from ultralytics.hara.hara_obb_deepsort4.obj_obb_detector import ObbDetector
 from deep_sort.deep_sort.sort import obb_utils
-
-cfg = get_config()
-cfg.merge_from_file("deep_sort/configs/deep_sort.yaml")
+from ultralytics.hara.hara_obb_deepsort4.deep_sort.configs.common_cfg import cfg
 
 # deepsort = DeepSort(cfg.DEEPSORT.REID_CKPT,
 #                     max_dist=cfg.DEEPSORT.MAX_DIST, min_confidence=cfg.DEEPSORT.MIN_CONFIDENCE,
 #                     nms_max_overlap=cfg.DEEPSORT.NMS_MAX_OVERLAP, max_iou_distance=cfg.DEEPSORT.MAX_IOU_DISTANCE,
 #                     max_age=cfg.DEEPSORT.MAX_AGE, n_init=cfg.DEEPSORT.N_INIT, nn_budget=cfg.DEEPSORT.NN_BUDGET,
 #                     use_cuda=True)
+
+
+
 deepsort_obb = DeepSORTOBB(cfg.DEEPSORT.REID_CKPT,
                            max_dist=cfg.DEEPSORT.MAX_DIST, min_confidence=cfg.DEEPSORT.MIN_CONFIDENCE,
                            nms_max_overlap=cfg.DEEPSORT.NMS_MAX_OVERLAP, max_iou_distance=cfg.DEEPSORT.MAX_IOU_DISTANCE,
@@ -80,7 +81,6 @@ DARK_COLORS = [
 ]
 
 
-# TODO hara: track length
 def draw_trail(image, tracks2draw, trail_length=630):
     for track2draw in tracks2draw:
         track_history_positions = track2draw[3]
@@ -143,7 +143,7 @@ def plot_bboxes(image, bboxes2draw, line_thickness=None):
     """
     tl = 5  # line/font thickness
     color = (0, 0, 256)
-    for (xyxyxyxy, cls_id, track_id, _) in bboxes2draw:
+    for (xyxyxyxy, _, track_id, _) in bboxes2draw:
         # Draw OBB as polygon
         pts = np.array(xyxyxyxy, np.int32).reshape((-1, 1, 2))
         cv2.polylines(image, [pts], True, color, thickness=tl, lineType=cv2.LINE_AA)

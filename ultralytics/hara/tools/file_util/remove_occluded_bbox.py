@@ -68,7 +68,7 @@ def process_folder(folder_path: str, overwrite: bool = True):
 
 
 if __name__ == "__main__":
-    folder_path = r"D:\chicken_project\experiment5reid\reid_training\combination_id0"
+    folder_path = r"D:\chicken_project\experiment5reid\hbb_training\combination_id\combination0614"
 
     # overwrite=True means directly modify original JSON files
     # overwrite=False means create new files like xxx_cleaned.json

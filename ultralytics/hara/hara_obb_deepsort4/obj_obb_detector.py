@@ -3,6 +3,7 @@ from ultralytics import YOLO
 import numpy as np
 import numpy as np
 from scipy.optimize import linear_sum_assignment
+from ultralytics.hara.hara_obb_deepsort4.deep_sort.configs.common_cfg import cfg
 
 # OBJ_LIST = ['person', 'car', 'bus', 'truck']
 # DETECTOR_PATH = r'G:\project_chicken\code\experiment_deepSORT\weights\yolov8s.pt'
@@ -10,7 +11,7 @@ OBJ_LIST = ['chicken']
 # DETECTOR_PATH = r'/ultralytics/hara/weights/yolov8m-obb-chicken-0401.pt'
 # DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolov8m-obb-chicken-0426.pt'
 # DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolov8m-obb-chicken-0520.pt'
-DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolo11l-obb-chicken-0607.pt'
+DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolo11l-obb-chicken-0614-half.pt'
 
 
 class baseDet(object):
@@ -99,19 +100,20 @@ class ObbDetector(baseDet):
             )
 
         # If there are more than 15 detections, we can apply a selection strategy here (e.g., based on confidence or spatial distribution)
-        if len(pred_boxes) > 15 and len(self.bbox_history) > 0 and len(self.bbox_history[-1]) == 15:
-            prev_points = np.array([[box[1][0], box[1][1]] for box in self.bbox_history[-1]])  # shape: (15, 2)
-            curr_points = np.array([[box[1][0], box[1][1]] for box in pred_boxes])  # shape: (m, 2)
-            curr_scores = np.array([box[3] for box in pred_boxes])  # shape: (m,)
-            _, _, _, selected_indices = select_15_points_by_distance_and_confidence(
-                prev_points, curr_points, curr_scores, alpha_distance=0.7, alpha_score=0.3,
-                x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max
-            )
-            # Update pred_boxes to only include the selected points
-            pred_boxes = [pred_boxes[i] for i in selected_indices]
-        else:
-            print(
-                f"Current frame has {len(pred_boxes)} detections, which is not more than 15 or no previous frame with 15 detections to compare with. Skipping selection step.")
+        if cfg.DEEPSORT.USE_OPTIMIZATION:
+            if len(pred_boxes) > cfg.DEEPSORT.MAX_ID_POOL and len(self.bbox_history) > 0 and len(self.bbox_history[-1]) == cfg.DEEPSORT.MAX_ID_POOL:
+                prev_points = np.array([[box[1][0], box[1][1]] for box in self.bbox_history[-1]])  # shape: (15, 2)
+                curr_points = np.array([[box[1][0], box[1][1]] for box in pred_boxes])  # shape: (m, 2)
+                curr_scores = np.array([box[3] for box in pred_boxes])  # shape: (m,)
+                _, _, _, selected_indices = select_15_points_by_distance_and_confidence(
+                    prev_points, curr_points, curr_scores, alpha_distance=0.7, alpha_score=0.3,
+                    x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max
+                )
+                # Update pred_boxes to only include the selected points
+                pred_boxes = [pred_boxes[i] for i in selected_indices]
+            else:
+                print(
+                    f"Current frame has {len(pred_boxes)} detections, which is not more than 15 or no previous frame with 15 detections to compare with. Skipping selection step.")
 
         # Update frame memory with current detections
         self._update_frame_memory(pred_boxes)

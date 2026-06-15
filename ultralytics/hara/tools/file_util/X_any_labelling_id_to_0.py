@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 # Change this to your folder path
-folder = Path(r"D:\chicken_project\experiment5reid\reid_training\combination_id0")
+folder = Path(r"D:\chicken_project\experiment5reid\reid_obb_training\combination_id_0614_half\combination_id0")
 
 for json_file in folder.glob("*.json"):
     with open(json_file, "r", encoding="utf-8") as f:

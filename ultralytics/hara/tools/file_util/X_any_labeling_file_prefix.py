@@ -3,7 +3,7 @@ import json
 import os
 
 # Change this to your folder path
-folder = Path(r"D:\chicken_project\experiment5reid\reid_training\combination_id\12_RGB_sick")
+folder = Path(r"D:\chicken_project\experiment5reid\hbb_training\combination_id\12_RGB_sick")
 
 prefix = "12_RGB_sick"
 

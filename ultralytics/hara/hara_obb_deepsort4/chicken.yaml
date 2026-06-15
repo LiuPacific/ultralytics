@@ -18,10 +18,18 @@
 
 
 # 0606
-path: D:/chicken_project/experiment5reid/obb_training/obb_20260606
-train: D:/chicken_project/experiment5reid/obb_training/obb_20260606/images/train
-val: D:/chicken_project/experiment5reid/obb_training/obb_20260606/images/val
-test: D:/chicken_project/experiment5reid/obb_training/obb_20260606/images/test
+#path: D:/chicken_project/experiment5reid/obb_training/obb_20260606
+#train: D:/chicken_project/experiment5reid/obb_training/obb_20260606/images/train
+#val: D:/chicken_project/experiment5reid/obb_training/obb_20260606/images/val
+#test: D:/chicken_project/experiment5reid/obb_training/obb_20260606/images/test
+
+# 0614, half data
+path: D:/chicken_project/experiment5reid/reid_obb_training/combination_id_0614_half/combination_id0
+train: D:/chicken_project/experiment5reid/reid_obb_training/combination_id_0614_half/combination_id0/train
+val: D:/chicken_project/experiment5reid/reid_obb_training/combination_id_0614_half/combination_id0/val
+test: D:/chicken_project/experiment5reid/reid_obb_training/combination_id_0614_half/combination_id0/test
+# yolo train data=C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/hara_obb_deepsort4/chicken.yaml model=C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/weights/yolo11l-obb.pt epochs=200 imgsz=1280 batch=12 workers=4 name=yolov11l-obb-chicken-0614-half
+
 
 names:
   0: chicken

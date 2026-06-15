@@ -1,8 +1,7 @@
-import cv2
-from obj_obb_detector import ObbDetector
 import numpy as np
 import objtracker
-
+from objdetector import Detector
+import cv2
 
 def main():
     # Initialize video capture to get video properties
@@ -14,15 +13,17 @@ def main():
     width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-
     # Close the video capture
     capture.release()
 
-    detector = ObbDetector()
+    detector = Detector()
     capture = cv2.VideoCapture(VIDEO_PATH)
     videoWriter = None
     fps = int(capture.get(5))
     print('fps:', fps)
+
+    # Dictionary to store the trail points of each object
+    object_trails = {}
 
     while True:
         _, im = capture.read()
@@ -31,12 +32,6 @@ def main():
         # detections = OBBDetections()
 
         output_image_frame, tracks2draw = objtracker.update(detector, im)
-
-
-        # for track2draw in tracks2draw:
-        #     xyxyxyxy,_, track_id = track2draw
-        #     detections.add(xyxyxyxy, None, None, track_id)
-
 
         if videoWriter is None:
             fourcc = cv2.VideoWriter_fourcc(
@@ -55,6 +50,8 @@ def main():
     capture.release()
     videoWriter.release()
     cv2.destroyAllWindows()
+
+
 
 if __name__ == '__main__':
 
@@ -95,8 +92,30 @@ if __name__ == '__main__':
     # RESULT_PATH = '1208040829_jump_reoccur.mp4'
     # main()
 
-    #
+
     VIDEO_PATH = r'F:\20251002\RGB_mock\seg1.mp4'
-    RESULT_PATH = 'seg1_3_tracking.mp4'
+    RESULT_PATH = 'seg1_2_tracking.mp4'
     main()
-    #
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

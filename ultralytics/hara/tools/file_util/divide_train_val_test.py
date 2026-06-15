@@ -7,7 +7,7 @@ from pathlib import Path
 # Settings
 # =========================
 
-source_dir = Path(r"D:\chicken_project\experiment5reid\reid_training\combination_id0606")
+source_dir = Path(r"D:\chicken_project\experiment5reid\reid_obb_training\combination_id_0614_half\combination_id0")
 
 train_ratio = 0.8
 val_ratio = 0.1

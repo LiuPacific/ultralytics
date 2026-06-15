@@ -6,6 +6,7 @@ from .track_obb import TrackOBB, TrackState
 from .linear_assignment_obb import gate_cost_matrix_obb, matching_cascade, min_cost_matching
 from scipy.optimize import linear_sum_assignment
 from sklearn.metrics.pairwise import cosine_distances
+from ultralytics.hara.hara_obb_deepsort4.deep_sort.configs.common_cfg import cfg
 
 
 class TrackerOBB:
@@ -60,20 +61,20 @@ class TrackerOBB:
             self.tracks[track_idx].mark_missed()
 
         for detection_idx in unmatched_detections:
-            if self.MAX_ID_POOL == 0:  # if MAX_ID_POOL is 0, initiate tracks with new sequential IDs (original behavior)
-                self._initiate_track(detections[detection_idx])
-            else:  # If MAX_ID_POOL is not 0, we will only initiate new tracks with ID less than self.MAX_ID_POOL
+            if cfg.DEEPSORT.USE_OPTIMIZATION and self.MAX_ID_POOL>0:
                 self._initiate_track_MAX_ID_POOL(detections[detection_idx], MAX_ID_POOL=self.MAX_ID_POOL)
+            else:
+                self._initiate_track(detections[detection_idx])
 
         # If MAX_ID_POOL is 0, use original behavior (delete tracks after max_age)
-        if self.MAX_ID_POOL == 0:
+        if cfg.DEEPSORT.USE_OPTIMIZATION and self.MAX_ID_POOL == 0:
             self.tracks = [t for t in self.tracks if not t.is_deleted()]
 
-        # Perform track re-identification
-        self._reidentify_tracks()
-
-        # Perform track re-identification by ReID (appearance features)
-        self._reidentify_tracks_by_ReID()
+        if cfg.DEEPSORT.USE_OPTIMIZATION:
+            # Perform track re-identification
+            self._reidentify_tracks()
+            # Perform track re-identification by ReID (appearance features)
+            self._reidentify_tracks_by_ReID()
 
         # Update distance metric.
         active_targets = [t.track_id for t in self.tracks if t.is_confirmed()]
