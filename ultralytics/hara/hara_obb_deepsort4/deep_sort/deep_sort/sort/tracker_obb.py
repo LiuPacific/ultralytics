@@ -15,7 +15,8 @@ class TrackerOBB:
     """
 
     def __init__(self, metric, max_iou_distance=0.7, max_age=70, n_init=3, kalman_filter=None, use_rotated_iou=True,
-                 MAX_ID_POOL=0, reconnection_distance_threshold=400, reuse_id_assignment_distance_threshold=200):
+                 MAX_ID_POOL=0, reconnection_distance_threshold=400, reuse_id_assignment_distance_threshold=200,
+                 csv_path=None, flush_interval=30):
         self.metric = metric
         self.max_iou_distance = max_iou_distance
         self.max_age = max_age
@@ -33,6 +34,11 @@ class TrackerOBB:
         self.tracks = []
         self._next_id = 1
         self.frame_id = 0  # Global frame counter (incremented each update)
+        # CSV logging buffer and configuration
+        self.csv_path = csv_path or "tracking_output.csv"
+        self._csv_buffer = []
+        self._frames_since_flush = 0
+        self._flush_interval = flush_interval
 
     def predict(self):
         """Propagate track state distributions one time step forward."""
@@ -92,7 +98,72 @@ class TrackerOBB:
         self._save_tracking_information()
 
     def _save_tracking_information(self):
-        pass
+        """Record tracking information for current frame into internal buffer and flush to CSV when needed."""
+        self.record_frame_into_buffer(self.frame_id)
+        self._frames_since_flush += 1
+        if self._frames_since_flush >= self._flush_interval:
+            # flush
+            self._frames_since_flush = 0
+            self.save_csv()
+
+    def record_frame_into_buffer(self, global_frame_id: int):
+        """Record current tracks into internal CSV buffer for the given global frame id.
+
+        This function will flush the buffer to disk every `self._flush_interval` frames.
+        """
+        for track in self.tracks:
+            tid = int(track.track_id)
+            # detected this frame if time_since_update == 0
+            detected = (track.time_since_update == 0)
+
+            # Determine center coordinates: use last detected xy if available, otherwise None
+            if track.last_detected_xywhr is not None:
+                try:
+                    cx, cy = float(track.last_detected_xywhr[0]), float(track.last_detected_xywhr[1])
+                except (TypeError, IndexError):
+                    cx, cy = (None, None)
+            else:
+                cx, cy = (None, None)
+
+            if detected and track.last_detected_xywhr is not None:
+                try:
+                    w, h, angle = (float(track.last_detected_xywhr[2]), float(track.last_detected_xywhr[3]), float(track.last_detected_xywhr[4]))
+                    confidence = float(track.last_confidence) if track.last_confidence is not None else None
+                except (TypeError, IndexError):
+                    w, h, angle, confidence = (None, None, None, None)
+            else:
+                # not detected in this frame: keep center from last detected, other fields null
+                w, h, angle, confidence = (None, None, None, None)
+
+            self._csv_buffer.append((int(global_frame_id), tid, cx, cy, w, h, angle, confidence, bool(detected)))
+
+
+
+    def save_csv(self, file_path: str = None, force: bool = False):
+        """Flush internal CSV buffer to disk.
+
+        If file_path is None, use self.csv_path.
+        """
+        import os
+        import csv
+
+        if not self._csv_buffer and not force:
+            return
+
+        out_path = file_path or self.csv_path
+        file_exists = os.path.exists(out_path)
+
+        # write rows
+        with open(out_path, 'a', newline='') as f:
+            writer = csv.writer(f)
+            if not file_exists:
+                writer.writerow(['frame_id', 'track_id', 'center_x', 'center_y', 'width', 'height', 'angle', 'confidence', 'detected'])
+            for row in self._csv_buffer:
+                # Convert None to empty string for CSV
+                writer.writerow([r if r is not None else '' for r in row])
+
+        # clear buffer
+        self._csv_buffer = []
 
     def _match(self, detections):
         def gated_metric(tracks, dets, track_indices, detection_indices):
@@ -148,9 +219,13 @@ class TrackerOBB:
         # For OBB detections, we need to convert to xywhr format for Kalman filter
         xywhr = detection.to_xywhr()
         mean, covariance = self.kf.initiate(xywhr)
-        self.tracks.append(TrackOBB(
+        new_track = TrackOBB(
             mean, covariance, self._next_id, self.n_init, self.max_age,
-            detection.feature, self.frame_id))
+            detection.feature, self.frame_id)
+        # set last detected info on the newly created track
+        new_track.last_detected_xywhr = xywhr
+        new_track.last_confidence = detection.confidence
+        self.tracks.append(new_track)
         self._next_id += 1
 
     def _initiate_track_MAX_ID_POOL(self, detection, MAX_ID_POOL=15):
@@ -294,8 +369,7 @@ class TrackerOBB:
         new_track = TrackOBB(
             mean, covariance, temp_id, self.n_init, self.max_age,
             detection.feature, self.frame_id)
-        self.tracks.append(new_track)
-        self._next_id += 1
+
 
         # Find the old track with reuse_id to merge into new_track
         old_track = None
@@ -318,6 +392,16 @@ class TrackerOBB:
         else:
             # No old track to merge; just use the reuse_id directly
             new_track.track_id = reuse_id
+
+        # set last detected info on the newly created track
+        new_track.last_detected_xywhr = xywhr
+        new_track.last_confidence = detection.confidence
+        self.tracks.append(new_track)
+        self._next_id += 1
+
+
+
+
 
     def _reidentify_tracks(self):
         """Re-identify tracks that disappeared and reappeared using position history."""

@@ -53,6 +53,10 @@ class TrackOBB:
         self._feature_sample_interval = 30  # Sample feature every 30 global frames
         self._last_sampled_frame_id = frame_id  # Last frame where feature was sampled
 
+        # Last detected (measurement) xywhr and confidence (updated when a detection is associated)
+        self.last_detected_xywhr = None
+        self.last_confidence = None
+
     def to_tlwh(self):
         """Get current position in axis-aligned bounding box format `(top left x, top left y,
         width, height)` for compatibility.
@@ -146,6 +150,10 @@ class TrackOBB:
                 'feature': detection.feature.copy()
             })
             self._last_sampled_frame_id = frame_id
+
+        # Update last detected xywhr and confidence
+        self.last_detected_xywhr = measurement
+        self.last_confidence = detection.confidence
 
     def mark_missed(self):
         """Mark this track as missed (no association at the current time step)."""
