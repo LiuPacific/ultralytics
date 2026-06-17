@@ -88,6 +88,12 @@ class TrackerOBB:
         self.metric.partial_fit(
             np.asarray(features), np.asarray(targets), active_targets)
 
+        # save tracking information
+        self._save_tracking_information()
+
+    def _save_tracking_information(self):
+        pass
+
     def _match(self, detections):
         def gated_metric(tracks, dets, track_indices, detection_indices):
             features = np.array([dets[i].feature for i in detection_indices])

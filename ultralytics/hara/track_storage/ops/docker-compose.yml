@@ -1,0 +1,25 @@
+services:
+  timescaledb:
+    image: timescale/timescaledb-ha:pg17.10-ts2.27.2
+    container_name: hara_chicken_timescaledb
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: hara
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: chicken_tracking
+
+    ports:
+      - "15432:5432"
+
+    volumes:
+      - D:/chicken_project/pg_data:/home/postgres/pgdata
+      - ./initdb/init_chicken_tracking.sql:/docker-entrypoint-initdb.d/100_init_chicken_tracking.sql:ro
+
+    shm_size: "1gb"
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hara -d chicken_tracking"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

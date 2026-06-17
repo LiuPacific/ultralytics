@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
 
     VIDEO_PATH = r'F:\20251002\RGB_mock\seg1.mp4'
-    RESULT_PATH = 'seg1_3_tracking_hbb.mp4'
+    RESULT_PATH = 'seg1_3_detection_hbb.mp4'
     main()
 
 
