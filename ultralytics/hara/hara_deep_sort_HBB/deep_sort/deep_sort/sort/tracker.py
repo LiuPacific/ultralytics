@@ -40,7 +40,7 @@ class Tracker:
 
     """
 
-    def __init__(self, metric, max_iou_distance=0.7, max_age=70, n_init=3):
+    def __init__(self, metric, max_iou_distance=0.7, max_age=70, n_init=3, csv_path=None, flush_interval=30):
         self.metric = metric
         self.max_iou_distance = max_iou_distance
         self.max_age = max_age
@@ -54,7 +54,13 @@ class Tracker:
 
         self.tracks = []   # 保存一个轨迹列表，用于保存一系列轨迹
         self._next_id = 1  # 下一个分配的轨迹id
- 
+        # CSV logging buffer and configuration
+        self.csv_path = csv_path or "tracking_output.csv"
+        self._csv_buffer = []
+        self._frames_since_flush = 0
+        self._flush_interval = flush_interval
+        self.frame_id = 0  # Global frame counter
+
     def predict(self):
         """Propagate track state distributions one time step forward.
         将跟踪状态分布向前传播一步
@@ -74,6 +80,9 @@ class Tracker:
             A list of detections at the current time step.
 
         """
+        # Increment global frame counter
+        self.frame_id += 1
+
         # Run matching cascade.
         matches, unmatched_tracks, unmatched_detections = \
             self._match(detections)
@@ -112,6 +121,77 @@ class Tracker:
         # 距离度量中的特征集更新
         self.metric.partial_fit(
             np.asarray(features), np.asarray(targets), active_targets)
+
+        # save tracking information
+        self._save_tracking_information()
+
+    def _save_tracking_information(self):
+        """Record tracking information for current frame into internal buffer and flush to CSV when needed."""
+        self.record_frame(self.frame_id)
+        self._frames_since_flush += 1
+        if self._frames_since_flush >= self._flush_interval:
+            # flush
+            self._frames_since_flush = 0
+            self.save_csv()
+
+    def record_frame(self, global_frame_id: int):
+        """Record current tracks into internal CSV buffer for the given global frame id.
+        Only records detected tracks (time_since_update == 0) for non-optimized mode.
+
+        This function will flush the buffer to disk every `self._flush_interval` frames.
+        """
+        for track in self.tracks:
+            # Only record detected tracks (confirmed + detected in current frame)
+            if track.time_since_update != 0:
+                continue
+
+            tid = int(track.track_id)
+            detected = True  # By definition, we only record detected tracks
+
+            # Get center and dimensions from last detected xyah
+            if track.last_detected_xyah is not None:
+                try:
+                    # xyah format: x, y, aspect_ratio, height
+                    x, y, a, h = float(track.last_detected_xyah[0]), float(track.last_detected_xyah[1]), \
+                                 float(track.last_detected_xyah[2]), float(track.last_detected_xyah[3])
+                    w = a * h  # width = aspect_ratio * height
+                    confidence = float(track.last_confidence) if track.last_confidence is not None else None
+                except (TypeError, IndexError):
+                    continue
+            else:
+                continue
+
+            # For HBB (horizontal bounding box), no rotation angle
+            # CSV format: frame_id, track_id, center_x, center_y, width, height, confidence, detected
+            self._csv_buffer.append((int(global_frame_id), tid, x, y, w, h, confidence, bool(detected)))
+
+
+
+    def save_csv(self, file_path: str = None, force: bool = False):
+        """Flush internal CSV buffer to disk.
+
+        If file_path is None, use self.csv_path.
+        """
+        import os
+        import csv
+
+        if not self._csv_buffer and not force:
+            return
+
+        out_path = file_path or self.csv_path
+        file_exists = os.path.exists(out_path)
+
+        # write rows
+        with open(out_path, 'a', newline='') as f:
+            writer = csv.writer(f)
+            if not file_exists:
+                writer.writerow(['frame_id', 'track_id', 'center_x', 'center_y', 'width', 'height', 'confidence', 'detected'])
+            for row in self._csv_buffer:
+                # Convert None to empty string for CSV
+                writer.writerow([r if r is not None else '' for r in row])
+
+        # clear buffer
+        self._csv_buffer = []
 
     def _match(self, detections):
 
@@ -169,9 +249,19 @@ class Tracker:
 
     def _initiate_track(self, detection):
         mean, covariance = self.kf.initiate(detection.to_xyah())
-        self.tracks.append(Track(
+        new_track = Track(
             mean, covariance, self._next_id, self.n_init, self.max_age,
-            detection.feature))
+            detection.feature)
+        # set last detected info on the newly created track for CSV logging
+        try:
+            new_track.last_detected_xyah = detection.to_xyah()
+        except Exception:
+            new_track.last_detected_xyah = None
+        try:
+            new_track.last_confidence = detection.confidence
+        except Exception:
+            new_track.last_confidence = None
+        self.tracks.append(new_track)
         # hara change starts;
         if self._next_id >=16:
             # if next id is 16, it means currently we have 15 ids.

@@ -53,7 +53,7 @@ class TrackerOBB:
         # 201 gating distance 0.6
         # 203 5.79
         # 204
-        if self.frame_id >=200 and self.frame_id <=204:
+        if self.frame_id >= 200 and self.frame_id <= 204:
             print("---")
 
         # Run matching cascade.
@@ -67,7 +67,7 @@ class TrackerOBB:
             self.tracks[track_idx].mark_missed()
 
         for detection_idx in unmatched_detections:
-            if cfg.DEEPSORT.USE_OPTIMIZATION and self.MAX_ID_POOL>0:
+            if cfg.DEEPSORT.USE_OPTIMIZATION and self.MAX_ID_POOL > 0:
                 self._initiate_track_MAX_ID_POOL(detections[detection_idx], MAX_ID_POOL=self.MAX_ID_POOL)
             else:
                 self._initiate_track(detections[detection_idx])
@@ -116,6 +116,10 @@ class TrackerOBB:
             # detected this frame if time_since_update == 0
             detected = (track.time_since_update == 0)
 
+            # If optimization is not used, don't record the track's data. There should be new tracks created and recorded.
+            if not cfg.DEEPSORT.USE_OPTIMIZATION or self.MAX_ID_POOL == 0:
+                continue
+
             # Determine center coordinates: use last detected xy if available, otherwise None
             if track.last_detected_xywhr is not None:
                 try:
@@ -125,9 +129,11 @@ class TrackerOBB:
             else:
                 cx, cy = (None, None)
 
+            # if cfg.DEEPSORT.USE_OPTIMIZATION and self.MAX_ID_POOL>0:
             if detected and track.last_detected_xywhr is not None:
                 try:
-                    w, h, angle = (float(track.last_detected_xywhr[2]), float(track.last_detected_xywhr[3]), float(track.last_detected_xywhr[4]))
+                    w, h, angle = (float(track.last_detected_xywhr[2]), float(track.last_detected_xywhr[3]),
+                                   float(track.last_detected_xywhr[4]))
                     confidence = float(track.last_confidence) if track.last_confidence is not None else None
                 except (TypeError, IndexError):
                     w, h, angle, confidence = (None, None, None, None)
@@ -136,8 +142,6 @@ class TrackerOBB:
                 w, h, angle, confidence = (None, None, None, None)
 
             self._csv_buffer.append((int(global_frame_id), tid, cx, cy, w, h, angle, confidence, bool(detected)))
-
-
 
     def save_csv(self, file_path: str = None, force: bool = False):
         """Flush internal CSV buffer to disk.
@@ -157,7 +161,9 @@ class TrackerOBB:
         with open(out_path, 'a', newline='') as f:
             writer = csv.writer(f)
             if not file_exists:
-                writer.writerow(['frame_id', 'track_id', 'center_x', 'center_y', 'width', 'height', 'angle', 'confidence', 'detected'])
+                writer.writerow(
+                    ['frame_id', 'track_id', 'center_x', 'center_y', 'width', 'height', 'angle', 'confidence',
+                     'detected'])
             for row in self._csv_buffer:
                 # Convert None to empty string for CSV
                 writer.writerow([r if r is not None else '' for r in row])
@@ -296,8 +302,6 @@ class TrackerOBB:
         if best_candidate is not None and best_dist < self.reuse_id_assignment_distance_threshold:
             reuse_id = best_candidate.track_id
 
-
-
         # # 1) Consider deleted tracks first
         # deleted_candidates = [t for t in self.tracks if t.is_deleted() and 1 <= t.track_id <= MAX_ID_POOL]
         # best_candidate = None
@@ -370,7 +374,6 @@ class TrackerOBB:
             mean, covariance, temp_id, self.n_init, self.max_age,
             detection.feature, self.frame_id)
 
-
         # Find the old track with reuse_id to merge into new_track
         old_track = None
         if reuse_id is not None:
@@ -398,10 +401,6 @@ class TrackerOBB:
         new_track.last_confidence = detection.confidence
         self.tracks.append(new_track)
         self._next_id += 1
-
-
-
-
 
     def _reidentify_tracks(self):
         """Re-identify tracks that disappeared and reappeared using position history."""
@@ -558,7 +557,8 @@ class TrackerOBB:
 
         for r, c in zip(row_ind, col_ind):
             # if cost_matrix[r, c] < similarity_threshold and cost_matrix[r, c] != np.inf:
-            if cost_matrix[r, c] < similarity_threshold and cost_matrix[r, c] != np.inf and cost_matrix[r, c] < self.reconnection_distance_threshold:
+            if cost_matrix[r, c] < similarity_threshold and cost_matrix[r, c] != np.inf and cost_matrix[
+                r, c] < self.reconnection_distance_threshold:
                 lost_track = lost_tracks[r]
                 new_track = new_tracks[c]
 

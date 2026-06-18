@@ -108,6 +108,10 @@ class Track:
 
         self.position_history = deque(maxlen=300)
 
+        # Last detected (measurement) xyah and confidence (updated when a detection is associated)
+        self.last_detected_xyah = None
+        self.last_confidence = None
+
 
     def to_tlwh(self):
         """Get current position in bounding box format `(top left x, top left y,
@@ -170,8 +174,9 @@ class Track:
             The associated detection.
 
         """
+        measurement = detection.to_xyah()
         self.mean, self.covariance = kf.update(
-            self.mean, self.covariance, detection.to_xyah())
+            self.mean, self.covariance, measurement)
         self.features.append(detection.feature)
 
         self.hits += 1
@@ -182,6 +187,10 @@ class Track:
             self.state = TrackState.Confirmed
 
         self.position_history.append(self.get_center())
+
+        # Update last detected xyah and confidence for CSV logging
+        self.last_detected_xyah = measurement
+        self.last_confidence = detection.confidence
 
     def mark_missed(self):
         """Mark this track as missed (no association at the current time step).
