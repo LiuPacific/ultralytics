@@ -19,7 +19,7 @@ class DeepSORTOBB(object):
     def __init__(self, model_path, max_dist=0.2, min_confidence=0.3, nms_max_overlap=1.0,
                  max_iou_distance=0.7, max_age=70, n_init=3, nn_budget=100, use_cuda=True, MAX_ID_POOL=15,
                  use_rotated_features=True, reconnection_distance_threshold=400,
-                 reuse_id_assignment_distance_threshold=200, use_reid=False):
+                 reuse_id_assignment_distance_threshold=200, use_reid=False, tracking_csv_path=None):
         self.min_confidence = min_confidence
         self.nms_max_overlap = nms_max_overlap
         self.use_rotated_features = use_rotated_features
@@ -38,6 +38,7 @@ class DeepSORTOBB(object):
                                       n_init=n_init, kalman_filter=self.kalman_filter, MAX_ID_POOL=MAX_ID_POOL,
                                       reconnection_distance_threshold=reconnection_distance_threshold,
                                       reuse_id_assignment_distance_threshold=reuse_id_assignment_distance_threshold,
+                                      tracking_csv_path=tracking_csv_path
                                       )
 
     def update(self, xyxyxyxy_list, xywhr_list, confidences, ori_img):

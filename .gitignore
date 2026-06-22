@@ -222,3 +222,4 @@ results.csv
 **/.weights/
 **/.temp/
 .cap
+.run

@@ -23,3 +23,25 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+
+
+  grafana:
+    image: grafana/grafana
+    container_name: hara_chicken_grafana
+    restart: unless-stopped
+
+    ports:
+      - "13000:3000"
+
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+
+    volumes:
+      - D:\chicken_project\grafana_data\chicken_grafana:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+
+    depends_on:
+      timescaledb:
+        condition: service_healthy

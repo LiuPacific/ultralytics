@@ -32,7 +32,8 @@ def get_config(config_file=None):
     return YamlParser(config_file=config_file)
 
 cfg = get_config()
-cfg.merge_from_file("deep_sort/configs/deep_sort.yaml")
+# cfg.merge_from_file("deep_sort/configs/deep_sort.yaml")
+
 
 if __name__ == "__main__":
     cfg = YamlParser(config_file="../configs/yolov3.yaml")

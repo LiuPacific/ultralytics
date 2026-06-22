@@ -2,6 +2,7 @@ CREATE EXTENSION IF NOT EXISTS timescaledb;
 CREATE EXTENSION IF NOT EXISTS postgis;
 
 CREATE TABLE IF NOT EXISTS tracking_points (
+    COLUMN hid SERIAL PRIMARY KEY,
     ts TIMESTAMPTZ NOT NULL,
 
     video_id TEXT NOT NULL,
@@ -22,13 +23,15 @@ CREATE TABLE IF NOT EXISTS tracking_points (
 
     confidence REAL,
 
+    -- Whether this point comes from an actual detector result.
+    -- TRUE means detected by the model; FALSE can mean interpolated, predicted, or manually filled.
+    detected BOOLEAN NOT NULL DEFAULT TRUE,
+
     -- Store OBB/HBB details, detector metadata, angle, width, height, etc.
     bbox JSONB,
 
     -- Extra flexible metadata: model version, ReID score, occlusion flag, etc.
     extra JSONB,
-
-    PRIMARY KEY (video_id, frame_index, track_id, ts)
     );
 
 -- TimescaleDB hypertables are PostgreSQL tables automatically partitioned by time into chunks

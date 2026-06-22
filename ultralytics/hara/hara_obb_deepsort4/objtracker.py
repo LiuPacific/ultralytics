@@ -6,30 +6,10 @@ import numpy as np
 from ultralytics.hara.hara_obb_deepsort4.deep_sort.deep_sort.deep_sort_obb import DeepSORTOBB
 from ultralytics.hara.hara_obb_deepsort4.obj_obb_detector import ObbDetector
 from deep_sort.deep_sort.sort import obb_utils
-from ultralytics.hara.hara_obb_deepsort4.deep_sort.configs.common_cfg import cfg
-
-# deepsort = DeepSort(cfg.DEEPSORT.REID_CKPT,
-#                     max_dist=cfg.DEEPSORT.MAX_DIST, min_confidence=cfg.DEEPSORT.MIN_CONFIDENCE,
-#                     nms_max_overlap=cfg.DEEPSORT.NMS_MAX_OVERLAP, max_iou_distance=cfg.DEEPSORT.MAX_IOU_DISTANCE,
-#                     max_age=cfg.DEEPSORT.MAX_AGE, n_init=cfg.DEEPSORT.N_INIT, nn_budget=cfg.DEEPSORT.NN_BUDGET,
-#                     use_cuda=True)
 
 
 
-deepsort_obb = DeepSORTOBB(cfg.DEEPSORT.REID_CKPT,
-                           max_dist=cfg.DEEPSORT.MAX_DIST, min_confidence=cfg.DEEPSORT.MIN_CONFIDENCE,
-                           nms_max_overlap=cfg.DEEPSORT.NMS_MAX_OVERLAP, max_iou_distance=cfg.DEEPSORT.MAX_IOU_DISTANCE,
-                           max_age=cfg.DEEPSORT.MAX_AGE, n_init=cfg.DEEPSORT.N_INIT, nn_budget=cfg.DEEPSORT.NN_BUDGET,
-                           use_cuda=True,
-                           MAX_ID_POOL=cfg.DEEPSORT.MAX_ID_POOL,
-                           reconnection_distance_threshold=cfg.DEEPSORT.RECONNECTION_DISTANCE_THRESHOLD,
-                           reuse_id_assignment_distance_threshold=cfg.DEEPSORT.REUSE_ID_ASSIGNMENT_DISTANCE_THRESHOLD,
-                           use_reid=cfg.DEEPSORT.USE_REID,
-                           use_rotated_features=cfg.DEEPSORT.USE_ROTATED_FEATURES
-                           )
-
-
-def update(target_detector: ObbDetector, image):
+def update(target_detector: ObbDetector, image, deepsort_obb: DeepSORTOBB):
     obb_detections = target_detector.detect(image)
     xyxyxyxy_list = []
     xywhr_list = []

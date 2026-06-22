@@ -52,6 +52,7 @@ INSERT INTO tracking_points (
     x_px,
     y_px,
     confidence,
+    detected,
     bbox,
     extra
 )
@@ -65,6 +66,7 @@ VALUES (
     512.4,
     348.7,
     0.96,
+    True,
     '{"type":"OBB","cx":512.4,"cy":348.7,"w":80.2,"h":160.5,"angle":1.57}'::jsonb,
     '{"detector":"yolo11l-obb","tracker":"deepsort_obb"}'::jsonb
 );

@@ -1,10 +1,12 @@
 DEEPSORT:
+  DETECTION_MODEL_PATH: "C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/weights/yolo11l-obb-chicken-0614-half.pt"
+  REID_CKPT: ""
 #  REID_CKPT: "deep_sort/deep_sort/deep/checkpoint/ckpt_person.t7"
-  REID_CKPT: "C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/hara_reid/outputs/best_osnet.pth"
+#  REID_CKPT: "C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/hara_reid/outputs/best_osnet.pth"
   MAX_DIST: 0.2
   MIN_CONFIDENCE: 0.3
   NMS_MAX_OVERLAP: 0.5
-  MAX_IOU_DISTANCE: 0.5
+  MAX_IOU_DISTANCE: 0.7
   N_INIT: 3
   NN_BUDGET: 100
   MAX_ID_POOL: 15
@@ -12,7 +14,11 @@ DEEPSORT:
   REUSE_ID_ASSIGNMENT_DISTANCE_THRESHOLD: 200
   USE_REID: False
   USE_ROTATED_FEATURES: True
-  USE_OPTIMIZATION: True
-  MAX_AGE: 10
-#  USE_OPTIMIZATION: False
-#  MAX_AGE: 70
+#  USE_OPTIMIZATION: True
+#  MAX_AGE: 10
+  USE_OPTIMIZATION: False
+  MAX_AGE: 30
+  TRACKING_CSV_PATH: tracking_output1.csv
+  VIDEO_PATH: F:/20251002/RGB_mock/seg1.mp4
+  RESULT_PATH: seg1_3_csv.mp4
+  

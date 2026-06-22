@@ -5,13 +5,8 @@ import numpy as np
 from scipy.optimize import linear_sum_assignment
 from ultralytics.hara.hara_obb_deepsort4.deep_sort.configs.common_cfg import cfg
 
-# OBJ_LIST = ['person', 'car', 'bus', 'truck']
-# DETECTOR_PATH = r'G:\project_chicken\code\experiment_deepSORT\weights\yolov8s.pt'
+# OBJ_LIST = ['person', 'chicken']
 OBJ_LIST = ['chicken']
-# DETECTOR_PATH = r'/ultralytics/hara/weights/yolov8m-obb-chicken-0401.pt'
-# DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolov8m-obb-chicken-0426.pt'
-# DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolov8m-obb-chicken-0520.pt'
-DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolo11l-obb-chicken-0614-half.pt'
 
 
 class baseDet(object):
@@ -40,7 +35,7 @@ class ObbDetector(baseDet):
         self.frame_memory_length = 5
 
     def init_model(self):
-        self.weights = DETECTOR_PATH
+        self.weights = cfg.DEEPSORT.DETECTION_MODEL_PATH
         self.device = 0 if torch.cuda.is_available() else 'cpu'
         self.model = YOLO(self.weights)
         self.m = self.model

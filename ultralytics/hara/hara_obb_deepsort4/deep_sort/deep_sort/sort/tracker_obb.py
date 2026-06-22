@@ -16,7 +16,7 @@ class TrackerOBB:
 
     def __init__(self, metric, max_iou_distance=0.7, max_age=70, n_init=3, kalman_filter=None, use_rotated_iou=True,
                  MAX_ID_POOL=0, reconnection_distance_threshold=400, reuse_id_assignment_distance_threshold=200,
-                 csv_path=None, flush_interval=30):
+                 flush_interval=30, tracking_csv_path="tracking_output.csv"):
         self.metric = metric
         self.max_iou_distance = max_iou_distance
         self.max_age = max_age
@@ -35,7 +35,7 @@ class TrackerOBB:
         self._next_id = 1
         self.frame_id = 0  # Global frame counter (incremented each update)
         # CSV logging buffer and configuration
-        self.csv_path = csv_path or "tracking_output.csv"
+        self.tracking_csv_path = tracking_csv_path
         self._csv_buffer = []
         self._frames_since_flush = 0
         self._flush_interval = flush_interval
@@ -117,8 +117,8 @@ class TrackerOBB:
             detected = (track.time_since_update == 0)
 
             # If optimization is not used, don't record the track's data. There should be new tracks created and recorded.
-            if not cfg.DEEPSORT.USE_OPTIMIZATION or self.MAX_ID_POOL == 0:
-                continue
+            # if not cfg.DEEPSORT.USE_OPTIMIZATION or self.MAX_ID_POOL == 0:
+            #     continue
 
             # Determine center coordinates: use last detected xy if available, otherwise None
             if track.last_detected_xywhr is not None:
@@ -154,7 +154,7 @@ class TrackerOBB:
         if not self._csv_buffer and not force:
             return
 
-        out_path = file_path or self.csv_path
+        out_path = file_path or self.tracking_csv_path
         file_exists = os.path.exists(out_path)
 
         # write rows
