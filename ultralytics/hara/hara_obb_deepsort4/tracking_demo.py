@@ -149,5 +149,18 @@ if __name__ == '__main__':
     cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold6_tracking.yaml")
     start()
 
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min\hold1_tracking.yaml")
+    start()
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min\hold2_tracking.yaml")
+    start()
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min\hold3_tracking.yaml")
+    start()
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min\hold4_tracking.yaml")
+    start()
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min\hold5_tracking.yaml")
+    start()
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min\hold6_tracking.yaml")
+    start()
+
 
 

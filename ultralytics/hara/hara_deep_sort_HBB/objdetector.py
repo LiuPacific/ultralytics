@@ -1,10 +1,10 @@
 import torch
 from ultralytics import YOLO
+from ultralytics.hara.hara_deep_sort_HBB.deep_sort.configs.common_cfg import cfg
 
 # OBJ_LIST = ['person', 'car', 'bus', 'truck']
 # DETECTOR_PATH = r'G:\project_chicken\code\experiment_deepSORT\weights\yolov8s.pt'
-OBJ_LIST = ['chicken', 'bus']
-DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolo11l-hbb-chicken-0614-half.pt'
+OBJ_LIST = ['chicken']
 
 class baseDet(object):
     def __init__(self):
@@ -28,7 +28,7 @@ class Detector( baseDet):
         self.init_model()
 
     def init_model(self):
-        self.weights = DETECTOR_PATH
+        self.weights = cfg.DEEPSORT.DETECTION_MODEL_PATH
         self.device = 0 if torch.cuda.is_available() else 'cpu'
         self.model = YOLO(self.weights)
         self.m = self.model

@@ -2,6 +2,7 @@ import os
 import yaml
 from easydict import EasyDict as edict
 
+
 class YamlParser(edict):
     """
     This is yaml parser based on EasyDict.
@@ -17,12 +18,12 @@ class YamlParser(edict):
 
         super(YamlParser, self).__init__(cfg_dict)
 
-    
+
     def merge_from_file(self, config_file):
         with open(config_file, 'r') as fo:
             #self.update(yaml.load(fo.read()))
             self.update(yaml.load(fo.read(),Loader=yaml.FullLoader))
-    
+
     def merge_from_dict(self, config_dict):
         self.update(config_dict)
 
@@ -30,9 +31,13 @@ class YamlParser(edict):
 def get_config(config_file=None):
     return YamlParser(config_file=config_file)
 
+cfg = get_config()
+# cfg.merge_from_file("deep_sort/configs/deep_sort.yaml")
+
 
 if __name__ == "__main__":
     cfg = YamlParser(config_file="../configs/yolov3.yaml")
     cfg.merge_from_file("../configs/deep_sort.yaml")
 
     import ipdb; ipdb.set_trace()
+

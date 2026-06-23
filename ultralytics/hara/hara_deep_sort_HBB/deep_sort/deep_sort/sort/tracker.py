@@ -40,7 +40,8 @@ class Tracker:
 
     """
 
-    def __init__(self, metric, max_iou_distance=0.7, max_age=70, n_init=3, csv_path=None, flush_interval=30):
+    def __init__(self, metric, max_iou_distance=0.7, max_age=70, n_init=3, csv_path=None, flush_interval=30,
+                 tracking_csv_path="tracking_output.csv"):
         self.metric = metric
         self.max_iou_distance = max_iou_distance
         self.max_age = max_age
@@ -55,7 +56,7 @@ class Tracker:
         self.tracks = []   # 保存一个轨迹列表，用于保存一系列轨迹
         self._next_id = 1  # 下一个分配的轨迹id
         # CSV logging buffer and configuration
-        self.csv_path = csv_path or "tracking_output.csv"
+        self.tracking_csv_path = tracking_csv_path
         self._csv_buffer = []
         self._frames_since_flush = 0
         self._flush_interval = flush_interval
@@ -170,7 +171,7 @@ class Tracker:
     def save_csv(self, file_path: str = None, force: bool = False):
         """Flush internal CSV buffer to disk.
 
-        If file_path is None, use self.csv_path.
+        If file_path is None, use self.tracking_csv_path.
         """
         import os
         import csv
@@ -178,7 +179,7 @@ class Tracker:
         if not self._csv_buffer and not force:
             return
 
-        out_path = file_path or self.csv_path
+        out_path = file_path or self.tracking_csv_path
         file_exists = os.path.exists(out_path)
 
         # write rows

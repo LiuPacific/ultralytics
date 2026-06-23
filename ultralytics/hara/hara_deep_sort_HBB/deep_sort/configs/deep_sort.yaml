@@ -1,10 +1,11 @@
 DEEPSORT:
+  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/hbb_hold1_5min/weights/last.pt"
   REID_CKPT: ""
 #  REID_CKPT: "E:/chicken_project/workspace/ultralytics/ultralytics/hara/hara_deep_sort/.weights/.deep_sort_checkpoint/ckpt_person.t7"
 #  MAX_DIST: 0.2
-  MAX_DIST: 0.5
-#  MIN_CONFIDENCE: 0.3
-  MIN_CONFIDENCE: 0.2
+  MAX_DIST: 0.2
+  MIN_CONFIDENCE: 0.3
+#  MIN_CONFIDENCE: 0.2
   NMS_MAX_OVERLAP: 0.5
   MAX_IOU_DISTANCE: 0.7
 #  MAX_IOU_DISTANCE: 1
@@ -13,4 +14,7 @@ DEEPSORT:
   N_INIT: 3
   NN_BUDGET: 100
   USE_REID: False
-
+#  TRACKING_CSV_PATH: tracking_output1.csv
+  TRACKING_CSV_PATH: D:/chicken_project/experiment6report/running/hbb_hold1_5min/weights/tracking_output1.csv
+  VIDEO_PATH: F:/20251002/RGB_mock/seg1.mp4
+  RESULT_PATH: seg1_3_csv.mp4

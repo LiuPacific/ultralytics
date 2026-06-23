@@ -13,7 +13,7 @@ __all__ = ['DeepSort']  # __all__ 提供了暴露接口用的”白名单“
 class DeepSort(object):
     def __init__(self, model_path, max_dist=0.2, min_confidence=0.3, nms_max_overlap=1.0, max_iou_distance=0.7,
                  max_age=70, n_init=3, nn_budget=100, use_cuda=True,
-                 use_reid=False):
+                 use_reid=False, tracking_csv_path=None):
         self.min_confidence = min_confidence  # 检测结果置信度阈值
         self.nms_max_overlap = nms_max_overlap  # 非极大抑制阈值，设置为1代表不进行抑制
         self.use_reid = use_reid
@@ -27,7 +27,8 @@ class DeepSort(object):
         # 由距离度量方法构造一个 Tracker。
         # 第一个参数可选'cosine' or 'euclidean'
         metric = NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
-        self.tracker = Tracker(metric, max_iou_distance=max_iou_distance, max_age=max_age, n_init=n_init)
+        self.tracker = Tracker(metric, max_iou_distance=max_iou_distance, max_age=max_age, n_init=n_init,
+                               tracking_csv_path=tracking_csv_path)
 
     def update(self, bbox_xywh, confidences, ori_img):
         self.height, self.width = ori_img.shape[:2]
