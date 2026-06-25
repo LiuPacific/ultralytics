@@ -471,8 +471,32 @@ def filter_by_frame_range(
 # ============================================================
 
 if __name__ == "__main__":
-    tracking_csv = r".run/obb_hold1_10min_tracking_output.csv"
-    gt_csv = r".run\08_mock_1-15_tracking.csv"
+
+    # gt_csv = r".run\08_mock_1-15_tracking.csv"
+    # tracking_csv = r".run/obb_hold1_10min_tracking_output.csv"
+    # tracking_csv = r".run/opt_hold1_10min_tracking_output.csv"
+
+
+
+    # gt_csv = r".run\08_sick_16-30_tracking.csv"
+    # tracking_csv = r".run/opt_hold2_10min_tracking_output.csv"
+    # tracking_csv = r".run/obb_hold2_10min_tracking_output.csv"
+
+    # gt_csv = r".run\10_mock_76-90_tracking.csv"
+    # tracking_csv = r".run/obb_hold3_10min_tracking_output.csv"
+    # tracking_csv = r".run/opt_hold3_10min_tracking_output.csv"
+
+    # gt_csv = r".run\10_sick_31-45_tracking.csv"
+    # tracking_csv = r".run/obb_hold4_10min_tracking_output.csv"
+    # tracking_csv = r".run/opt_hold4_10min_tracking_output.csv"
+
+    # gt_csv = r".run\12_mock_46-60_tracking.csv"
+    # tracking_csv = r".run/obb_hold5_10min_tracking_output.csv"
+    # tracking_csv = r".run/opt_hold5_10min_tracking_output.csv"
+
+    # gt_csv = r".run\12_sick_61-75_tracking.csv"
+    # tracking_csv = r".run/obb_hold6_10min_tracking_output.csv"
+    # tracking_csv = r".run/opt_hold6_10min_tracking_output.csv"
 
 
     metrics = evaluate_tracking(

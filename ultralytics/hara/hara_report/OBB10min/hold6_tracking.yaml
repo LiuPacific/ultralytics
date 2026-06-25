@@ -19,3 +19,4 @@ DEEPSORT:
   TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/obb_hold6_10min/tracking_output.csv"
   VIDEO_PATH: D:/chicken_project/video_reid_obb/sick_20251217T000000Z_20251217T003000Z.mkv
   RESULT_PATH: "E:/temp/obb10hold6.mp4"
+  MAX_FRAME: 20000

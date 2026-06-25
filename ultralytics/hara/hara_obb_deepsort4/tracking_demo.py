@@ -19,9 +19,7 @@ def get_deepsort_obb():
                                )
     return deepsort_obb
 
-def start():
-
-
+def start(show_window=True):
     # Initialize video capture to get video properties
     capture = cv2.VideoCapture(cfg.DEEPSORT.VIDEO_PATH)
     if not capture.isOpened():
@@ -42,7 +40,14 @@ def start():
     print('fps:', fps)
 
     deepsort_obb = get_deepsort_obb()
+
+    global_frame_id = 0
+    max_frame = cfg.DEEPSORT.MAX_FRAME
     while True:
+        if global_frame_id>max_frame:
+            break
+        global_frame_id += 1
+
         _, im = capture.read()
         if im is None:
             break
@@ -65,10 +70,12 @@ def start():
 
         videoWriter.write(output_image_frame)
 
-        height, width = output_image_frame.shape[:2]
-        output_image_frame = cv2.resize(output_image_frame, (int(width/3), int(height/3)))
-        cv2.imshow('Demo', output_image_frame)
-        cv2.waitKey(1)
+
+        if show_window:
+            height, width = output_image_frame.shape[:2]
+            output_image_frame = cv2.resize(output_image_frame, (int(width/3), int(height/3)))
+            cv2.imshow('Demo', output_image_frame)
+            cv2.waitKey(1)
 
 
     capture.release()
@@ -119,36 +126,36 @@ if __name__ == '__main__':
     # RESULT_PATH = 'seg1_3_csv.mp4'
 
     # cfg.merge_from_file("deep_sort/configs/deep_sort.yaml")
+    # start(show_window=False)
 
 
-
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB5min\hold1_tracking.yaml")
-    start()
-
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB5min\hold2_tracking.yaml")
-    start()
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB5min\hold3_tracking.yaml")
-    start()
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB5min\hold4_tracking.yaml")
-    start()
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB5min\hold5_tracking.yaml")
-    start()
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB5min\hold6_tracking.yaml")
-    start()
-
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold1_tracking.yaml")
-    start()
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold2_tracking.yaml")
-    start()
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold3_tracking.yaml")
-    start()
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold4_tracking.yaml")
-    start()
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold5_tracking.yaml")
-    start()
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold6_tracking.yaml")
-    start()
-
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB5min\hold1_tracking.yaml")
+    # start()
+    #
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB5min\hold2_tracking.yaml")
+    # start()
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB5min\hold3_tracking.yaml")
+    # start()
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB5min\hold4_tracking.yaml")
+    # start()
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB5min\hold5_tracking.yaml")
+    # start()
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB5min\hold6_tracking.yaml")
+    # start()
+    #
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold1_tracking.yaml")
+    # start()
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold2_tracking.yaml")
+    # start()
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold3_tracking.yaml")
+    # start()
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold4_tracking.yaml")
+    # start()
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold5_tracking.yaml")
+    # start()
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold6_tracking.yaml")
+    # start()
+    #
     cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min\hold1_tracking.yaml")
     start()
     cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min\hold2_tracking.yaml")

@@ -21,4 +21,4 @@ DEEPSORT:
   TRACKING_CSV_PATH: tracking_output1.csv
   VIDEO_PATH: F:/20251002/RGB_mock/seg1.mp4
   RESULT_PATH: seg1_3_csv.mp4
-  
+  MAX_FRAME: 20
