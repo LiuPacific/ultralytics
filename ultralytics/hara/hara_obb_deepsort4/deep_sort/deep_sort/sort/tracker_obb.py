@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+import os
 import numpy as np
 
 from .iou_matching_obb import obb_iou_cost, iou_cost_fallback
@@ -36,6 +37,8 @@ class TrackerOBB:
         self.frame_id = 0  # Global frame counter (incremented each update)
         # CSV logging buffer and configuration
         self.tracking_csv_path = tracking_csv_path
+        if self.tracking_csv_path and os.path.exists(self.tracking_csv_path):
+            os.remove(self.tracking_csv_path)
         self._csv_buffer = []
         self._frames_since_flush = 0
         self._flush_interval = flush_interval

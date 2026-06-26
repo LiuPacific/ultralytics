@@ -1,8 +1,20 @@
 import cv2
+import os
+import yaml
+from datetime import datetime
 from obj_obb_detector import ObbDetector
 import objtracker
 from ultralytics.hara.hara_obb_deepsort4.deep_sort.configs.common_cfg import cfg
 from ultralytics.hara.hara_obb_deepsort4.deep_sort.deep_sort.deep_sort_obb import DeepSORTOBB
+
+
+def _to_plain_dict(value):
+    if isinstance(value, dict):
+        return {key: _to_plain_dict(sub_value) for key, sub_value in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_to_plain_dict(item) for item in value]
+    return value
+
 
 def get_deepsort_obb():
     deepsort_obb = DeepSORTOBB(cfg.DEEPSORT.REID_CKPT,
@@ -30,57 +42,84 @@ def start(show_window=True):
     height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
 
-    # Close the video capture
+    # Close the video capture (we'll re-open for actual processing)
     capture.release()
 
     detector = ObbDetector()
     capture = cv2.VideoCapture(cfg.DEEPSORT.VIDEO_PATH)
     videoWriter = None
-    fps = int(capture.get(5))
-    print('fps:', fps)
+    input_video_fps = int(capture.get(cv2.CAP_PROP_FPS))
+    print('input video fps:', input_video_fps)
 
     deepsort_obb = get_deepsort_obb()
 
     global_frame_id = 0
     max_frame = cfg.DEEPSORT.MAX_FRAME
-    while True:
-        if global_frame_id>max_frame:
-            break
-        global_frame_id += 1
 
-        _, im = capture.read()
-        if im is None:
-            break
-        # detections = OBBDetections()
+    # Logging / summary file
+    start_time = datetime.now()
+    frames_processed = 0
+    out_filename = f"output_{start_time.strftime('%Y%m%d_%H%M%S')}.txt"
+    out_filepath = os.path.join(os.getcwd(), out_filename)
 
+    try:
+        while True:
+            if global_frame_id > max_frame:
+                break
+            global_frame_id += 1
 
-        output_image_frame, tracks2draw = objtracker.update(detector, im, deepsort_obb)
+            ret, im = capture.read()
+            if not ret or im is None:
+                break
 
+            # Process frame
+            output_image_frame, tracks2draw = objtracker.update(detector, im, deepsort_obb)
+            frames_processed += 1
 
-        # for track2draw in tracks2draw:
-        #     xyxyxyxy,_, track_id = track2draw
-        #     detections.add(xyxyxyxy, None, None, track_id)
+            if videoWriter is None:
+                fourcc = cv2.VideoWriter_fourcc(
+                    'm', 'p', '4', 'v')  # opencv3.0
+                videoWriter = cv2.VideoWriter(
+                    cfg.DEEPSORT.RESULT_PATH, fourcc, input_video_fps, (output_image_frame.shape[1], output_image_frame.shape[0]))
 
+            videoWriter.write(output_image_frame)
 
-        if videoWriter is None:
-            fourcc = cv2.VideoWriter_fourcc(
-                'm', 'p', '4', 'v')  # opencv3.0
-            videoWriter = cv2.VideoWriter(
-                cfg.DEEPSORT.RESULT_PATH, fourcc, fps, (output_image_frame.shape[1], output_image_frame.shape[0]))
+            if show_window:
+                height, width = output_image_frame.shape[:2]
+                output_image_frame = cv2.resize(output_image_frame, (int(width/3), int(height/3)))
+                cv2.imshow('Demo', output_image_frame)
+                cv2.waitKey(1)
+    finally:
+        # cleanup
+        end_time = datetime.now()
+        elapsed = (end_time - start_time).total_seconds()
+        processing_fps = frames_processed / elapsed if elapsed > 0 else 0.0
 
-        videoWriter.write(output_image_frame)
+        # Write summary to file
+        try:
+            with open(out_filepath, 'w', encoding='utf-8') as f:
+                f.write(f"start_time: {start_time.isoformat()}\n")
+                f.write(f"end_time: {end_time.isoformat()}\n")
+                f.write(f"elapsed_seconds: {elapsed:.3f}\n")
+                f.write(f"input_video_fps: {input_video_fps}\n")
+                f.write(f"processing_fps: {processing_fps:.3f}\n")
+                f.write(f"frames_processed: {frames_processed}\n")
+                f.write("deepsort_cfg:\n")
+                f.write(yaml.safe_dump(_to_plain_dict(cfg.DEEPSORT), sort_keys=False, default_flow_style=False))
+            print(f"Wrote tracking summary to {out_filepath}")
+        except Exception as e:
+            print(f"Failed to write summary file {out_filepath}: {e}")
 
-
-        if show_window:
-            height, width = output_image_frame.shape[:2]
-            output_image_frame = cv2.resize(output_image_frame, (int(width/3), int(height/3)))
-            cv2.imshow('Demo', output_image_frame)
-            cv2.waitKey(1)
-
-
-    capture.release()
-    videoWriter.release()
-    cv2.destroyAllWindows()
+        try:
+            capture.release()
+        except Exception:
+            pass
+        try:
+            if videoWriter is not None:
+                videoWriter.release()
+        except Exception:
+            pass
+        cv2.destroyAllWindows()
 
 if __name__ == '__main__':
 
@@ -125,8 +164,8 @@ if __name__ == '__main__':
     # VIDEO_PATH = r'F:\20251002\RGB_mock\seg1.mp4'
     # RESULT_PATH = 'seg1_3_csv.mp4'
 
-    cfg.merge_from_file("deep_sort/configs/deep_sort.yaml")
-    start(show_window=True)
+    # cfg.merge_from_file("deep_sort/configs/deep_sort.yaml")
+    # start(show_window=True)
 
 
     # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB5min\hold1_tracking.yaml")
@@ -157,17 +196,17 @@ if __name__ == '__main__':
     # start()
     #
     # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min\hold1_tracking.yaml")
-    # start()
+    # start(show_window=False)
     # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min\hold2_tracking.yaml")
-    # start()
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min\hold3_tracking.yaml")
-    # start()
+    # start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min\hold3_tracking.yaml")
+    start(show_window=False)
     # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min\hold4_tracking.yaml")
-    # start()
+    # start(show_window=False)
     # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min\hold5_tracking.yaml")
-    # start()
+    # start(show_window=False)
     # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min\hold6_tracking.yaml")
-    # start()
+    # start(show_window=False)
 
 
 

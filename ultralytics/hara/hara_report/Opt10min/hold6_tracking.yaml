@@ -4,7 +4,7 @@ DEEPSORT:
   MAX_DIST: 0.2
   MIN_CONFIDENCE: 0.3
   NMS_MAX_OVERLAP: 0.5
-  MAX_IOU_DISTANCE: 0.7
+  MAX_IOU_DISTANCE: 0.9
   N_INIT: 3
   NN_BUDGET: 100
   MAX_ID_POOL: 15
@@ -17,7 +17,7 @@ DEEPSORT:
 #  MAX_IOU_DISTANCE: 0.8
   #  USE_OPTIMIZATION: False
   #  MAX_AGE: 30
-  TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/obb_hold6_10min/opt_hold6_10min_tracking_output_07.csv"
+  TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/obb_hold6_10min/opt_hold6_10min_tracking_output_09.csv"
   VIDEO_PATH: D:/chicken_project/video_reid_obb/sick_20251217T000000Z_20251217T003000Z.mkv
-  RESULT_PATH: "E:/temp/opt_obb10hold6_07.mp4"
+  RESULT_PATH: "E:/temp/opt_obb10hold6_09.mp4"
   MAX_FRAME: 20000

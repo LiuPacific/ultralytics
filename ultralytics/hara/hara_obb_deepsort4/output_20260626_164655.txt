@@ -1,0 +1,7 @@
+start_time: 2026-06-26T16:46:55.395741
+end_time: 2026-06-26T16:46:59.108476
+elapsed_seconds: 3.713
+input_video_fps: 30
+processing_fps: 13.737
+frames_processed: 51
+file_name: mock_20251007T000000Z_20251007T010000Z.mkv
