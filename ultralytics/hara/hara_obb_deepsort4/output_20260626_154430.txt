@@ -1,6 +1,0 @@
-start_time: 2026-06-26T15:44:30.989945
-end_time: 2026-06-26T15:44:33.887046
-elapsed_seconds: 2.897
-input_video_fps: 30
-processing_fps: 10.010
-frames_processed: 29

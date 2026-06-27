@@ -70,13 +70,14 @@ class TrackerOBB:
             self.tracks[track_idx].mark_missed()
 
         for detection_idx in unmatched_detections:
-            if cfg.DEEPSORT.USE_OPTIMIZATION and self.MAX_ID_POOL > 0:
-                self._initiate_track_MAX_ID_POOL(detections[detection_idx], MAX_ID_POOL=self.MAX_ID_POOL)
-            else:
-                self._initiate_track(detections[detection_idx])
+            self._initiate_track(detections[detection_idx])
+            # if cfg.DEEPSORT.USE_OPTIMIZATION and self.MAX_ID_POOL > 0:
+            #     self._initiate_track_MAX_ID_POOL(detections[detection_idx], MAX_ID_POOL=self.MAX_ID_POOL)
+            # else:
+            #     self._initiate_track(detections[detection_idx])
 
         # If MAX_ID_POOL is 0, use original behavior (delete tracks after max_age)
-        if cfg.DEEPSORT.USE_OPTIMIZATION and self.MAX_ID_POOL == 0:
+        if not cfg.DEEPSORT.USE_OPTIMIZATION and self.MAX_ID_POOL == 0:
             self.tracks = [t for t in self.tracks if not t.is_deleted()]
 
         if cfg.DEEPSORT.USE_OPTIMIZATION:

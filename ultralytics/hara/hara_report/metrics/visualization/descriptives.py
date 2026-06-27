@@ -92,7 +92,7 @@ draw_boxplot_with_points(
     cols=["Original MOTA", "Optimized MOTA"],
     title="Boxplot of MOTA Across Six Folds",
     ylabel="MOTA",
-    filename="boxplot_mota_with_points.png",
+    filename=".run/boxplot_mota_with_points.png",
     decimal=True
 )
 
@@ -105,7 +105,7 @@ draw_boxplot_with_points(
     cols=["Original IDF1", "Optimized IDF1"],
     title="Boxplot of IDF1 Across Six Folds",
     ylabel="IDF1",
-    filename="boxplot_idf1_with_points.png",
+    filename=".run/boxplot_idf1_with_points.png",
     decimal=True
 )
 
@@ -118,6 +118,6 @@ draw_boxplot_with_points(
     cols=["Original IDS", "Optimized IDS"],
     title="Boxplot of IDS Across Six Folds",
     ylabel="Number of ID Switches",
-    filename="boxplot_ids_with_points.png",
+    filename=".run/boxplot_ids_with_points.png",
     decimal=False
 )
