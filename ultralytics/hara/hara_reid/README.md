@@ -1,3 +1,10 @@
+# prepare ReID data
+
+1. label file name should be this style `08_RGB_mockframe_00_00_01.png` and `08_RGB_mockframe_00_00_01.json`
+2. combine the file together to `combine_id` folder
+3. use `image_crop.py` in tool to crop the id image.
+4. delete images with `-`, since I use negative sign `-` to say that the chicken is occluded.
+
 # Chicken OSNet ReID for DeepSORT
 
 This project trains an OSNet ReID model for chicken crops and produces the cosine-distance cost matrix needed by DeepSORT.

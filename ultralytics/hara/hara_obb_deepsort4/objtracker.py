@@ -10,15 +10,15 @@ from deep_sort.deep_sort.sort import obb_utils
 
 
 def update(target_detector: ObbDetector, image, deepsort_obb: DeepSORTOBB):
-    obb_detections = target_detector.detect(image)
+    selected_detections,pred_boxes = target_detector.detect(image)
     xyxyxyxy_list = []
     xywhr_list = []
     conf_list = []
     tracks2draw = []
-    image = plot_all_detections(image, obb_detections)
-    if len(obb_detections):
+    image = plot_all_detections(image, pred_boxes)
+    if len(selected_detections):
         # Adapt detections to deep sort input format
-        for detection in obb_detections:
+        for detection in selected_detections:
             xyxyxyxy, xywhr, label, conf = detection
             xyxyxyxy_list.append(xyxyxyxy)
             xywhr_list.append(xywhr)

@@ -53,14 +53,20 @@ def gate_cost_matrix_obb(
     """
     gating_dim = 2 if only_position else 5  # 5 dimensions for OBB: cx, cy, w, h, angle
 
-    gating_threshold = chi2inv95_obb if gating_dim == 5 else kf.chi2inv95.get(gating_dim, 9.4877)
+    gating_threshold = chi2inv95_obb if gating_dim == 5 else KalmanFilterOBB.chi2inv95.get(gating_dim, 9.4877)
     # if cfg.DEEPSORT.USE_OPTIMIZATION:
-    #     gating_threshold = chi2inv50_obb if gating_dim == 5 else kf.chi2inv50.get(gating_dim, 6.0644)
-        # gating_threshold = chi2inv70_obb if gating_dim == 5 else kf.chi2inv70.get(gating_dim, 6.0644)
-        # gating_threshold = chi2inv60_obb if gating_dim == 5 else kf.chi2inv60.get(gating_dim, 6.0644)
+    #     gating_threshold = chi2inv50_obb if gating_dim == 5 else KalmanFilterOBB.chi2inv50.get(gating_dim, 6.0644)
+        # gating_threshold = chi2inv70_obb if gating_dim == 5 else KalmanFilterOBB.chi2inv70.get(gating_dim, 6.0644)
+        # gating_threshold = chi2inv60_obb if gating_dim == 5 else KalmanFilterOBB.chi2inv95.get(gating_dim, 6.0644)
 
     measurements = np.asarray(
         [detections[i].to_xywhr() for i in detection_indices])
+    # measurements(15,5)
+    #     0x    1y    2w    3h    4r
+    #0
+    #1
+    #...
+    #14
 
     for row, track_idx in enumerate(track_indices):
         track = tracks[track_idx]
@@ -69,7 +75,28 @@ def gate_cost_matrix_obb(
 
         cost_matrix[row, gating_distance > gating_threshold] = gated_cost
         if cfg.DEEPSORT.USE_OPTIMIZATION:
-            cost_matrix[row, gating_distance > gating_threshold] = gated_cost
+            # For the distance between detection's position and the tracking's position, if the distance is greater than 500, then the distance will be INFTY_COST
+            track_position = track.last_detected_xywhr[:2] if track.last_detected_xywhr is not None else track.mean[:2]
+            position_distance = np.linalg.norm(
+                measurements[:, :2] - track_position, axis=1)
+            # (15,)
+            #   0
+            # 0,960.49279
+            # 1,1084.47266
+            # 2,1.26109
+            # 3,957.37866
+            # 4,597.65586
+            # 5,1055.24962
+            # 6,361.48855
+            # 7,1235.54625
+            # 8,1021.43470
+            # 9,575.38818
+            # 10,129.18059
+            # 11,1293.53053
+            # 12,1292.09211
+            # 13,1384.40268
+            # 14,1309.87469
+            cost_matrix[row, position_distance > 300] = gated_cost
     return cost_matrix
 
 

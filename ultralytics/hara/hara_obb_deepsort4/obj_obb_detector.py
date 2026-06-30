@@ -95,6 +95,7 @@ class ObbDetector(baseDet):
             )
 
         # If there are more than 15 detections, we can apply a selection strategy here (e.g., based on confidence or spatial distribution)
+        selected_detections = pred_boxes
         if cfg.DEEPSORT.USE_OPTIMIZATION:
             if len(pred_boxes) > cfg.DEEPSORT.MAX_ID_POOL and len(self.bbox_history) > 0 and len(self.bbox_history[-1]) == cfg.DEEPSORT.MAX_ID_POOL:
                 prev_points = np.array([[box[1][0], box[1][1]] for box in self.bbox_history[-1]])  # shape: (15, 2)
@@ -105,15 +106,14 @@ class ObbDetector(baseDet):
                     x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max
                 )
                 # Update pred_boxes to only include the selected points
-                pred_boxes = [pred_boxes[i] for i in selected_indices]
+                selected_detections = [pred_boxes[i] for i in selected_indices]
             else:
                 print(
                     f"Current frame has {len(pred_boxes)} detections, which is not more than 15 or no previous frame with 15 detections to compare with. Skipping selection step.")
+            self._update_frame_memory(selected_detections)
 
         # Update frame memory with current detections
-        self._update_frame_memory(pred_boxes)
-
-        return pred_boxes
+        return selected_detections, pred_boxes
 
 
 def select_15_points_by_distance_and_confidence(

@@ -16,7 +16,7 @@ DEEPSORT:
   #  MAX_AGE: 10
   USE_OPTIMIZATION: False
   MAX_AGE: 30
-  TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/obb_hold3_10min/tracking_output.csv"
+  TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/obb_hold3_10min/obb10hold3_tracking.csv"
   VIDEO_PATH: D:/chicken_project/video_reid_obb/mock_20251007T000000Z_20251007T010000Z.mkv
   RESULT_PATH: "E:/temp/obb10hold3.mp4"
   MAX_FRAME: 20000

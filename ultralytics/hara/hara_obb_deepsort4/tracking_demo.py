@@ -98,7 +98,7 @@ def start(show_window=True):
                 f.write(f"input_video_fps: {input_video_fps}\n")
                 f.write(f"processing_fps: {processing_fps:.3f}\n")
                 f.write(f"frames_processed: {frames_processed}\n")
-                f.write(f"VIDEO_PATH: {cfg.DEEPSORT.get("VIDEO_PATH")}\n")
+                f.write(f"RESULT_PATH: {cfg.DEEPSORT.get("RESULT_PATH")}\n")
                 f.write(f"deepsort_cfg: {cfg.get("DEEPSORT")}\n")
             print(f"Wrote tracking summary to {out_filepath}")
         except Exception as e:
@@ -164,7 +164,6 @@ if __name__ == '__main__':
 
     # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB5min\hold1_tracking.yaml")
     # start()
-    #
     # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB5min\hold2_tracking.yaml")
     # start()
     # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB5min\hold3_tracking.yaml")
@@ -176,6 +175,7 @@ if __name__ == '__main__':
     # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB5min\hold6_tracking.yaml")
     # start()
     #
+    # obb10
     # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold1_tracking.yaml")
     # start(show_window=False)
     # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold2_tracking.yaml")
@@ -189,21 +189,55 @@ if __name__ == '__main__':
     # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold6_tracking.yaml")
     # start(show_window=False)
     #
-    # optimization without init
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minNoInit\hold1_tracking.yaml")
+    # # obb10 ReID
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10minReID\hold1_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minNoInit\hold2_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10minReID\hold2_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minNoInit\hold3_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10minReID\hold3_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minNoInit\hold4_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10minReID\hold4_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minNoInit\hold5_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10minReID\hold5_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minNoInit\hold6_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10minReID\hold6_tracking.yaml")
     start(show_window=False)
     #
-    # full optimization
+    #
+    #
+    # #
+    # # optimization without init
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minNoInit\hold1_tracking.yaml")
+    # start(show_window=False)
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minNoInit\hold2_tracking.yaml")
+    # start(show_window=False)
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minNoInit\hold3_tracking.yaml")
+    # start(show_window=False)
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minNoInit\hold4_tracking.yaml")
+    # start(show_window=False)
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minNoInit\hold5_tracking.yaml")
+    # start(show_window=False)
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minNoInit\hold6_tracking.yaml")
+    # start(show_window=False)
+    #
+    # # optimization without init with ReID
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minNoInitReID\hold1_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minNoInitReID\hold2_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minNoInitReID\hold3_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minNoInitReID\hold4_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minNoInitReID\hold5_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minNoInitReID\hold6_tracking.yaml")
+    start(show_window=False)
+    #
+    #
+    #
+    #
+    # # full optimization
     # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min\hold1_tracking.yaml")
     # start(show_window=False)
     # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min\hold2_tracking.yaml")
@@ -216,6 +250,18 @@ if __name__ == '__main__':
     # start(show_window=False)
     # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min\hold6_tracking.yaml")
     # start(show_window=False)
-
-
-
+    #
+    #
+    # # full optimization ReID
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minReID\hold1_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minReID\hold2_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minReID\hold3_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minReID\hold4_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minReID\hold5_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10minReID\hold6_tracking.yaml")
+    start(show_window=False)

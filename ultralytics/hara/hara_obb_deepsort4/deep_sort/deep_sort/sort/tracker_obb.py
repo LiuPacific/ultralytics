@@ -70,21 +70,21 @@ class TrackerOBB:
             self.tracks[track_idx].mark_missed()
 
         for detection_idx in unmatched_detections:
-            self._initiate_track(detections[detection_idx])
-            # if cfg.DEEPSORT.USE_OPTIMIZATION and self.MAX_ID_POOL > 0:
-            #     self._initiate_track_MAX_ID_POOL(detections[detection_idx], MAX_ID_POOL=self.MAX_ID_POOL)
-            # else:
-            #     self._initiate_track(detections[detection_idx])
+            # self._initiate_track(detections[detection_idx])
+            if cfg.DEEPSORT.USE_OPTIMIZATION and self.MAX_ID_POOL > 0:
+                self._initiate_track_MAX_ID_POOL(detections[detection_idx], MAX_ID_POOL=self.MAX_ID_POOL)
+            else:
+                self._initiate_track(detections[detection_idx])
 
         # If MAX_ID_POOL is 0, use original behavior (delete tracks after max_age)
-        if not cfg.DEEPSORT.USE_OPTIMIZATION and self.MAX_ID_POOL == 0:
+        if not cfg.DEEPSORT.USE_OPTIMIZATION or self.MAX_ID_POOL == 0:
             self.tracks = [t for t in self.tracks if not t.is_deleted()]
 
         if cfg.DEEPSORT.USE_OPTIMIZATION:
             # Perform track re-identification
             self._reidentify_tracks()
             # Perform track re-identification by ReID (appearance features)
-            self._reidentify_tracks_by_ReID()
+            # self._reidentify_tracks_by_ReID()
 
         # Update distance metric.
         active_targets = [t.track_id for t in self.tracks if t.is_confirmed()]
@@ -181,8 +181,9 @@ class TrackerOBB:
             targets = np.array([tracks[i].track_id for i in track_indices])
 
             cost_matrix = np.ones((len(targets), len(features)))
-            if features[0] is not None:
-                cost_matrix = self.metric.distance(features, targets)
+            if cfg.DEEPSORT.USE_REID:
+                if features[0] is not None:
+                    cost_matrix = self.metric.distance(features, targets)
 
             cost_matrix = gate_cost_matrix_obb(
                 self.kf, cost_matrix, tracks, dets, track_indices,
@@ -255,7 +256,8 @@ class TrackerOBB:
             print("---")
 
         # Determine currently used IDs within the pool (active & not deleted)
-        used_ids = set([t.track_id for t in self.tracks if not t.is_deleted() and 1 <= t.track_id <= MAX_ID_POOL])
+        # used_ids = set([t.track_id for t in self.tracks if not t.is_deleted() and 1 <= t.track_id <= MAX_ID_POOL])
+        used_ids = set([t.track_id for t in self.tracks if 1 <= t.track_id <= MAX_ID_POOL])
 
         # # Count active (not deleted) tracks within pool
         # active_count = len(used_ids)
@@ -285,7 +287,8 @@ class TrackerOBB:
             # detection_center = np.array([0.0, 0.0], dtype=float)
 
         # both deleted and missed are considered equally.
-        missed_candidates = [t for t in self.tracks if 1 <= t.track_id <= MAX_ID_POOL and t.time_since_update > 0]
+        missed_candidates = [t for t in self.tracks if 1 <= t.track_id <= MAX_ID_POOL and not t.is_deleted() and t.time_since_update > 0]
+
         best_candidate = None
         best_dist = np.inf
         for t in missed_candidates:
@@ -303,6 +306,22 @@ class TrackerOBB:
                 best_dist = dist
                 best_candidate = t
 
+        if best_candidate is None and best_dist >= self.reuse_id_assignment_distance_threshold:
+            deleted_candidates = [t for t in self.tracks if t.is_deleted() and 1 <= t.track_id <= MAX_ID_POOL]
+            for t in deleted_candidates:
+                hist = t.get_position_history()
+                if hist:
+                    last_center = np.array(hist[-1][:2], dtype=float)
+                else:
+                    try:
+                        last_center = np.array(t.to_xywhr()[:2], dtype=float)
+                    except Exception as e:
+                        print("exception ", e)
+                        continue
+                dist = np.linalg.norm(last_center - detection_center)
+                if dist < best_dist:
+                    best_dist = dist
+                    best_candidate = t
         if best_candidate is not None and best_dist < self.reuse_id_assignment_distance_threshold:
             reuse_id = best_candidate.track_id
 

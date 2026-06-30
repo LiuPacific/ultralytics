@@ -1,0 +1,8 @@
+start_time: 2026-06-29T03:21:14.492782
+end_time: 2026-06-29T03:52:43.586122
+elapsed_seconds: 1889.093
+input_video_fps: 30
+processing_fps: 10.588
+frames_processed: 20001
+RESULT_PATH: E:/temp/obb10hold6_reid.mp4
+deepsort_cfg: {'DETECTION_MODEL_PATH': 'D:/chicken_project/experiment6report/running/obb_hold6_10min/weights/last.pt', 'REID_CKPT': 'C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/hara_reid/.run/without_hold6/best_osnet.pth', 'MAX_DIST': 0.2, 'MIN_CONFIDENCE': 0.3, 'NMS_MAX_OVERLAP': 0.5, 'MAX_IOU_DISTANCE': 0.7, 'N_INIT': 3, 'NN_BUDGET': 100, 'MAX_ID_POOL': 0, 'RECONNECTION_DISTANCE_THRESHOLD': 200, 'REUSE_ID_ASSIGNMENT_DISTANCE_THRESHOLD': 200, 'USE_REID': True, 'USE_ROTATED_FEATURES': True, 'USE_OPTIMIZATION': False, 'MAX_AGE': 30, 'TRACKING_CSV_PATH': 'D:/chicken_project/experiment6report/running/obb_hold6_10min/obb10hold6_reid_tracking.csv', 'VIDEO_PATH': 'D:/chicken_project/video_reid_obb/sick_20251217T000000Z_20251217T003000Z.mkv', 'RESULT_PATH': 'E:/temp/obb10hold6_reid.mp4', 'MAX_FRAME': 20000, 'merge_from_file': <bound method YamlParser.merge_from_file of {...}>, 'merge_from_dict': <bound method YamlParser.merge_from_dict of {...}>}

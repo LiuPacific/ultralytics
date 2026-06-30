@@ -1,6 +1,6 @@
-raw_image_dir: "D:/chicken_project/experiment5reid/reid_training/combination_id_croped"          # put your id_55_12_RGB_mock_frame_00_03_21.png files here
-prepared_dir: "D:/chicken_project/experiment5reid/reid_training/prepared_reid"
-output_dir: "./outputs"
+raw_image_dir: "D:/chicken_project/experiment6report/reid/without_hold6"          # put id_55_12_RGB_mock_frame_00_03_21.png files here
+prepared_dir: "D:/chicken_project/experiment6report/reid/prepared_without_hold6"
+output_dir: "./run/without_hold6"
 
 # OSNet commonly uses H=256, W=128 for ReID. Padding keeps chicken shape.
 input_height: 256

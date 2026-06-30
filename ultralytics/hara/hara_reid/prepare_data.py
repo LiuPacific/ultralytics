@@ -26,6 +26,9 @@ def main():
 
     rows = []
     for p in image_paths:
+        if "-" in p.stem: # when id is `-45`, id 45 chicken is fully occluded..
+            print(f"[WARN] Skip file name containing '-': {p.name}")
+            continue
         info = parse_chicken_filename(str(p))
         if info is None:
             print(f"[WARN] Skip unrecognized file name: {p.name}")

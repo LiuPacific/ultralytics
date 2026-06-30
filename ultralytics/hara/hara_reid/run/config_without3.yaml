@@ -1,0 +1,28 @@
+raw_image_dir: "D:/chicken_project/experiment6report/reid/without_hold3"          # put id_55_12_RGB_mock_frame_00_03_21.png files here
+prepared_dir: "D:/chicken_project/experiment6report/reid/prepared_without_hold3"
+output_dir: "./run/without_hold3"
+
+# OSNet commonly uses H=256, W=128 for ReID. Padding keeps chicken shape.
+input_height: 256
+input_width: 128
+use_padding: true
+
+# Training
+model_name: "osnet_x0_75"              # options: osnet_x0_25, osnet_x0_5, osnet_x0_75, osnet_x1_0
+pretrained: true
+batch_size: 32
+epochs: 30
+lr: 0.0003
+weight_decay: 0.0005
+num_workers: 4
+triplet_margin: 0.3
+triplet_weight: 1.0
+ce_weight: 1.0
+
+# Split. For first run, random image split within each chicken ID.
+# Later, consider split by month/time segment to avoid adjacent-frame leakage.
+train_ratio: 0.70
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+

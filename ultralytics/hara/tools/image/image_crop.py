@@ -103,12 +103,12 @@ def batch_crop_chickens(json_dir, image_dir, output_dir):
 
 
 if __name__ == "__main__":
-    # json_dir = r"D:\chicken_project\experiment5reid\image_crop_experiment"
-    # image_dir = r"D:\chicken_project\experiment5reid\image_crop_experiment"
-    # output_dir = r"D:\chicken_project\experiment5reid\image_crop_experiment\out"
-    json_dir = r"D:\chicken_project\experiment5reid\reid_training\combination_id"
-    image_dir = r"D:\chicken_project\experiment5reid\reid_training\combination_id"
-    output_dir = r"D:\chicken_project\experiment5reid\reid_training\combination_id_croped"
+    # json_dir = r"D:\chicken_project\experiment5reid\reid_training\combination_id"
+    # image_dir = r"D:\chicken_project\experiment5reid\reid_training\combination_id"
+    # output_dir = r"D:\chicken_project\experiment5reid\reid_training\combination_id_croped"
+    json_dir = r"D:\chicken_project\experiment6report\reid\12_sick_61-75"
+    image_dir = r"D:\chicken_project\experiment6report\reid\12_sick_61-75"
+    output_dir = r"D:\chicken_project\experiment6report\reid\hold6"
 
     batch_crop_chickens(json_dir, image_dir, output_dir)
 

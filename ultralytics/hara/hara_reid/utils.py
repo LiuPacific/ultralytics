@@ -10,8 +10,9 @@ import yaml
 from PIL import Image, ImageOps
 import cv2
 
+# r"^id_(?P<chicken_id>\d+)_(?P<month>\d+)_(?P<modality>RGB|T|Thermal|thermal)_(?P<group>sick|mock)_(?P<frame>.+)\.(png|jpg|jpeg)$",
 FILENAME_RE = re.compile(
-    r"^id_(?P<chicken_id>\d+)_(?P<month>\d+)_(?P<modality>RGB|T|Thermal|thermal)_(?P<group>sick|mock)_(?P<frame>.+)\.(png|jpg|jpeg)$",
+    r"^id_(?P<chicken_id>\d+)_(?P<month>\d+)_(?P<modality>RGB|T|Thermal|thermal)_(?P<group>sick|mock)(.+)\.(png|jpg|jpeg)$",
     re.IGNORECASE,
 )
 
