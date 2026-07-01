@@ -13,7 +13,7 @@ DEEPSORT:
   USE_REID: False
   USE_ROTATED_FEATURES: True
   #  USE_OPTIMIZATION: True
-  #  MAX_AGE: 10
+  #  MAX_AGE: 30
   USE_OPTIMIZATION: False
   MAX_AGE: 30
   TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/obb_hold2_5min/tracking_output.csv"

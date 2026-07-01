@@ -14,7 +14,7 @@ DEEPSORT:
   USE_REID: False
   USE_ROTATED_FEATURES: True
   #  USE_OPTIMIZATION: True
-  #  MAX_AGE: 10
+  #  MAX_AGE: 30
   USE_OPTIMIZATION: False
   MAX_AGE: 70
   TRACKING_CSV_PATH: tracking_output1.csv

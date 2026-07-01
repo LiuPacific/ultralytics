@@ -16,7 +16,10 @@ DEEPSORT:
   USE_REID: False
   USE_ROTATED_FEATURES: True
   USE_OPTIMIZATION: True
-  MAX_AGE: 10
+  REUSE_ID: True # use_optimization & reuse_id to turn on it.
+  DETECTION_OPTIMIZATION_ON: False
+  TRACK_RECONNECTION_ON: False
+  MAX_AGE: 30
 #  USE_OPTIMIZATION: False
 #  MAX_AGE: 30
   TRACKING_CSV_PATH: tracking_output1.csv

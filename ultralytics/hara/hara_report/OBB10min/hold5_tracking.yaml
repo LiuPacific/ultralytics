@@ -7,16 +7,19 @@ DEEPSORT:
   MAX_IOU_DISTANCE: 0.7
   N_INIT: 3
   NN_BUDGET: 100
-  MAX_ID_POOL: 15
+  MAX_ID_POOL: 0
   RECONNECTION_DISTANCE_THRESHOLD: 200
   REUSE_ID_ASSIGNMENT_DISTANCE_THRESHOLD: 200
   USE_REID: False
   USE_ROTATED_FEATURES: True
   #  USE_OPTIMIZATION: True
-  #  MAX_AGE: 10
+  #  MAX_AGE: 30
   USE_OPTIMIZATION: False
+  REUSE_ID: False # use_optimization & reuse_id to turn on it.
+  DETECTION_OPTIMIZATION_ON: False
+  TRACK_RECONNECTION_ON: False
   MAX_AGE: 30
-  TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/obb_hold5_10min/obb10hold5_tracking.csv"
+  TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/obb_hold5_10min/obb10hold5.csv"
   VIDEO_PATH: D:/chicken_project/video_reid_obb/mock_20251217T000000Z_20251217T003000Z.mkv
   RESULT_PATH: "E:/temp/obb10hold5.mp4"
   MAX_FRAME: 20000

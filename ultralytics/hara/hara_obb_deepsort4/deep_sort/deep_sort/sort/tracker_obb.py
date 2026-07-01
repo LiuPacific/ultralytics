@@ -71,18 +71,19 @@ class TrackerOBB:
 
         for detection_idx in unmatched_detections:
             # self._initiate_track(detections[detection_idx])
-            if cfg.DEEPSORT.USE_OPTIMIZATION and self.MAX_ID_POOL > 0:
+            if cfg.DEEPSORT.USE_OPTIMIZATION and cfg.DEEPSORT.get("REUSE_ID", False):
                 self._initiate_track_MAX_ID_POOL(detections[detection_idx], MAX_ID_POOL=self.MAX_ID_POOL)
             else:
                 self._initiate_track(detections[detection_idx])
 
         # If MAX_ID_POOL is 0, use original behavior (delete tracks after max_age)
-        if not cfg.DEEPSORT.USE_OPTIMIZATION or self.MAX_ID_POOL == 0:
+        if not cfg.DEEPSORT.USE_OPTIMIZATION or self.MAX_ID_POOL == 0 or not cfg.DEEPSORT.get("REUSE_ID", False):
             self.tracks = [t for t in self.tracks if not t.is_deleted()]
 
         if cfg.DEEPSORT.USE_OPTIMIZATION:
-            # Perform track re-identification
-            self._reidentify_tracks()
+            if cfg.DEEPSORT.get("TRACK_RECONNECTION_ON", True):
+                # Perform track re-identification
+                self._reidentify_tracks()
             # Perform track re-identification by ReID (appearance features)
             # self._reidentify_tracks_by_ReID()
 

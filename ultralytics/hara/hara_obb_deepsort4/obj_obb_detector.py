@@ -1,4 +1,6 @@
 import torch
+from sympy import false
+
 from ultralytics import YOLO
 import numpy as np
 import numpy as np
@@ -96,7 +98,7 @@ class ObbDetector(baseDet):
 
         # If there are more than 15 detections, we can apply a selection strategy here (e.g., based on confidence or spatial distribution)
         selected_detections = pred_boxes
-        if cfg.DEEPSORT.USE_OPTIMIZATION:
+        if cfg.DEEPSORT.USE_OPTIMIZATION and cfg.DEEPSORT.get("DETECTION_OPTIMIZATION_ON", True):
             if len(pred_boxes) > cfg.DEEPSORT.MAX_ID_POOL and len(self.bbox_history) > 0 and len(self.bbox_history[-1]) == cfg.DEEPSORT.MAX_ID_POOL:
                 prev_points = np.array([[box[1][0], box[1][1]] for box in self.bbox_history[-1]])  # shape: (15, 2)
                 curr_points = np.array([[box[1][0], box[1][1]] for box in pred_boxes])  # shape: (m, 2)
