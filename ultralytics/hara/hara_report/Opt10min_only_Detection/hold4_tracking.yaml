@@ -13,7 +13,7 @@ DEEPSORT:
   USE_REID: False
   USE_ROTATED_FEATURES: True
   USE_OPTIMIZATION: True
-  REUSE_ID: True # use_optimization & reuse_id to turn on it.
+  REUSE_ID: False # use_optimization & reuse_id to turn on it.
   DETECTION_OPTIMIZATION_ON: True
   TRACK_RECONNECTION_ON: False
   MAX_AGE: 30

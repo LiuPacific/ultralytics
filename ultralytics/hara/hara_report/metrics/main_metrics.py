@@ -109,60 +109,73 @@ def evaluate_tracking(
 # 7. Example usage
 # ============================================================
 
-if __name__ == "__main__":
-    # For original model,
+def run_one():
 
-    # gt_csv = r".run/08_mock_1-15_tracking.csv"
-    # tracking_csv = r".run3/obb10hold1_tracking.csv"
-    # tracking_csv = r".run3/obb10hold1_reid_tracking.csv"
-    # tracking_csv = r".run4/opt_hold1_10min_noinit_tracking_output_07.csv"
-    # tracking_csv = r".run4/opt10hold1_noinit_reid_tracking.csv"
-    # tracking_csv = r".run3/opt_hold1_10min_tracking_output_07.csv"
-    # tracking_csv = r".run3/opt10hold1_reid_tracking.csv"
-    #
+    gt_csv = r".run/08_mock_1-15_tracking_10.csv"
+    tracking_csv = r".run6/obb10hold1_10.csv"
+    # tracking_csv = r".run6/obb10hold1_reid_10.csv"
+    # tracking_csv = r".run6/opt10hold1_detection_track_10.csv"
+    # tracking_csv = r".run6/opt10hold1_detection_track_reid_10.csv"
+    # tracking_csv = r".run6/opt10hold1_detection_track_reuseID_10.csv"
+    # tracking_csv = r".run6/opt10hold1_detection_track_reuseID_reid_10.csv"
+    # tracking_csv = r".run6/opt10hold1_detection_10.csv"
+    # tracking_csv = r".run6/opt10hold1_reuseID_10.csv"
+    # tracking_csv = r".run6/opt10hold1_track_10.csv"
 
+    # gt_csv = r".run\08_sick_16-30_tracking_10.csv"
+    # tracking_csv = r".run6/obb10hold2_10.csv"
+    # tracking_csv = r".run6/obb10hold2_reid_10.csv"
+    # tracking_csv = r".run6/opt10hold2_detection_track_10.csv"
+    # tracking_csv = r".run6/opt10hold2_detection_track_reid_10.csv"
+    # tracking_csv = r".run6/opt10hold2_detection_track_reuseID_10.csv"
+    # tracking_csv = r".run6/opt10hold2_detection_track_reuseID_reid_10.csv"
+    # tracking_csv = r".run6/opt10hold2_detection_10.csv"
+    # tracking_csv = r".run6/opt10hold2_reuseID_10.csv"
+    # tracking_csv = r".run6/opt10hold2_track_10.csv"
 
-    # gt_csv = r".run\08_sick_16-30_tracking.csv"
-    # tracking_csv = r".run3/obb10hold2_tracking.csv"
-    # tracking_csv = r".run3/obb10hold2_reid_tracking.csv"
-    # tracking_csv = r".run4/opt_hold2_10min_noinit_tracking_output_07.csv"
-    # tracking_csv = r".run4/opt10hold2_noinit_reid_tracking.csv"
-    # tracking_csv = r".run3/opt_hold2_10min_tracking_output_07.csv"
-    # tracking_csv = r".run3/opt10hold2_reid_tracking.csv"
+    # gt_csv = r".run\10_mock_76-90_tracking_10.csv"
+    # tracking_csv = r".run6/obb10hold3_10.csv"
+    # tracking_csv = r".run6/obb10hold3_reid_10.csv"
+    # tracking_csv = r".run6/opt10hold3_detection_track_10.csv"
+    # tracking_csv = r".run6/opt10hold3_detection_track_reid_10.csv"
+    # tracking_csv = r".run6/opt10hold3_detection_track_reuseID_10.csv"
+    # tracking_csv = r".run6/opt10hold3_detection_track_reuseID_reid_10.csv"
+    # tracking_csv = r".run6/opt10hold3_detection_10.csv"
+    # tracking_csv = r".run6/opt10hold3_reuseID_10.csv"
+    # tracking_csv = r".run6/opt10hold3_track_10.csv"
 
-    # gt_csv = r".run\10_mock_76-90_tracking.csv"
-    # tracking_csv = r".run3/obb10hold3_tracking.csv"
-    # tracking_csv = r".run2/obb10hold3_reid_tracking.csv"
-    # tracking_csv = r".run4/opt_hold3_10min_noinit_tracking_output_07.csv"
-    # tracking_csv = r".run4/opt10hold3_noinit_reid_tracking.csv"
-    # tracking_csv = r".run3/opt_hold3_10min_tracking_output_07.csv"
-    # tracking_csv = r".run2/opt10hold3_reid_tracking.csv"
+    # gt_csv = r".run\10_sick_31-45_tracking_10.csv"
+    # tracking_csv = r".run6/obb10hold4_10.csv"
+    # tracking_csv = r".run6/obb10hold4_reid_10.csv"
+    # tracking_csv = r".run6/opt10hold4_detection_track_10.csv"
+    # tracking_csv = r".run6/opt10hold4_detection_track_reid_10.csv"
+    # tracking_csv = r".run6/opt10hold4_detection_track_reuseID_10.csv"
+    # tracking_csv = r".run6/opt10hold4_detection_track_reuseID_reid_10.csv"
+    # tracking_csv = r".run6/opt10hold4_detection_10.csv"
+    # tracking_csv = r".run6/opt10hold4_reuseID_10.csv"
+    # tracking_csv = r".run6/opt10hold4_track_10.csv"
 
-    # gt_csv = r".run\10_sick_31-45_tracking.csv"
-    # tracking_csv = r".run3/obb10hold4_tracking.csv"
-    # tracking_csv = r".run2/obb10hold4_reid_tracking.csv"
-    # tracking_csv = r".run4/opt_hold4_10min_noinit_tracking_output_07.csv"
-    # tracking_csv = r".run4/opt10hold4_noinit_reid_tracking.csv"
-    # tracking_csv = r".run3/opt_hold4_10min_tracking_output_07.csv"
-    # tracking_csv = r".run2/opt10hold4_reid_tracking.csv"
+    # gt_csv = r".run\12_mock_46-60_tracking_10.csv"
+    # tracking_csv = r".run6/obb10hold5_10.csv"
+    # tracking_csv = r".run6/obb10hold5_reid_10.csv"
+    # tracking_csv = r".run6/opt10hold5_detection_track_10.csv"
+    # tracking_csv = r".run6/opt10hold5_detection_track_reid_10.csv"
+    # tracking_csv = r".run6/opt10hold5_detection_track_reuseID_10.csv"
+    # tracking_csv = r".run6/opt10hold5_detection_track_reuseID_reid_10.csv"
+    # tracking_csv = r".run6/opt10hold5_detection_10.csv"
+    # tracking_csv = r".run6/opt10hold5_reuseID_10.csv"
+    # tracking_csv = r".run6/opt10hold5_track_10.csv"
 
-    # gt_csv = r".run\12_mock_46-60_tracking.csv"
-    # tracking_csv = r".run3/obb10hold5_tracking.csv"
-    # tracking_csv = r".run2/obb10hold5_reid_tracking.csv"
-    # tracking_csv = r".run4/opt_hold5_10min_noinit_tracking_output_07.csv"
-    # tracking_csv = r".run4/opt10hold5_noinit_reid_tracking.csv"
-    # tracking_csv = r".run3/opt_hold5_10min_tracking_output_07.csv"
-    # tracking_csv = r".run2/opt10hold5_reid_tracking.csv"
-
-    # gt_csv = r".run\12_sick_61-75_tracking.csv"
-    # tracking_csv = r".run3/obb10hold6_tracking.csv"
-    # tracking_csv = r".run2/obb10hold6_reid_tracking.csv"
-    # tracking_csv = r".run4/opt_hold6_10min_noinit_tracking_output_07.csv"
-    # tracking_csv = r".run4/opt10hold6_noinit_reid_tracking.csv"
-    # tracking_csv = r".run3/opt_hold6_10min_tracking_output_07.csv"
-    # tracking_csv = r".run2/opt10hold6_reid_tracking.csv"
-
-
+    # gt_csv = r".run\12_sick_61-75_tracking_10.csv"
+    # tracking_csv = r".run6/obb10hold6_10.csv"
+    # tracking_csv = r".run6/obb10hold6_reid_10.csv"
+    # tracking_csv = r".run6/opt10hold6_detection_track_10.csv"
+    # tracking_csv = r".run6/opt10hold6_detection_track_reid_10.csv"
+    # tracking_csv = r".run6/opt10hold6_detection_track_reuseID_10.csv"
+    # tracking_csv = r".run6/opt10hold6_detection_track_reuseID_reid_10.csv"
+    # tracking_csv = r".run6/opt10hold6_detection_10.csv"
+    # tracking_csv = r".run6/opt10hold6_reuseID_10.csv"
+    # tracking_csv = r".run6/opt10hold6_track_10.csv"
     metrics = evaluate_tracking(
         tracking_csv=tracking_csv,
         gt_csv=gt_csv,
@@ -180,6 +193,104 @@ if __name__ == "__main__":
     print("---------------------------")
     for k, v in metrics.items():
         print(f"{k}: {v}")
+
+def run_batch():
+
+    gt_csv = r".run/08_mock_1-15_tracking.csv"
+    tracking_csv_s = [
+        r".run6/obb10hold1_10.csv",
+        r".run6/obb10hold1_reid10.csv",
+        r".run6/opt10hold1_detection_track_10.csv",
+        r".run6/opt10hold1_detection_track_reid_10.csv",
+        r".run6/opt10hold1_detection_track_reuseID_10.csv",
+        r".run6/opt10hold1_detection_track_reuseID_reid_10.csv",
+        r".run6/opt10hold1_detection_10.csv",
+        r".run6/opt10hold1_reuseID_10.csv",
+        r".run6/opt10hold1_track_10.csv"
+    ]
+
+    gt_csv = r".run\08_sick_16-30_tracking.csv"
+    tracking_csv_s = [
+        r".run6/obb10hold2_10.csv",
+        r".run6/obb10hold2_reid10.csv",
+        r".run6/opt10hold2_detection_track_10.csv",
+        r".run6/opt10hold2_detection_track_reid_10.csv",
+        r".run6/opt10hold2_detection_track_reuseID_10.csv",
+        r".run6/opt10hold2_detection_track_reuseID_reid_10.csv",
+        r".run6/opt10hold2_detection_10.csv",
+        r".run6/opt10hold2_reuseID_10.csv",
+        r".run6/opt10hold2_track_10.csv"
+    ]
+
+    # gt_csv = r".run\10_mock_76-90_tracking.csv"
+    # tracking_csv_s = [
+    #     r".run6/obb10hold3_10.csv",
+    #     r".run6/obb10hold3_reid_10.csv",
+    #     r".run6/opt10hold3_detection_track_10.csv",
+    #     r".run6/opt10hold3_detection_track_reid_10.csv",
+    #     r".run6/opt10hold3_detection_track_reuseID_10.csv",
+    #     r".run6/opt10hold3_detection_track_reuseID_reid_10.csv",
+    #     r".run6/opt10hold3_detection_10.csv",
+    #     r".run6/opt10hold3_reuseID_10.csv",
+    #     r".run6/opt10hold3_track_10.csv"]
+
+    # gt_csv = r".run\10_sick_31-45_tracking.csv"
+    # tracking_csv_s = [
+    #     r".run6/obb10hold4_10.csv",
+    #     r".run6/obb10hold4_reid_10.csv",
+    #     r".run6/opt10hold4_detection_track_10.csv",
+    #     r".run6/opt10hold4_detection_track_reid_10.csv",
+    #     r".run6/opt10hold4_detection_track_reuseID_10.csv",
+    #     r".run6/opt10hold4_detection_track_reuseID_reid_10.csv",
+    #     r".run6/opt10hold4_detection_10.csv",
+    #     r".run6/opt10hold4_reuseID_10.csv",
+    #     r".run6/opt10hold4_track_10.csv"]
+
+    # gt_csv = r".run\12_mock_46-60_tracking.csv"
+    # tracking_csv_s = [
+    #     r".run6/obb10hold5_10.csv",
+    #     r".run6/obb10hold5_reid_10.csv",
+    #     r".run6/opt10hold5_detection_track_10.csv",
+    #     r".run6/opt10hold5_detection_track_reid_10.csv",
+    #     r".run6/opt10hold5_detection_track_reuseID_10.csv",
+    #     r".run6/opt10hold5_detection_track_reuseID_reid_10.csv",
+    #     r".run6/opt10hold5_detection_10.csv",
+    #     r".run6/opt10hold5_reuseID_10.csv",
+    #     r".run6/opt10hold5_track_10.csv"]
+
+    # gt_csv = r".run\12_sick_61-75_tracking.csv"
+    # tracking_csv_s = [
+        # r".run6/obb10hold6_10.csv",
+        # r".run6/obb10hold6_reid_10.csv",
+        # r".run6/opt10hold6_detection_track_10.csv",
+        # r".run6/opt10hold6_detection_track_reid_10.csv",
+        # r".run6/opt10hold6_detection_track_reuseID_10.csv",
+        # r".run6/opt10hold6_detection_track_reuseID_reid_10.csv",
+        # r".run6/opt10hold6_detection_10.csv",
+        # r".run6/opt10hold6_reuseID_10.csv",
+        # r".run6/opt10hold6_track_10.csv"]
+
+    for tracking_csv in tracking_csv_s:
+        print(f"Evaluating tracking CSV: {tracking_csv}")
+        metrics = evaluate_tracking(
+            tracking_csv=tracking_csv,
+            gt_csv=gt_csv,
+            distance_threshold=50,
+            ignore_invisible=False,
+            include_undetected_predictions=False,
+            min_confidence=None,
+
+            # Only evaluate this global frame id range
+            frame_start=0,
+            frame_end=18060 # 10:02
+        )
+
+        for k, v in metrics.items():
+            print(f"{k}: {v}")
+        print("---------------------------")
+
+if __name__ == "__main__":
+    run_batch()
 
 
 

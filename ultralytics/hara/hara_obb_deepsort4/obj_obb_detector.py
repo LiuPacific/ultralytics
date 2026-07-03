@@ -16,7 +16,7 @@ class baseDet(object):
         self.img_size = 1280
         self.conf = 0.25
         # self.iou = 0.70
-        self.iou = 0.80
+        self.nms_iou = cfg.DEEPSORT.get("NMS_THRESHOLD", 0.7)
 
     def init_model(self):
         raise EOFError("Undefined model type.")
@@ -69,7 +69,7 @@ class ObbDetector(baseDet):
 
     def detect(self, im, x_min=270, x_max=1900, y_min=100, y_max=1600):
         res = self.model.predict(im, imgsz=self.img_size, conf=self.conf,
-                                 iou=self.iou, device=self.device)
+                                 iou=self.nms_iou, device=self.device)
 
         obb_xyxyxyxy = res[0].obb.xyxyxyxy.cpu().numpy()  # shape: (N, 4, 2)
         obb_xywhr = res[0].obb.xywhr.cpu().numpy()  # shape: (N, 5)

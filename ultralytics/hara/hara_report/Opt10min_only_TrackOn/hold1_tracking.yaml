@@ -15,7 +15,7 @@ DEEPSORT:
   USE_OPTIMIZATION: True
   REUSE_ID: False # use_optimization & reuse_id to turn on it.
   DETECTION_OPTIMIZATION_ON: False
-  TRACK_RECONNECTION_ON: False
+  TRACK_RECONNECTION_ON: True
   MAX_AGE: 30
 #  MAX_IOU_DISTANCE: 0.8
 #  USE_OPTIMIZATION: False

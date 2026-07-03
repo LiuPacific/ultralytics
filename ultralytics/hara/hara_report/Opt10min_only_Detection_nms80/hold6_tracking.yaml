@@ -1,9 +1,9 @@
 DEEPSORT:
-  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/obb_hold5_10min/weights/last.pt"
+  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/obb_hold6_10min/weights/last.pt"
   REID_CKPT: ""
   MAX_DIST: 0.2
   MIN_CONFIDENCE: 0.3
-  NMS_MAX_OVERLAP: 0.5
+  NMS_THRESHOLD: 0.8
   MAX_IOU_DISTANCE: 0.7
   N_INIT: 3
   NN_BUDGET: 100
@@ -20,7 +20,7 @@ DEEPSORT:
 #  MAX_IOU_DISTANCE: 0.8
   #  USE_OPTIMIZATION: False
   #  MAX_AGE: 30
-  TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/obb_hold5_10min/opt10hold5_detection.csv"
-  VIDEO_PATH: D:/chicken_project/video_reid_obb/mock_20251217T000000Z_20251217T003000Z.mkv
-  RESULT_PATH: "E:/temp/opt10hold5_detection.mp4"
+  TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/obb_hold6_10min/opt10hold6_detection.csv"
+  VIDEO_PATH: D:/chicken_project/video_reid_obb/sick_20251217T000000Z_20251217T003000Z.mkv
+  RESULT_PATH: "E:/temp/opt10hold6_detection.mp4"
   MAX_FRAME: 20000

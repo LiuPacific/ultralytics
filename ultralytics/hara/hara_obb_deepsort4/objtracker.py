@@ -15,7 +15,7 @@ def update(target_detector: ObbDetector, image, deepsort_obb: DeepSORTOBB):
     xywhr_list = []
     conf_list = []
     tracks2draw = []
-    image = plot_all_detections(image, pred_boxes)
+
     if len(selected_detections):
         # Adapt detections to deep sort input format
         for detection in selected_detections:
@@ -35,9 +35,9 @@ def update(target_detector: ObbDetector, image, deepsort_obb: DeepSORTOBB):
             tracks2draw.append(
                 (xyxyxyxy, '', track_id, track_history_positions)  # xyxyxyxy, class_id, track_id
             )
-
-    image = draw_trail(image, tracks2draw)
+    image = plot_all_detections(image, pred_boxes)
     image = plot_bboxes(image, tracks2draw)
+    image = draw_trail(image, tracks2draw)
     return image, tracks2draw
 
 
