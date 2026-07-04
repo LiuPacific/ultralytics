@@ -20,7 +20,7 @@ DEEPSORT:
 #  MAX_IOU_DISTANCE: 0.8
   #  USE_OPTIMIZATION: False
   #  MAX_AGE: 30
-  TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/obb_hold6_10min/opt10hold6_detection.csv"
+  TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/obb_hold6_10min/opt10hold6_detection_nms80.csv"
   VIDEO_PATH: D:/chicken_project/video_reid_obb/sick_20251217T000000Z_20251217T003000Z.mkv
-  RESULT_PATH: "E:/temp/opt10hold6_detection.mp4"
+  RESULT_PATH: "E:/temp/opt10hold6_detection_nms80.mp4"
   MAX_FRAME: 20000
