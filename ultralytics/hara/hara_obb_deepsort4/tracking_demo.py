@@ -193,18 +193,18 @@ if __name__ == '__main__':
 
     #
     # Opt10min_only_Detection
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection\hold1_tracking.yaml")
-    start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection\hold2_tracking.yaml")
-    start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection\hold3_tracking.yaml")
-    start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection\hold4_tracking.yaml")
-    start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection\hold5_tracking.yaml")
-    start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection\hold6_tracking.yaml")
-    start(show_window=False)
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection\hold1_tracking.yaml")
+    # start(show_window=False)
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection\hold2_tracking.yaml")
+    # start(show_window=False)
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection\hold3_tracking.yaml")
+    # start(show_window=False)
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection\hold4_tracking.yaml")
+    # start(show_window=False)
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection\hold5_tracking.yaml")
+    # start(show_window=False)
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection\hold6_tracking.yaml")
+    # start(show_window=False)
 
     #
     # Opt10min_only_ReUseID

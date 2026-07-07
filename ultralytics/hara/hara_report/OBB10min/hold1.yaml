@@ -8,9 +8,9 @@ train:
 val:
   - 08_mock_1-15
 test:
-# yolo train data=C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/hara_deep_sort_HBB/chicken_hbb.yaml model=C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/weights/yolo11l.pt epochs=200 imgsz=1280 batch=12 workers=4 name=yolov11l-hbb-chicken-0614-half
 
 names:
   0: chicken
 
+# yolo train data=C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/hara_deep_sort_HBB/chicken_hbb.yaml model=C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/weights/yolo11l.pt epochs=200 imgsz=1280 batch=12 workers=4 name=yolov11l-hbb-chicken-0614-half
 
