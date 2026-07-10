@@ -6,14 +6,17 @@ DEEPSORT:
   MAX_DIST: 0.2
   MIN_CONFIDENCE: 0.3
   #  MIN_CONFIDENCE: 0.2
-  NMS_MAX_OVERLAP: 0.5
+  NMS_THRESHOLD: 0.8
   MAX_IOU_DISTANCE: 0.7
   #  MAX_IOU_DISTANCE: 1
   MAX_AGE: 30
   #  MAX_AGE: 600
   N_INIT: 3
   NN_BUDGET: 100
+  MAX_ID_POOL: 15
   USE_REID: False
+  USE_OPTIMIZATION: False
+  DETECTION_OPTIMIZATION_ON: True
   TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/hbb_hold1_5min/tracking_output.csv"
   VIDEO_PATH: F:/20251002/RGB_mock/seg1.mp4
   RESULT_PATH: "result.mp4"

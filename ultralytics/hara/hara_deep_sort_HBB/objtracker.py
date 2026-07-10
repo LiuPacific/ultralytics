@@ -6,10 +6,11 @@ import numpy as np
 
 
 def update(target_detector, image, deepsort: DeepSort):
-    _, detected_bboxes = target_detector.detect(image)
+    _, detected_bboxes, pred_boxes = target_detector.detect(image)
     bbox_xywh = []
     confs = []
     tracks2draw = []
+
     if len(detected_bboxes):
         # Adapt detections to deep sort input format
         for x1, y1, x2, y2, _, conf in detected_bboxes:
@@ -29,6 +30,8 @@ def update(target_detector, image, deepsort: DeepSort):
             tracks2draw.append(
                 (x1, y1, x2, y2, '', track_id,track_history_positions)
             )
+
+    image = plot_all_detections(image, pred_boxes)
     image = draw_trail(image, tracks2draw)
     image = plot_bboxes(image, tracks2draw)
     return image, tracks2draw
