@@ -103,21 +103,22 @@ if __name__ == '__main__':
     # RESULT_PATH = '1208040829_jump_reoccur.mp4'
     # main()
 
-    # VIDEO_PATH = r'F:\20251002\RGB_mock\seg1.mp4'
-    # RESULT_PATH = 'seg1_4_csv.mp4'
-    # cfg.merge_from_file(r"deep_sort/configs/deep_sort.yaml")
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\HBB5min\hold1_tracking.yaml")
+
+    cfg.merge_from_file(r"deep_sort/configs/deep_sort.yaml")
     start()
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\HBB5min\hold2_tracking.yaml")
-    start()
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\HBB5min\hold3_tracking.yaml")
-    start()
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\HBB5min\hold4_tracking.yaml")
-    start()
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\HBB5min\hold5_tracking.yaml")
-    start()
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\HBB5min\hold6_tracking.yaml")
-    start()
+
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\HBB5min\hold1_tracking.yaml")
+    # start()
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\HBB5min\hold2_tracking.yaml")
+    # start()
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\HBB5min\hold3_tracking.yaml")
+    # start()
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\HBB5min\hold4_tracking.yaml")
+    # start()
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\HBB5min\hold5_tracking.yaml")
+    # start()
+    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\HBB5min\hold6_tracking.yaml")
+    # start()
 
 
 

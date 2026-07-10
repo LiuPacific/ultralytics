@@ -3,7 +3,7 @@ import unittest
 import tempfile
 from pathlib import Path
 
-from ultralytics.hara.tools.obb.obb2hbb import get_json_file_list,convert_json_file
+from ultralytics.hara.tools.labelling.obb2hbb import get_json_file_list,convert_json_file
 
 
 class TestGetJsonFileList(unittest.TestCase):
