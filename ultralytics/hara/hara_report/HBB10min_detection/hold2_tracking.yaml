@@ -1,0 +1,23 @@
+DEEPSORT:
+  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/hbb_hold2_10min/weights/last.pt"
+  REID_CKPT: ""
+  #  REID_CKPT: "E:/chicken_project/workspace/ultralytics/ultralytics/hara/hara_deep_sort/.weights/.deep_sort_checkpoint/ckpt_person.t7"
+  #  MAX_DIST: 0.2
+  MAX_DIST: 0.2
+  MIN_CONFIDENCE: 0.3
+  NMS_THRESHOLD: 0.8
+  MAX_IOU_DISTANCE: 0.7
+  MAX_AGE: 30
+  #  MAX_AGE: 600
+  N_INIT: 3
+  NN_BUDGET: 100
+  USE_OPTIMIZATION: False
+  USE_REID: False
+  DETECTION_OPTIMIZATION_ON: False
+  TRACK_RECONNECTION_ON: False
+  RECONNECTION_DISTANCE_THRESHOLD: 200
+  REUSE_ID_ASSIGNMENT_DISTANCE_THRESHOLD: 200
+  MAX_FRAME: 20000
+  TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/hbb_hold2_10min/hbb10hold2.csv"
+  VIDEO_PATH: D:/chicken_project/video_reid_obb/sick_20250826T000000Z_20250826T002000Z.mkv
+  RESULT_PATH: "E:/temp/hbb10hold2.mp4"
