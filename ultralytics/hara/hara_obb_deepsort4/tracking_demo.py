@@ -66,7 +66,7 @@ def start(show_window=True):
                 break
 
             # Process frame
-            output_image_frame, tracks2draw = objtracker.update(detector, im, deepsort_obb)
+            output_image_frame, _ = objtracker.update(detector, im, deepsort_obb)
             frames_processed += 1
 
             if videoWriter is None:
@@ -162,152 +162,93 @@ if __name__ == '__main__':
     # start(show_window=True)
 
 
-    # # temp NMS80 for detection only
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection_nms80\hold1_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection_nms80\hold2_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection_nms80\hold3_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection_nms80\hold4_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection_nms80\hold5_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection_nms80\hold6_tracking.yaml")
-    # start(show_window=False)
 
     #
     # OBB10
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold1_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold2_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold3_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold4_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold5_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10min\hold6_tracking.yaml")
-    # start(show_window=False)
-
-    #
-    # Opt10min_only_Detection
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection\hold1_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection\hold2_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection\hold3_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection\hold4_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection\hold5_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_Detection\hold6_tracking.yaml")
-    # start(show_window=False)
-
-    #
-    # Opt10min_only_ReUseID
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_ReUseID\hold1_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min\hold1_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_ReUseID\hold2_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min\hold2_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_ReUseID\hold3_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min\hold3_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_ReUseID\hold4_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min\hold4_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_ReUseID\hold5_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min\hold5_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_ReUseID\hold6_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min\hold6_tracking.yaml")
     start(show_window=False)
 
     #
-    # Opt10min_only_TrackOn
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_TrackOn\hold1_tracking.yaml")
+    # OBB10 detection
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_detection\hold1_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_TrackOn\hold2_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_detection\hold2_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_TrackOn\hold3_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_detection\hold3_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_TrackOn\hold4_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_detection\hold4_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_TrackOn\hold5_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_detection\hold5_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_only_TrackOn\hold6_tracking.yaml")
-    start(show_window=False)
-
-    #
-    # OBB10minReID
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10minReID\hold1_tracking.yaml")
-    start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10minReID\hold2_tracking.yaml")
-    start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10minReID\hold3_tracking.yaml")
-    start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10minReID\hold4_tracking.yaml")
-    start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10minReID\hold5_tracking.yaml")
-    start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\OBB10minReID\hold6_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_detection\hold6_tracking.yaml")
     start(show_window=False)
 
     #
-    # Opt10min_detection_track
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_track\hold1_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_track\hold2_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_track\hold3_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_track\hold4_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_track\hold5_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_track\hold6_tracking.yaml")
-    # start(show_window=False)
-
-    #
-    # Opt10min_detection_track_reuseID
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_track_reuseID\hold1_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_track_reuseID\hold2_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_track_reuseID\hold3_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_track_reuseID\hold4_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_track_reuseID\hold5_tracking.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_track_reuseID\hold6_tracking.yaml")
-    # start(show_window=False)
-
-
-    #
-    # Opt10min_detection_tracking_reuseID_ReID
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_tracking_reuseID_ReID\hold1_tracking.yaml")
+    # OBB10 track
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_track\hold1_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_tracking_reuseID_ReID\hold2_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_track\hold2_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_tracking_reuseID_ReID\hold3_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_track\hold3_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_tracking_reuseID_ReID\hold4_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_track\hold4_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_tracking_reuseID_ReID\hold5_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_track\hold5_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_tracking_reuseID_ReID\hold6_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_track\hold6_tracking.yaml")
     start(show_window=False)
 
     #
-    # Opt10min_detection_track_ReID
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_track_ReID\hold1_tracking.yaml")
+    # OBB10 detection track
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_detection_track_ReID\hold1_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_track_ReID\hold2_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_detection_track_ReID\hold2_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_track_ReID\hold3_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_detection_track_ReID\hold3_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_track_ReID\hold4_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_detection_track_ReID\hold4_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_track_ReID\hold5_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_detection_track_ReID\hold5_tracking.yaml")
     start(show_window=False)
-    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\Opt10min_detection_track_ReID\hold6_tracking.yaml")
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_detection_track_ReID\hold6_tracking.yaml")
+    start(show_window=False)
+
+    #
+    # # OBB10minReID
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_ReID\hold1_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_ReID\hold2_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_ReID\hold3_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_ReID\hold4_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_ReID\hold5_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_ReID\hold6_tracking.yaml")
+    start(show_window=False)
+
+    #
+    # Opt10min_detection_track reID
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_detection_track_ReID\hold1_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_detection_track_ReID\hold2_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_detection_track_ReID\hold3_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_detection_track_ReID\hold4_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_detection_track_ReID\hold5_tracking.yaml")
+    start(show_window=False)
+    cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\OBB10min_detection_track_ReID\hold6_tracking.yaml")
     start(show_window=False)

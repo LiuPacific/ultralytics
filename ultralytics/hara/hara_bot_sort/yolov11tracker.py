@@ -5,7 +5,7 @@ from ultralytics import YOLO
 
 OBJ_LIST = ['person', 'car', 'bus', 'truck']
 # DETECTOR_PATH = '.weights/yolov8s.pt'
-# OBJ_LIST = ['chicken', 'bus']
+# OBJ_LIST = ['chicken']
 DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolo11l.pt'
 # DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolov8s.pt'
 

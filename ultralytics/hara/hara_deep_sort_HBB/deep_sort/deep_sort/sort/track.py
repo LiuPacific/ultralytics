@@ -128,6 +128,10 @@ class Track:
         ret[:2] -= ret[2:] / 2
         return ret
 
+    def get_detection_center(self):
+        xyah = self.last_detected_xyah.copy()
+        return xyah[:2]
+
     def get_center(self):
         ret = self.mean[:4].copy()
         return ret[:2]
@@ -225,3 +229,18 @@ class Track:
             List of xy positions from the last 300 frames.
         """
         return list(self.position_history)
+
+    def merge_with(self, new_track):
+        """Merge an older track history into a newly created replacement track.
+
+        This is used by tracker-level re-identification. The new track keeps its
+        current Kalman state, but inherits the old track's historical context so
+        downstream consumers continue to see one continuous identity.
+        """
+        new_track.position_history.extendleft(reversed(list(self.position_history)))
+        # Prepend old appearance features to new track's features
+
+        if self.hits:
+            new_track.hits += self.hits
+        if self.age:
+            new_track.age += self.age

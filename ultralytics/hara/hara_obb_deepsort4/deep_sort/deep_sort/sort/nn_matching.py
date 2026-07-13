@@ -178,9 +178,16 @@ class NearestNeighborDistanceMetric(object):
             if self.budget is not None:
                 # 只考虑budget个目标，超过直接忽略
                 self.samples[target] = self.samples[target][-self.budget:]
-        
-        # 筛选激活的目标；samples是一个字典{id->feature list}
-        self.samples = {k: self.samples[k] for k in active_targets}
+
+        # Keep only active targets that already have a stored feature gallery.
+        # This makes the metric robust to tracker-side ID reuse/reconnection,
+        # where a track can become active before its appearance samples have
+        # been re-populated under the reused ID.
+        self.samples = {
+            k: self.samples[k]
+            for k in active_targets
+            if k in self.samples
+        }
 
     def distance(self, features, targets):
         """Compute distance between features and targets.

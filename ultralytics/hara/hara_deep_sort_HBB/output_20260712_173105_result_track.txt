@@ -1,0 +1,8 @@
+start_time: 2026-07-12T17:31:05.969834
+end_time: 2026-07-12T17:31:38.242180
+elapsed_seconds: 32.272
+input_video_fps: 30
+processing_fps: 9.513
+frames_processed: 307
+RESULT_PATH: result_track.mp4
+deepsort_cfg: {'DETECTION_MODEL_PATH': 'C:/Users/tliu25/workspace/ultralytics/runs/detect/hbb_s_hold1_10min-3/last44.pt', 'REID_CKPT': '', 'MAX_DIST': 0.2, 'MIN_CONFIDENCE': 0.3, 'NMS_THRESHOLD': 0.8, 'MAX_IOU_DISTANCE': 0.7, 'MAX_AGE': 30, 'N_INIT': 3, 'NN_BUDGET': 100, 'USE_OPTIMIZATION': False, 'USE_REID': False, 'DETECTION_OPTIMIZATION_ON': False, 'TRACK_RECONNECTION_ON': False, 'RECONNECTION_DISTANCE_THRESHOLD': 200, 'REUSE_ID_ASSIGNMENT_DISTANCE_THRESHOLD': 200, 'MAX_ID_POOL': 15, 'MAX_FRAME': 20000, 'TRACKING_CSV_PATH': 'tracking_output.csv', 'VIDEO_PATH': 'D:/chicken_project/video_cases/seg_loss_detection.mp4', 'RESULT_PATH': 'result_track.mp4', 'merge_from_file': <bound method YamlParser.merge_from_file of {...}>, 'merge_from_dict': <bound method YamlParser.merge_from_dict of {...}>}
