@@ -1,5 +1,5 @@
 DEEPSORT:
-  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/hbb_hold5_10min/weights/last.pt"
+  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold5_10min/weights/last.pt"
   REID_CKPT: ""
   #  REID_CKPT: "E:/chicken_project/workspace/ultralytics/ultralytics/hara/hara_deep_sort/.weights/.deep_sort_checkpoint/ckpt_person.t7"
   #  MAX_DIST: 0.2
@@ -18,6 +18,6 @@ DEEPSORT:
   RECONNECTION_DISTANCE_THRESHOLD: 200
   REUSE_ID_ASSIGNMENT_DISTANCE_THRESHOLD: 200
   MAX_FRAME: 20000
-  TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/hbb_hold5_10min/hbb_l_10hold5_detection.csv"
+  TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold5_10min/hbb_l_10hold5_detection.csv"
   VIDEO_PATH: D:/chicken_project/video_reid_obb/mock_20251217T000000Z_20251217T003000Z.mkv
   RESULT_PATH: "E:/temp/hbb_l_10hold5_detection.mp4"
