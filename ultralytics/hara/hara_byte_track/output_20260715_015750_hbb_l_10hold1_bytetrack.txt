@@ -1,0 +1,10 @@
+start_time: 2026-07-15T01:57:50.881609
+end_time: 2026-07-15T02:01:03.819486
+elapsed_seconds: 192.938
+input_video_fps: 30
+processing_fps: 14.440
+frames_processed: 2786
+VIDEO_PATH: D:/chicken_project/video_reid_obb/mock_20250826T000000Z_20250826T002000Z.mkv
+RESULT_PATH: E:/temp/hbb_l_10hold1_bytetrack.mp4
+TRACKING_CSV_PATH: D:/chicken_project/experiment6report/running/hbb_l_hold1_10min/hbb_l_10hold1_bytetrack.csv
+byte_track_cfg: {'merge_from_file': <bound method YamlParser.merge_from_file of {...}>, 'merge_from_dict': <bound method YamlParser.merge_from_dict of {...}>, 'tracker_type': 'hara_bytetrack', 'track_high_thresh': 0.25, 'track_low_thresh': 0.1, 'new_track_thresh': 0.25, 'track_buffer': 300, 'match_thresh': 0.8, 'fuse_score': True, 'ByteTrack': {'DETECTION_MODEL_PATH': 'D:/chicken_project/experiment6report/running/hbb_l_hold1_10min/weights/best.pt', 'MAX_FRAME': 20000, 'TRACKING_CSV_PATH': 'D:/chicken_project/experiment6report/running/hbb_l_hold1_10min/hbb_l_10hold1_bytetrack.csv', 'VIDEO_PATH': 'D:/chicken_project/video_reid_obb/mock_20250826T000000Z_20250826T002000Z.mkv', 'RESULT_PATH': 'E:/temp/hbb_l_10hold1_bytetrack.mp4', 'IMG_SIZE': 1280, 'NMS_THRESHOLD': 0.8, 'MAX_ID_POOL': 15, 'USE_OPTIMIZATION': False, 'DETECTION_OPTIMIZATION_ON': False, 'TRACK_RECONNECTION_ON': False, 'RECONNECTION_DISTANCE_THRESHOLD': 200, 'FRAME_MEMORY_LENGTH': 5, 'merge_from_file': <bound method YamlParser.merge_from_file of {...}>, 'merge_from_dict': <bound method YamlParser.merge_from_dict of {...}>}, 'cfg_path': 'C:\\Users\\tliu25\\workspace\\ultralytics\\ultralytics\\hara\\hara_report\\large_model\\HBB10min\\hold1_bytetrack.yaml'}

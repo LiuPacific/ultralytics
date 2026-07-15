@@ -57,6 +57,10 @@ class TrackOBB:
         self.last_detected_xywhr = None
         self.last_confidence = None
 
+    def get_detection_center(self):
+        xywhr = self.last_detected_xywhr.copy()
+        return xywhr[:2]
+
     def to_tlwh(self):
         """Get current position in axis-aligned bounding box format `(top left x, top left y,
         width, height)` for compatibility.
@@ -137,8 +141,8 @@ class TrackOBB:
         if self.state == TrackState.Tentative and self.hits >= self._n_init:
             self.state = TrackState.Confirmed
 
-        # Store current position in history
-        self.position_history.append(self.to_xywhr())
+        # Store the associated detection measurement, not the Kalman-filtered state.
+        self.position_history.append(measurement.copy())
 
         # Update last update frame ID
         self.frame_id_last_update = frame_id

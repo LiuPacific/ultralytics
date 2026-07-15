@@ -7,7 +7,8 @@ tracker_type: hara_botsort # (str) Registered Hara BoT-SORT backend
 track_high_thresh: 0.25 # (float) First-stage match threshold; raise for cleaner tracks, lower to keep more
 track_low_thresh: 0.1 # (float) Second-stage threshold for low-score matches; balances recovery vs drift
 new_track_thresh: 0.25 # (float) Start a new track if no match ≥ this; higher reduces false tracks
-track_buffer: 30 # (int) Frames to keep lost tracks alive; higher handles occlusion, increases ID switches risk
+#track_buffer: 30 # (int) Frames to keep lost tracks alive; higher handles occlusion, increases ID switches risk
+track_buffer: 300
 match_thresh: 0.8 # (float) Association similarity threshold (IoU/cost); tune with detector quality
 fuse_score: True # (bool) Fuse detection score with motion/IoU for matching; stabilizes weak detections
 
@@ -30,3 +31,9 @@ BotSORT:
   RESULT_PATH: "result_track.mp4"
   IMG_SIZE: 1280
   NMS_THRESHOLD: 0.8
+  MAX_ID_POOL: 15
+  USE_OPTIMIZATION: True
+  DETECTION_OPTIMIZATION_ON: True
+  TRACK_RECONNECTION_ON: True
+  RECONNECTION_DISTANCE_THRESHOLD: 200
+  FRAME_MEMORY_LENGTH: 5

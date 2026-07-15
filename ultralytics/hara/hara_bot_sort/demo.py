@@ -20,12 +20,34 @@ class Detections:
     def add(self, xyxy, confidence, class_id, tracker_id):
         self.detections.append((xyxy, confidence, class_id, tracker_id))
 
-def draw_trail(output_image_frame, trail_points, trail_color, trail_length=500):
+
+# Dark BGR colors for around 15 tracks
+DARK_COLORS = [
+    (0, 0, 139),  # dark red
+    (0, 100, 0),  # dark green
+    (139, 0, 0),  # dark blue
+    (0, 140, 140),  # dark yellow/cyan-like
+    (139, 0, 139),  # dark magenta
+    (139, 139, 0),  # dark cyan
+    (0, 69, 139),  # dark orange
+    (75, 0, 130),  # indigo
+    (47, 79, 79),  # dark slate gray
+    (85, 107, 47),  # dark olive green
+    (128, 0, 0),  # navy
+    (0, 128, 128),  # teal
+    (72, 61, 139),  # dark slate blue
+    (34, 139, 34),  # forest green
+    (25, 25, 112),  # midnight blue
+]
+
+def draw_trail(output_image_frame, object_trails, trail_length=500):
+    trail_points = list(object_trails.values())
+    trail_ids = list(object_trails.keys())
     for i in range(len(trail_points)):
         if len(trail_points[i]) > 1:
             for j in range(1, len(trail_points[i])):
                 cv2.line(output_image_frame, (int(trail_points[i][j-1][0]), int(trail_points[i][j-1][1])),
-                         (int(trail_points[i][j][0]), int(trail_points[i][j][1])), trail_color[i], thickness=3)
+                         (int(trail_points[i][j][0]), int(trail_points[i][j][1])), DARK_COLORS[trail_ids[i] % len(DARK_COLORS)], thickness=3)
         if len(trail_points[i]) > trail_length:
             trail_points[i].pop(0)  # Remove the oldest point from the trail
 
@@ -94,8 +116,9 @@ def start(show_window=True):
                     object_trails[track_id] = [(center.x, center.y)]
 
             # Draw the trail for each object
-            trail_colors = [(255, 0, 255)] * len(object_trails)  # Red color for all trails
-            draw_trail(output_image_frame, list(object_trails.values()), trail_colors)
+            # trail_colors = [(255, 0, 255)] * len(object_trails)  # Red color for all trails
+            # draw_trail(output_image_frame, list(object_trails.values()))
+            draw_trail(output_image_frame, object_trails)
 
             # Remove trails of objects that are not detected in the current frame
             for tracker_id in list(object_trails.keys()):
@@ -156,26 +179,117 @@ def start(show_window=True):
         cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    cfg_path = "config/hara_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start()
+    # cfg_path = "config/hara_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start()
 
     # # HBB10
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold1_botsort.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold2_botsort.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold3_botsort.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold4_botsort.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold5_botsort.yaml")
-    # start(show_window=False)
-    # cfg.merge_from_file(r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold6_botsort.yaml")
-    # start(show_window=False)
-    #
-    #
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold1_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold2_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold3_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold4_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold5_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold6_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+
+    # Detection
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold1_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold2_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold3_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold4_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold5_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold6_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+
+
+
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold1_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold2_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold3_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold4_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold5_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold6_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+
+
+
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold1_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold2_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold3_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold4_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold5_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold6_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+
 
 
 

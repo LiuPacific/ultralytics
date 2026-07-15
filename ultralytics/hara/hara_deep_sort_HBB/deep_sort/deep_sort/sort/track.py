@@ -190,7 +190,8 @@ class Track:
         if self.state == TrackState.Tentative and self.hits >= self._n_init:
             self.state = TrackState.Confirmed
 
-        self.position_history.append(self.get_center())
+        # Store the associated detection center, not the Kalman-filtered state.
+        self.position_history.append(measurement.copy())
 
         # Update last detected xyah and confidence for CSV logging
         self.last_detected_xyah = measurement

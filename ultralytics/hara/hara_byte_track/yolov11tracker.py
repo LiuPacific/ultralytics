@@ -43,7 +43,7 @@ class yolov11Tracker(baseTracker):
         self.weights = self.runtime_cfg.get("DETECTION_MODEL_PATH", DETECTOR_PATH)
         self.img_size = self.runtime_cfg.get("IMG_SIZE", self.img_size)
         self.conf = self.runtime_cfg.get("CONF", self.conf)
-        self.iou = self.runtime_cfg.get("IOU", self.iou)
+        self.iou = self.runtime_cfg.get("NMS_THRESHOLD", 0.8)
         self.device = 0 if torch.cuda.is_available() else 'cpu'
         self.model = YOLO(self.weights)
         self.m = self.model

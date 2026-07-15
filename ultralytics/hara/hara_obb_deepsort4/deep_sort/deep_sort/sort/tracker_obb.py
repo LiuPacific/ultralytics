@@ -430,7 +430,7 @@ class TrackerOBB:
         """Re-identify tracks that disappeared and reappeared using position history."""
         # Find new tracks that have existed for exactly 3 frames
         # duplicate detections exist more than 3 frames
-        new_tracks = [t for t in self.tracks if t.age == 3]
+        new_tracks = [t for t in self.tracks if (t.age>=3 and t.age<=5)]
 
         if not new_tracks:
             return
@@ -448,11 +448,11 @@ class TrackerOBB:
 
         for i, unmatched_track in enumerate(unmatched_tracks):
             # Last position of unmatched track
-            history = unmatched_track.get_position_history()
-            if history:
-                unmatched_center = history[-1][:2]  # cx, cy of last position
+            unmatched_history = unmatched_track.get_position_history()
+            if unmatched_history:
+                unmatched_center = unmatched_history[-1][:2]  # cx, cy of last position
             else:
-                unmatched_center = unmatched_track.to_xywhr()[:2]  # fallback
+                unmatched_center = unmatched_track.get_detection_center()  # fallback
             for j, new_track in enumerate(new_tracks):
                 # First position of new track
                 history = new_track.get_position_history()

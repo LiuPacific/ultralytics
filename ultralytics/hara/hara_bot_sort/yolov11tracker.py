@@ -33,7 +33,7 @@ class baseTracker(object):
 class yolov11Tracker(baseTracker):
     def __init__(self):
         super(yolov11Tracker, self).__init__()
-        self.runtime_cfg = cfg.get("BotSORT", {})
+        self.runtime_cfg = cfg.get("BotSORT", {}) or {}
         self.tracking_csv_path = self.runtime_cfg.get("TRACKING_CSV_PATH", "tracking_output1.csv")
         self._csv_buffer = []
         self._frames_since_flush = 0
@@ -45,7 +45,7 @@ class yolov11Tracker(baseTracker):
         self.weights = self.runtime_cfg.get("DETECTION_MODEL_PATH", DETECTOR_PATH)
         self.img_size = self.runtime_cfg.get("IMG_SIZE", self.img_size)
         self.conf = self.runtime_cfg.get("CONF", self.conf)
-        self.iou = self.runtime_cfg.get("IOU", self.iou)
+        self.iou = self.runtime_cfg.get("NMS_THRESHOLD", 0.7)
         self.device = 0 if torch.cuda.is_available() else 'cpu'
         self.model = YOLO(self.weights)
         self.m = self.model
