@@ -3,7 +3,7 @@
 # BoT-SORT tracker defaults for mode="track"
 # Docs: https://docs.ultralytics.com/modes/track/
 
-tracker_type: botsort # (str) Tracker backend: botsort|bytetrack; choose botsort to enable BoT-SORT features
+tracker_type: hara_botsort # (str) Registered Hara BoT-SORT backend
 track_high_thresh: 0.25 # (float) First-stage match threshold; raise for cleaner tracks, lower to keep more
 track_low_thresh: 0.1 # (float) Second-stage threshold for low-score matches; balances recovery vs drift
 new_track_thresh: 0.25 # (float) Start a new track if no match ≥ this; higher reduces false tracks
@@ -12,10 +12,21 @@ match_thresh: 0.8 # (float) Association similarity threshold (IoU/cost); tune wi
 fuse_score: True # (bool) Fuse detection score with motion/IoU for matching; stabilizes weak detections
 
 # BoT-SORT specifics
-gmc_method: sparseOptFlow # (str) Global motion compensation: sparseOptFlow|orb|sift|ecc|none; helps moving camera scenes
+#gmc_method: sparseOptFlow # (str) Global motion compensation: sparseOptFlow|orb|sift|ecc|none; helps moving camera scenes
+gmc_method: none
 
 # ReID model related thresh
 proximity_thresh: 0.5 # (float) Min IoU to consider tracks proximate for ReID; higher is stricter
 appearance_thresh: 0.8 # (float) Min appearance similarity for ReID; raise to avoid identity swaps
 with_reid: False # (bool) Enable ReID model use; needs extra model and compute
 model: auto # (str) ReID model name/path; "auto" uses detector features if available
+
+BotSORT:
+  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold1_10min/weights/last.pt"
+  MAX_FRAME: 20000
+  TRACKING_CSV_PATH: tracking_output.csv
+  #VIDEO_PATH: D:/chicken_project/video_cases/seg_loss_detection.mp4
+  VIDEO_PATH: D:/chicken_project/video_cases/moving.mp4
+  RESULT_PATH: "result_track.mp4"
+  IMG_SIZE: 1280
+  NMS_THRESHOLD: 0.8
