@@ -1,5 +1,5 @@
 DEEPSORT:
-  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold1_10min/weights/best.pt"
+  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold1_10min/weights/last.pt"
   REID_CKPT: ""
   #  REID_CKPT: "E:/chicken_project/workspace/ultralytics/ultralytics/hara/hara_deep_sort/.weights/.deep_sort_checkpoint/ckpt_person.t7"
   #  MAX_DIST: 0.2

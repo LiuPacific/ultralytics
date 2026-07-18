@@ -13,7 +13,7 @@ match_thresh: 0.8 # (float) Association similarity threshold (IoU/cost); tune wi
 fuse_score: True # (bool) Fuse detection score with motion/IoU for matching; stabilizes weak detections
 
 ByteTrack:
-  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold5_10min/weights/best.pt"
+  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold5_10min/weights/last.pt"
   MAX_FRAME: 20000
   TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold5_10min/hbb_l_10hold5_bytetrack_detection.csv"
   VIDEO_PATH: D:/chicken_project/video_reid_obb/mock_20251217T000000Z_20251217T003000Z.mkv

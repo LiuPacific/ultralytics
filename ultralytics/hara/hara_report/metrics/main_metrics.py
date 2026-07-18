@@ -112,7 +112,7 @@ def evaluate_tracking(
 def run_one():
 
     gt_csv = r".run/08_mock_1-15_tracking.csv"
-    tracking_csv = r".run10/hbb_l_10hold1.csv"
+    tracking_csv = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_deep_sort_HBB\hbb_l_10hold1.csv"
     # tracking_csv = r".run6/obb10hold1_reid_10.csv"
     # tracking_csv = r".run6/obb10hold1_detection_track_10.csv"
     # tracking_csv = r".run6/obb10hold1_detection_track_reid_10.csv"
@@ -191,101 +191,143 @@ def run_one():
 
 def run_batch():
 
-    # gt_csv = r".run/08_mock_1-15_tracking.csv"
-    # tracking_csv_s = [
-    #     r".run10/hbb_l_10hold1.csv",
-    #     r".run10/hbb_l_10hold1_detection.csv",
-    #     r".run10/hbb_l_10hold1_track.csv",
-    #     r".run10/hbb_l_10hold1_detection_track.csv",
-    #     r".run10/obb_l_10hold1.csv",
-    #     r".run10/obb_l_10hold1_reid.csv",
-    #     r".run10/obb_l_10hold1_detection.csv",
-    #     r".run10/obb_l_10hold1_track.csv",
-    #     r".run10/obb_l_10hold1_detection_track.csv",
-    #     r".run10/obb_l_10hold1_detection_track_reid.csv",
-    #     r".run10/hbb_l_10hold1_bytetrack.csv",
-    #     r".run10/hbb_l_10hold1_botsort.csv",
-    # ]
+    gt_csv = r".run/08_mock_1-15_tracking.csv"
+    tracking_csv_s = [
+        r".run12/hbb_l_10hold1.csv",
+        r".run12.5/hbb_l_10hold1_botsort.csv",
+        r".run12.5/hbb_l_10hold1_botsort_detection.csv",
+        r".run12.5/hbb_l_10hold1_botsort_detection_track.csv",
+        r".run12.5/hbb_l_10hold1_botsort_track.csv",
+        r".run12.5/hbb_l_10hold1_bytetrack.csv",
+        r".run12.5/hbb_l_10hold1_bytetrack_detection.csv",
+        r".run12.5/hbb_l_10hold1_bytetrack_detection_track.csv",
+        r".run12.5/hbb_l_10hold1_bytetrack_track.csv",
+        r".run12/hbb_l_10hold1_detection.csv",
+        r".run12/hbb_l_10hold1_detection_track.csv",
+        r".run12/hbb_l_10hold1_track.csv",
+
+        r".run12/obb_l_10hold1.csv",
+        r".run12/obb_l_10hold1_reid.csv",
+        r".run12/obb_l_10hold1_detection.csv",
+        r".run12/obb_l_10hold1_track.csv",
+        r".run12/obb_l_10hold1_detection_track.csv",
+        r".run12/obb_l_10hold1_detection_track_reid.csv",
+    ]
     #
     # gt_csv = r".run\08_sick_16-30_tracking.csv"
     # tracking_csv_s = [
-    #     r".run10/hbb_l_10hold2.csv",
-    #     r".run10/hbb_l_10hold2_detection.csv",
-    #     r".run10/hbb_l_10hold2_track.csv",
-    #     r".run10/hbb_l_10hold2_detection_track.csv",
-    #     r".run10/obb_l_10hold2.csv",
-    #     r".run10/obb_l_10hold2_reid.csv",
-    #     r".run10/obb_l_10hold2_detection.csv",
-    #     r".run10/obb_l_10hold2_track.csv",
-    #     r".run10/obb_l_10hold2_detection_track.csv",
-    #     r".run10/obb_l_10hold2_detection_track_reid.csv",
-    #     r".run10/hbb_l_10hold2_bytetrack.csv",
-    #     r".run10/hbb_l_10hold2_botsort.csv",
-    # ]
+    #     r".run12/hbb_l_10hold2.csv",
+    #     r".run12/hbb_l_10hold2_botsort.csv",
+    #     r".run12/hbb_l_10hold2_botsort_detection.csv",
+    #     r".run12/hbb_l_10hold2_botsort_detection_track.csv",
+    #     r".run12/hbb_l_10hold2_botsort_track.csv",
+    #     r".run12/hbb_l_10hold2_bytetrack.csv",
+    #     r".run12/hbb_l_10hold2_bytetrack_detection.csv",
+    #     r".run12/hbb_l_10hold2_bytetrack_detection_track.csv",
+    #     r".run12/hbb_l_10hold2_bytetrack_track.csv",
+    #     r".run12/hbb_l_10hold2_detection.csv",
+    #     r".run12/hbb_l_10hold2_detection_track.csv",
+    #     r".run12/hbb_l_10hold2_track.csv",
     #
+    #     r".run12/obb_l_10hold2.csv",
+    #     r".run12/obb_l_10hold2_reid.csv",
+    #     r".run12/obb_l_10hold2_detection.csv",
+    #     r".run12/obb_l_10hold2_track.csv",
+    #     r".run12/obb_l_10hold2_detection_track.csv",
+    #     r".run12/obb_l_10hold2_detection_track_reid.csv",
+    # ]
+    # #
     # gt_csv = r".run\10_mock_76-90_tracking.csv"
     # tracking_csv_s = [
-    #     r".run10/hbb_l_10hold3.csv",
-    #     r".run10/hbb_l_10hold3_detection.csv",
-    #     r".run10/hbb_l_10hold3_track.csv",
-    #     r".run10/hbb_l_10hold3_detection_track.csv",
-    #     r".run10/obb_l_10hold3.csv",
-    #     r".run10/obb_l_10hold3_reid.csv",
-    #     r".run10/obb_l_10hold3_detection.csv",
-    #     r".run10/obb_l_10hold3_track.csv",
-    #     r".run10/obb_l_10hold3_detection_track.csv",
-    #     r".run10/obb_l_10hold3_detection_track_reid.csv",
-    #     r".run10/hbb_l_10hold3_bytetrack.csv",
-    #     r".run10/hbb_l_10hold3_botsort.csv",
+    #     r".run12/hbb_l_10hold3.csv",
+    #     r".run12/hbb_l_10hold3_botsort.csv",
+    #     r".run12/hbb_l_10hold3_botsort_detection.csv",
+    #     r".run12/hbb_l_10hold3_botsort_detection_track.csv",
+    #     r".run12/hbb_l_10hold3_botsort_track.csv",
+    #     r".run12/hbb_l_10hold3_bytetrack.csv",
+    #     r".run12/hbb_l_10hold3_bytetrack_detection.csv",
+    #     r".run12/hbb_l_10hold3_bytetrack_detection_track.csv",
+    #     r".run12/hbb_l_10hold3_bytetrack_track.csv",
+    #     r".run12/hbb_l_10hold3_detection.csv",
+    #     r".run12/hbb_l_10hold3_detection_track.csv",
+    #     r".run12/hbb_l_10hold3_track.csv",
+    #
+    #     r".run12/obb_l_10hold3.csv",
+    #     r".run12/obb_l_10hold3_reid.csv",
+    #     r".run12/obb_l_10hold3_detection.csv",
+    #     r".run12/obb_l_10hold3_track.csv",
+    #     r".run12/obb_l_10hold3_detection_track.csv",
+    #     r".run12/obb_l_10hold3_detection_track_reid.csv",
     # ]
     #
     # gt_csv = r".run\10_sick_31-45_tracking.csv"
     # tracking_csv_s = [
-    #     r".run10/hbb_l_10hold4.csv",
-    #     r".run10/hbb_l_10hold4_detection.csv",
-    #     r".run10/hbb_l_10hold4_track.csv",
-    #     r".run10/hbb_l_10hold4_detection_track.csv",
-    #     r".run10/obb_l_10hold4.csv",
-    #     r".run10/obb_l_10hold4_reid.csv",
-    #     r".run10/obb_l_10hold4_detection.csv",
-    #     r".run10/obb_l_10hold4_track.csv",
-    #     r".run10/obb_l_10hold4_detection_track.csv",
-    #     r".run10/obb_l_10hold4_detection_track_reid.csv",
-    #     r".run10/hbb_l_10hold4_bytetrack.csv",
-    #     r".run10/hbb_l_10hold4_botsort.csv",
-    # ]
+    #     r".run12/hbb_l_10hold4.csv",
+    #     r".run12/hbb_l_10hold4_botsort.csv",
+    #     r".run12/hbb_l_10hold4_botsort_detection.csv",
+    #     r".run12/hbb_l_10hold4_botsort_detection_track.csv",
+    #     r".run12/hbb_l_10hold4_botsort_track.csv",
+    #     r".run12/hbb_l_10hold4_bytetrack.csv",
+    #     r".run12/hbb_l_10hold4_bytetrack_detection.csv",
+    #     r".run12/hbb_l_10hold4_bytetrack_detection_track.csv",
+    #     r".run12/hbb_l_10hold4_bytetrack_track.csv",
+    #     r".run12/hbb_l_10hold4_detection.csv",
+    #     r".run12/hbb_l_10hold4_detection_track.csv",
+    #     r".run12/hbb_l_10hold4_track.csv",
     #
+    #     r".run12/obb_l_10hold4.csv",
+    #     r".run12/obb_l_10hold4_reid.csv",
+    #     r".run12/obb_l_10hold4_detection.csv",
+    #     r".run12/obb_l_10hold4_track.csv",
+    #     r".run12/obb_l_10hold4_detection_track.csv",
+    #     r".run12/obb_l_10hold4_detection_track_reid.csv",
+    # ]
+    # #
     # gt_csv = r".run\12_mock_46-60_tracking.csv"
     # tracking_csv_s = [
-    #     r".run10/hbb_l_10hold5.csv",
-    #     r".run10/hbb_l_10hold5_detection.csv",
-    #     r".run10/hbb_l_10hold5_track.csv",
-    #     r".run10/hbb_l_10hold5_detection_track.csv",
-    #     r".run10/obb_l_10hold5.csv",
-    #     r".run10/obb_l_10hold5_reid.csv",
-    #     r".run10/obb_l_10hold5_detection.csv",
-    #     r".run10/obb_l_10hold5_track.csv",
-    #     r".run10/obb_l_10hold5_detection_track.csv",
-    #     r".run10/obb_l_10hold5_detection_track_reid.csv",
-    #     r".run10/hbb_l_10hold5_bytetrack.csv",
-    #     r".run10/hbb_l_10hold5_botsort.csv",
-    # ]
+    #     r".run12/hbb_l_10hold5.csv",
+    #     r".run12/hbb_l_10hold5_botsort.csv",
+    #     r".run12/hbb_l_10hold5_botsort_detection.csv",
+    #     r".run12/hbb_l_10hold5_botsort_detection_track.csv",
+    #     r".run12/hbb_l_10hold5_botsort_track.csv",
+    #     r".run12/hbb_l_10hold5_bytetrack.csv",
+    #     r".run12/hbb_l_10hold5_bytetrack_detection.csv",
+    #     r".run12/hbb_l_10hold5_bytetrack_detection_track.csv",
+    #     r".run12/hbb_l_10hold5_bytetrack_track.csv",
+    #     r".run12/hbb_l_10hold5_detection.csv",
+    #     r".run12/hbb_l_10hold5_detection_track.csv",
+    #     r".run12/hbb_l_10hold5_track.csv",
     #
-    gt_csv = r".run\12_sick_61-75_tracking.csv"
-    tracking_csv_s = [
-        r".run10/hbb_l_10hold6.csv",
-        r".run10/hbb_l_10hold6_detection.csv",
-        r".run10/hbb_l_10hold6_track.csv",
-        r".run10/hbb_l_10hold6_detection_track.csv",
-        r".run10/obb_l_10hold6.csv",
-        r".run10/obb_l_10hold6_reid.csv",
-        r".run10/obb_l_10hold6_detection.csv",
-        r".run10/obb_l_10hold6_track.csv",
-        r".run10/obb_l_10hold6_detection_track.csv",
-        r".run10/obb_l_10hold6_detection_track_reid.csv",
-        r".run10/hbb_l_10hold6_bytetrack.csv",
-        r".run10/hbb_l_10hold6_botsort.csv",
-    ]
+    #     r".run12/obb_l_10hold5.csv",
+    #     r".run12/obb_l_10hold5_reid.csv",
+    #     r".run12/obb_l_10hold5_detection.csv",
+    #     r".run12/obb_l_10hold5_track.csv",
+    #     r".run12/obb_l_10hold5_detection_track.csv",
+    #     r".run12/obb_l_10hold5_detection_track_reid.csv",
+    # ]
+    # #
+    # gt_csv = r".run\12_sick_61-75_tracking.csv"
+    # tracking_csv_s = [
+    #     r".run12/hbb_l_10hold6.csv",
+    #     r".run12/hbb_l_10hold6_botsort.csv",
+    #     r".run12/hbb_l_10hold6_botsort_detection.csv",
+    #     r".run12/hbb_l_10hold6_botsort_detection_track.csv",
+    #     r".run12/hbb_l_10hold6_botsort_track.csv",
+    #     r".run12/hbb_l_10hold6_bytetrack.csv",
+    #     r".run12/hbb_l_10hold6_bytetrack_detection.csv",
+    #     r".run12/hbb_l_10hold6_bytetrack_detection_track.csv",
+    #     r".run12/hbb_l_10hold6_bytetrack_track.csv",
+    #     r".run12/hbb_l_10hold6_detection.csv",
+    #     r".run12/hbb_l_10hold6_detection_track.csv",
+    #     r".run12/hbb_l_10hold6_track.csv",
+    #
+    #     r".run12/obb_l_10hold6.csv",
+    #     r".run12/obb_l_10hold6_reid.csv",
+    #     r".run12/obb_l_10hold6_detection.csv",
+    #     r".run12/obb_l_10hold6_track.csv",
+    #     r".run12/obb_l_10hold6_detection_track.csv",
+    #     r".run12/obb_l_10hold6_detection_track_reid.csv",
+    # ]
 
     for tracking_csv in tracking_csv_s:
         print(f"Evaluating tracking CSV: {tracking_csv}")

@@ -7,7 +7,7 @@ from . import linear_assignment
 from . import iou_matching
 from .track import Track, TrackState
 from ultralytics.hara.hara_deep_sort_HBB.deep_sort.configs.common_cfg import cfg
-
+import os
 
 class Tracker:
     """
@@ -63,6 +63,8 @@ class Tracker:
         self._next_id = 1  # 下一个分配的轨迹id
         # CSV logging buffer and configuration
         self.tracking_csv_path = tracking_csv_path
+        if self.tracking_csv_path and os.path.exists(self.tracking_csv_path):
+            os.remove(self.tracking_csv_path)
         self._csv_buffer = []
         self._frames_since_flush = 0
         self._flush_interval = flush_interval

@@ -115,6 +115,7 @@ def start(show_window=True):
 
 if __name__ == '__main__':
     # cfg.merge_from_file(r"deep_sort/configs/deep_sort.yaml")
+    # cfg.merge_from_file(r"deep_sort/configs/hold1_tracking.yaml")
     # start()
 
 

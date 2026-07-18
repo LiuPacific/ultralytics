@@ -23,7 +23,7 @@ with_reid: False # (bool) Enable ReID model use; needs extra model and compute
 model: auto # (str) ReID model name/path; "auto" uses detector features if available
 
 BotSORT:
-  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold3_10min/weights/best.pt"
+  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold3_10min/weights/last.pt"
   MAX_FRAME: 20000
   TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold3_10min/hbb_l_10hold3_botsort_detection.csv"
   VIDEO_PATH: D:/chicken_project/video_reid_obb/mock_20251007T000000Z_20251007T010000Z.mkv

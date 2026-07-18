@@ -33,6 +33,8 @@ class yolov11Tracker(baseTracker):
         super(yolov11Tracker, self).__init__()
         self.runtime_cfg = cfg.get("ByteTrack", {})
         self.tracking_csv_path = self.runtime_cfg.get("TRACKING_CSV_PATH") or "tracking_output.csv"
+        if self.tracking_csv_path and os.path.exists(self.tracking_csv_path):
+            os.remove(self.tracking_csv_path)
         self._csv_buffer = []
         self._frames_since_flush = 0
         self._flush_interval = self.runtime_cfg.get("TRACKING_FLUSH_INTERVAL", 30)

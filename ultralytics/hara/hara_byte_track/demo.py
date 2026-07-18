@@ -181,7 +181,7 @@ if __name__ == '__main__':
     # cfg.setdefault("cfg_path", cfg_path)
     # start()
 
-    # # HBB10
+    # HBB10
     cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold1_bytetrack.yaml"
     cfg.merge_from_file(cfg_path)
     cfg.setdefault("cfg_path", cfg_path)

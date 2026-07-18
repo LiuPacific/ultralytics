@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import deque
 from typing import Any
 
 import numpy as np
@@ -22,6 +23,8 @@ class HaraBYTETracker(BYTETracker):
         self.runtime_cfg = cfg.get("ByteTrack", {})
         self.bbox_history = []
         self.frame_memory_length = self.runtime_cfg.get("FRAME_MEMORY_LENGTH", 5)
+        self.position_history_length = self.runtime_cfg.get("POSITION_HISTORY_LENGTH", 300)
+        self.position_history = {}
 
     def update(self, results, img: np.ndarray | None = None, feats: np.ndarray | None = None) -> np.ndarray:
         """Update tracker state.
@@ -37,7 +40,7 @@ class HaraBYTETracker(BYTETracker):
         removed_stracks = []
 
         # hara detection optimization
-        if self.runtime_cfg.get("USE_OPTIMIZATION", False) and self.runtime_cfg.get("DETECTION_OPTIMIZATION_ON", True):
+        if self.runtime_cfg.get("USE_OPTIMIZATION", False) and self.runtime_cfg.get("DETECTION_OPTIMIZATION_ON", False):
             results, feats = self._apply_detection_optimization(results, img, feats)
 
         scores = results.conf
@@ -150,7 +153,7 @@ class HaraBYTETracker(BYTETracker):
             self.removed_stracks = self.removed_stracks[-1000:]
 
         if self.runtime_cfg.get("USE_OPTIMIZATION", False):
-            if self.runtime_cfg.get("TRACK_RECONNECTION_ON", True):
+            if self.runtime_cfg.get("TRACK_RECONNECTION_ON", False):
                 self._reidentify_tracks()
 
         return np.asarray([x.result for x in self.tracked_stracks if x.is_activated], dtype=np.float32)
@@ -175,7 +178,11 @@ class HaraBYTETracker(BYTETracker):
         for i, unmatched_track in enumerate(unmatched_tracks):
             unmatched_center = self._track_center(unmatched_track)
             for j, new_track in enumerate(new_tracks):
-                new_center = self._track_center(new_track)
+                history = self.position_history.get(new_track.track_id)
+                if history:
+                    new_center = history[0][:2]
+                else:
+                    new_center = self._track_center(new_track)
                 cost_matrix[i, j] = np.linalg.norm(unmatched_center - new_center)
 
         matches, _, _ = matching.linear_assignment(cost_matrix, thresh=reconnection_distance_threshold)
@@ -183,8 +190,10 @@ class HaraBYTETracker(BYTETracker):
             old_track = unmatched_tracks[int(row_index)]
             new_track = new_tracks[int(col_index)]
             old_track_id = old_track.track_id
+            new_track_id = new_track.track_id
 
             new_track.track_id = old_track_id
+            self._merge_position_history(old_track_id, new_track_id)
             new_track.start_frame = old_track.start_frame
             new_track.tracklet_len += getattr(old_track, "tracklet_len", 0)
             self.lost_stracks = [track for track in self.lost_stracks if track.track_id != old_track_id]
@@ -209,13 +218,46 @@ class HaraBYTETracker(BYTETracker):
         return self.frame_id - track.start_frame + 1
 
     def _track_center(self, track):
-        last_detected_xywh = getattr(track, "last_detected_xywh", None)
-        if last_detected_xywh is not None:
-            return np.asarray(last_detected_xywh[:2], dtype=float)
+        track_id = self._track_id(track)
+        if track_id is not None:
+            history = self.position_history.get(track_id)
+            if history:
+                return np.asarray(history[-1], dtype=float)
         return np.asarray(track.xywh[:2], dtype=float)
 
     def _record_detection(self, track, detection):
-        track.last_detected_xywh = np.asarray(detection.xywh, dtype=float).copy()
+        track_id = self._track_id(track)
+        if track_id is None:
+            return
+        detected_xywh = np.asarray(detection.xywh, dtype=float)
+        self._append_position_history(track_id, detected_xywh[:2])
+
+    def _append_position_history(self, track_id, center_xy):
+        history = self.position_history.get(track_id)
+        if history is None:
+            history = deque(maxlen=self.position_history_length)
+            self.position_history[track_id] = history
+        history.append(np.asarray(center_xy, dtype=float).copy())
+
+    def _merge_position_history(self, old_track_id, new_track_id):
+        old_track_id = int(old_track_id)
+        new_track_id = int(new_track_id)
+        if old_track_id == new_track_id:
+            return
+
+        old_history = list(self.position_history.get(old_track_id, ()))
+        new_history = list(self.position_history.get(new_track_id, ()))
+        if old_history or new_history:
+            merged_history = deque(maxlen=self.position_history_length)
+            merged_history.extend((old_history + new_history)[-self.position_history_length:])
+            self.position_history[old_track_id] = merged_history
+        self.position_history.pop(new_track_id, None)
+
+    def _track_id(self, track):
+        track_id = getattr(track, "track_id", track)
+        if track_id is None:
+            return None
+        return int(track_id)
 
     def _apply_detection_optimization(self, results, img: np.ndarray | None = None, feats=None):
         selected_results = results
