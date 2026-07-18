@@ -179,121 +179,123 @@ def start(show_window=True):
         cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    # cfg_path = "config/hara_botsort.yaml"
+    cfg_path = "config/hara_botsort.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start()
+
+
+    #
+    # # # HBB10
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold1_botsort.yaml"
     # cfg.merge_from_file(cfg_path)
     # cfg.setdefault("cfg_path", cfg_path)
-    # start()
-
-    # # HBB10
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold1_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold2_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold3_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold4_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold5_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold6_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-
-    # Detection
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold1_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold2_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold3_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold4_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold5_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold6_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-
-
-
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold1_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold2_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold3_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold4_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold5_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold6_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-
-
-
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold1_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold2_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold3_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold4_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold5_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold6_botsort.yaml"
-    cfg.merge_from_file(cfg_path)
-    cfg.setdefault("cfg_path", cfg_path)
-    start(show_window=False)
-
-
-
-
-
-
-
-
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold2_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold3_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold4_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold5_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold6_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    #
+    # # Detection
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold1_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold2_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold3_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold4_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold5_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold6_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    #
+    #
+    #
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold1_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold2_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold3_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold4_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold5_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold6_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    #
+    #
+    #
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold1_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold2_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold3_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold4_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold5_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold6_botsort.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start(show_window=False)
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #

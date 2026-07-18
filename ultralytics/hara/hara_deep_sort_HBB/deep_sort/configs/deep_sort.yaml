@@ -22,5 +22,6 @@ DEEPSORT:
   MAX_ID_POOL: 15
   MAX_FRAME: 20000
   TRACKING_CSV_PATH: tracking_output.csv
-  VIDEO_PATH: D:/chicken_project/video_cases/seg_loss_detection.mp4
+#  VIDEO_PATH: D:/chicken_project/video_cases/seg_loss_detection.mp4
+  VIDEO_PATH: D:/chicken_project/video_cases/long-occlusion.mp4
   RESULT_PATH: "result_track.mp4"

@@ -27,6 +27,12 @@ class HaraBOTSORT(BOTSORT):
         self.frame_memory_length = self.runtime_cfg.get("FRAME_MEMORY_LENGTH", 5)
         self.position_history_length = self.runtime_cfg.get("POSITION_HISTORY_LENGTH", 300)
         self.position_history = {}
+        self.detection_region = (
+            self.runtime_cfg.get("DETECTION_REGION_X_MIN", 270),
+            self.runtime_cfg.get("DETECTION_REGION_X_MAX", 1900),
+            self.runtime_cfg.get("DETECTION_REGION_Y_MIN", 100),
+            self.runtime_cfg.get("DETECTION_REGION_Y_MAX", 1600),
+        )
 
     def update(self, results, img: np.ndarray | None = None, feats: np.ndarray | None = None) -> np.ndarray:
         """Update tracker state.
@@ -41,6 +47,8 @@ class HaraBOTSORT(BOTSORT):
         refind_stracks = []
         lost_stracks = []
         removed_stracks = []
+
+        results, feats = self._filter_detections_by_region(results, feats)
 
         # hara detection optimization
         if self.runtime_cfg.get("USE_OPTIMIZATION", False) and self.runtime_cfg.get("DETECTION_OPTIMIZATION_ON", False):
@@ -261,6 +269,33 @@ class HaraBOTSORT(BOTSORT):
         if track_id is None:
             return None
         return int(track_id)
+
+    def _filter_detections_by_region(self, results, feats=None):
+        if len(results) == 0:
+            return results, feats
+
+        x_min, x_max, y_min, y_max = self.detection_region
+        xywh = np.asarray(self._to_numpy(results.xywh), dtype=float)
+        centers = xywh[:, :2]
+        keep_mask = (
+            (centers[:, 0] >= x_min)
+            & (centers[:, 0] <= x_max)
+            & (centers[:, 1] >= y_min)
+            & (centers[:, 1] <= y_max)
+        )
+        keep_indices = np.flatnonzero(keep_mask).astype(int).tolist()
+        if len(keep_indices) == len(results):
+            return results, feats
+        return results[keep_indices], self._slice_feats(feats, keep_indices)
+
+    def _to_numpy(self, value):
+        if hasattr(value, "detach"):
+            value = value.detach()
+        if hasattr(value, "cpu"):
+            value = value.cpu()
+        if hasattr(value, "numpy"):
+            return value.numpy()
+        return np.asarray(value)
 
     def _apply_detection_optimization(self, results, img: np.ndarray | None = None, feats=None):
         selected_results = results

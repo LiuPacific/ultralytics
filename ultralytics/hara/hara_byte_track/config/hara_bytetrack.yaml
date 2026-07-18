@@ -13,11 +13,12 @@ match_thresh: 0.8 # (float) Association similarity threshold (IoU/cost); tune wi
 fuse_score: True # (bool) Fuse detection score with motion/IoU for matching; stabilizes weak detections
 
 ByteTrack:
-  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold1_10min/weights/last.pt"
+  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold4_10min/weights/last.pt"
   MAX_FRAME: 20000
   TRACKING_CSV_PATH: tracking_output.csv
   #VIDEO_PATH: D:/chicken_project/video_cases/seg_loss_detection.mp4
-  VIDEO_PATH: D:/chicken_project/video_cases/moving.mp4
+#  VIDEO_PATH: D:/chicken_project/video_cases/moving.mp4
+  VIDEO_PATH: D:/chicken_project/video_cases/long-occlusion.mp4
   RESULT_PATH: "result_track.mp4"
   IMG_SIZE: 1280
   NMS_THRESHOLD: 0.8
