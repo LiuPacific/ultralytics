@@ -1,6 +1,6 @@
 DEEPSORT:
   DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/obb_l_hold1_10min/weights/last.pt"
-  REID_CKPT: "C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/hara_reid/.run/without_hold1/best_osnet.pth"
+  REID_CKPT: "C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/hara_reid/.run0/without_hold1/best_osnet.pth"
   MAX_DIST: 0.2
   MIN_CONFIDENCE: 0.3
   NMS_THRESHOLD: 0.8

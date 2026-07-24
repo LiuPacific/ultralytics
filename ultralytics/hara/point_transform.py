@@ -267,7 +267,7 @@ if __name__ == '__main__':
     print(f"\nOriginal point (in {SOURCE_IMAGE_RESOLUTION} image): {point_to_transform}")
     print(f"Transformed point (in {TARGET_IMAGE_RESOLUTION} image) via TPS: {transformed_point_tps.squeeze().numpy()}\n\n")
     # Original point (in (2336, 1752) image): [ 993. 1265.]
-    # Transformed point (in (640, 480) image) via TPS: [262.28915 364.70807]， in fact, it's 267,365
+    # Transformed point (in (640, 480) image) via TPS: [262.28915 364.70807], in fact, it's 267,365
 
     print("="*50)
     print("Method 2: Multi-Layer Perceptron (MLP) Registration")
@@ -294,4 +294,4 @@ if __name__ == '__main__':
     print(f"\nOriginal point (in {SOURCE_IMAGE_RESOLUTION} image): {point_to_transform}")
     print(f"Transformed point (in {TARGET_IMAGE_RESOLUTION} image) via MLP: {transformed_point_mlp.squeeze().numpy()}")
     # Original point (in (2336, 1752) image): [ 993. 1265.]
-    # Transformed point (in (640, 480) image) via MLP: [257.1639  364.06406]， in fact, it's 267,365
+    # Transformed point (in (640, 480) image) via MLP: [257.1639  364.06406], in fact, it's 267,365

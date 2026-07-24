@@ -1,10 +1,10 @@
 DEEPSORT:
 #  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/hbb_hold1_5min/weights/last.pt"
 #  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/hbb_hold1_10min/weights/last.pt"
-  DETECTION_MODEL_PATH: "C:/Users/tliu25/workspace/ultralytics/runs/detect/hbb_l_hold2_10min/weights/last.pt"
+  DETECTION_MODEL_PATH: "C:/Users/tliu25/workspace/ultralytics/runs/detect/hbb_l_hold1_10min/weights/last.pt"
 
-  REID_CKPT: ""
-  #  REID_CKPT: "E:/chicken_project/workspace/ultralytics/ultralytics/hara/hara_deep_sort/.weights/.deep_sort_checkpoint/ckpt_person.t7"
+#  REID_CKPT: ""
+  REID_CKPT: "C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/hara_reid/.run/without_hold1/best_osnet.pth"
   MAX_DIST: 0.2
   MIN_CONFIDENCE: 0.3
   NMS_THRESHOLD: 0.8
@@ -14,7 +14,8 @@ DEEPSORT:
   N_INIT: 3
   NN_BUDGET: 100
   USE_OPTIMIZATION: False
-  USE_REID: False
+#  USE_REID: False
+  USE_REID: True
   DETECTION_OPTIMIZATION_ON: False
   TRACK_RECONNECTION_ON: False
   RECONNECTION_DISTANCE_THRESHOLD: 200

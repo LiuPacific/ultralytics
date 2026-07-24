@@ -8,12 +8,6 @@ class TrackState:
     the track state is changed to `confirmed`. Tracks that are no longer alive
     are classified as `deleted` to mark them for removal from the set of active
     tracks.
-
-    单个目标track状态的枚举类型。 
-    新创建的track分类为“Tentative”，直到收集到足够的证据为止。 
-    然后，跟踪状态更改为“Confirmed”。 
-    不再活跃的tracks被归类为“Deleted”，以将其标记为从有效集中删除。
-
     """
 
     Tentative = 1
@@ -26,62 +20,45 @@ class Track:
     A single target track with state space `(x, y, a, h)` and associated
     velocities, where `(x, y)` is the center of the bounding box, `a` is the
     aspect ratio and `h` is the height.
-
-    具有状态空间（x，y，a，h）并关联速度的单个目标轨迹（track），
-    其中（x，y）是边界框的中心，a是宽高比，h是高度。
-
     Parameters
     ----------
     mean : ndarray
         Mean vector of the initial state distribution.
-        初始状态分布的均值向量
     covariance : ndarray
         Covariance matrix of the initial state distribution.
-        初始状态分布的协方差矩阵
     track_id : int
         A unique track identifier.
-        唯一的track标识符
     n_init : int
         Number of consecutive detections before the track is confirmed. The
         track state is set to `Deleted` if a miss occurs within the first
         `n_init` frames.
-        确认track之前的连续检测次数。 在第一个n_init帧中
-        第一个未命中的情况下将跟踪状态设置为“Deleted” 
     max_age : int
         The maximum number of consecutive misses before the track state is
         set to `Deleted`.
-        跟踪状态设置为Deleted之前的最大连续未命中数；代表一个track的存活期限
-         
+
     feature : Optional[ndarray]
         Feature vector of the detection this track originates from. If not None,
         this feature is added to the `features` cache.
-        此track所源自的检测的特征向量。 如果不是None，此feature已添加到feature缓存中。
 
     Attributes
     ----------
     mean : ndarray
         Mean vector of the initial state distribution.
-        初始状态分布的均值向量
     covariance : ndarray
         Covariance matrix of the initial state distribution.
-        初始状态分布的协方差矩阵
     track_id : int
         A unique track identifier.
     hits : int
         Total number of measurement updates.
-        测量更新总数
     age : int
         Total number of frames since first occurence.
-        自第一次出现以来的总帧数
     time_since_update : int
         Total number of frames since last measurement update.
-        自上次测量更新以来的总帧数
     state : TrackState
         The current track state.
     features : List[ndarray]
         A cache of features. On each measurement update, the associated feature
         vector is added to this list.
-        feature缓存(gallery)。每次测量更新时，相关feature向量添加到此列表中
 
     """
 
@@ -90,15 +67,15 @@ class Track:
         self.mean = mean
         self.covariance = covariance
         self.track_id = track_id
-        # hits代表匹配上了多少次，匹配次数超过n_init，设置Confirmed状态
-        # hits每次调用update函数的时候+1 
+        # hits counts successful matches. Once it exceeds n_init, the state is
+        # set to Confirmed. hits increments every time update() is called.
         self.hits = 1
-        self.age = 1 # 自从创建此追踪目标以来经过的帧数
-        # 每次调用predict函数的时候就会+1；每次调用update函数的时候就会设置为0
+        self.age = 1 # Number of frames elapsed since this track was created.
+        # Incremented by predict() and reset to 0 by update().
         self.time_since_update = 0
 
-        self.state = TrackState.Tentative # 初始化一个Track的时设置Tentative状态
-        # 每个track对应多个features, 每次更新都会将最新的feature添加到列表中
+        self.state = TrackState.Tentative # New tracks start in Tentative state.
+        # Each track has multiple features; every update appends the latest feature.
         self.features = []
         if feature is not None:
             self.features.append(feature)
@@ -108,8 +85,7 @@ class Track:
 
         self.position_history = deque(maxlen=300)
 
-        # Last detected (measurement) xyah and confidence (updated when a detection is associated)
-        self.last_detected_xyah = None
+        # Last detection confidence is updated when a detection is associated.
         self.last_confidence = None
 
 
@@ -129,8 +105,9 @@ class Track:
         return ret
 
     def get_detection_center(self):
-        xyah = self.last_detected_xyah.copy()
-        return xyah[:2]
+        if self.position_history:
+            return self.position_history[-1][:2].copy()
+        return self.get_center()
 
     def get_center(self):
         ret = self.mean[:4].copy()
@@ -153,7 +130,6 @@ class Track:
     def predict(self, kf):
         """Propagate the state distribution to the current time step using a
         Kalman filter prediction step.
-        使用卡尔曼滤波器预测步骤将状态分布传播到当前时间步
 
         Parameters
         ----------
@@ -168,7 +144,6 @@ class Track:
     def update(self, kf, detection):
         """Perform Kalman filter measurement update step and update the feature
         cache.
-        执行卡尔曼滤波器测量更新步骤并更新feature缓存
 
         Parameters
         ----------
@@ -185,27 +160,25 @@ class Track:
 
         self.hits += 1
         self.time_since_update = 0
-        # hits代表匹配上了多少次，匹配次数超过n_init，设置Confirmed状态
-        # 连续匹配上n_init帧的时候，转变为确定态
+        # hits counts successful matches. The track becomes Confirmed after
+        # n_init consecutive matches.
         if self.state == TrackState.Tentative and self.hits >= self._n_init:
             self.state = TrackState.Confirmed
 
-        # Store the associated detection center, not the Kalman-filtered state.
+        # Store the associated detection measurement, not the Kalman-filtered state.
         self.position_history.append(measurement.copy())
 
-        # Update last detected xyah and confidence for CSV logging
-        self.last_detected_xyah = measurement
         self.last_confidence = detection.confidence
 
     def mark_missed(self):
         """Mark this track as missed (no association at the current time step).
         """
-        # 如果在处于Tentative态的情况下没有匹配上任何detection，转变为删除态。
+        # If a Tentative track does not match any detection, mark it Deleted.
         if self.state == TrackState.Tentative:
             self.state = TrackState.Deleted
         elif self.time_since_update > self._max_age:
-            # 如果time_since_update超过max_age，设置Deleted状态
-            # 即失配连续达到max_age次数的时候，转变为删除态
+            # If time_since_update exceeds max_age, mark the track Deleted.
+            # This happens after max_age consecutive missed matches.
             self.state = TrackState.Deleted
 
     def is_tentative(self):
@@ -227,7 +200,7 @@ class Track:
         Returns
         -------
         list
-            List of xy positions from the last 300 frames.
+            List of xyah detection measurements from the last 300 frames.
         """
         return list(self.position_history)
 

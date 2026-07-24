@@ -65,7 +65,7 @@ def trigger(detections: Detections, pt1, pt2, prev_tracker_state, tracker_state,
 
             tracker_state[tracker_id]['state'] = tracker_state_new  # Update the tracker state
 
-    # 更新已经消失的检测对象状态
+    # Update the state of detection objects that have disappeared.
     for tracker_id in list(tracker_state.keys()):
         if tracker_id not in [item[3] for item in detections.detections]:
             prev_tracker_state[tracker_id] = tracker_state[tracker_id]  # Save the state of the disappeared object
@@ -88,7 +88,7 @@ if __name__ == '__main__':
     # Close the video capture
     capture.release()
 
-    # 例如 width = 1364 height = 768 pt1 = Point(0, 384) pt2 = Point(1364, 384)
+    # Example: width = 1364, height = 768, pt1 = Point(0, 384), pt2 = Point(1364, 384).
     pt1 = Point(0, height // 2)  # Line starting point at the center of the frame
     pt2 = Point(width, height // 2)  # Line ending point at the center of the frame
 
@@ -96,9 +96,9 @@ if __name__ == '__main__':
     out_count = 0
     in_count = 0
     out_count = 0
-    prev_tracker_state = {}  # 用于记录上一帧的检测对象状态
+    prev_tracker_state = {}  # Records detection object states from the previous frame.
     tracker_state = {}
-    crossing_ids = set()  # 用于存储已经穿越线的检测对象的ID
+    crossing_ids = set()  # Stores IDs of detection objects that have already crossed the line.
     detector = Detector()
     capture = cv2.VideoCapture(VIDEO_PATH)
 
@@ -118,13 +118,13 @@ if __name__ == '__main__':
             x1, y1, x2, y2, _, track_id = item_bbox
             detections.add((x1, y1, x2, y2), None, None, track_id)
 
-        # 使用trigger方法来计数穿越
+        # Use trigger() to count crossings.
         in_count, out_count = trigger(detections, pt1, pt2, prev_tracker_state, tracker_state, crossing_ids, in_count, out_count)
 
-        # 更新上一帧的检测目标状态
+        # Update the previous-frame detection target state.
         prev_tracker_state = tracker_state.copy()
 
-        # 清空穿越线集合，准备下一帧的计数
+        # Clear the crossing-line set before counting the next frame.
         crossing_ids.clear()
 
         # Add the current object's position to the trail

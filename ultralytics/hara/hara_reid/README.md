@@ -1,9 +1,9 @@
 # prepare ReID data
 
 1. label file name should be this style `08_RGB_mockframe_00_00_01.png` and `08_RGB_mockframe_00_00_01.json`
-2. combine the file together to `combine_id` folder
-3. use `image_crop.py` in tool to crop the id image.
-4. delete images with `-`, since I use negative sign `-` to say that the chicken is occluded.
+2. use `image_crop.py` in tool to crop the id image.
+3. delete images with `-`, since I use negative sign `-` to say that the chicken is occluded.
+   4. search `id_-` in the cropped folder.
 
 # Chicken OSNet ReID for DeepSORT
 

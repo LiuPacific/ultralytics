@@ -83,7 +83,10 @@ class TrackerOBB:
         if cfg.DEEPSORT.USE_OPTIMIZATION:
             if cfg.DEEPSORT.get("TRACK_RECONNECTION_ON", True):
                 # Perform track re-identification
-                self._reidentify_tracks()
+                if self.MAX_ID_POOL > 0:
+                    self._reidentify_tracks_MAX_ID_POOL()
+                else:
+                    self._reidentify_tracks()
             # Perform track re-identification by ReID (appearance features)
             # self._reidentify_tracks_by_ReID()
 
@@ -125,20 +128,19 @@ class TrackerOBB:
             # if not cfg.DEEPSORT.USE_OPTIMIZATION or self.MAX_ID_POOL == 0:
             #     continue
 
-            # Determine center coordinates: use last detected xy if available, otherwise None
-            if track.last_detected_xywhr is not None:
+            history = track.get_position_history()
+            if history:
                 try:
-                    cx, cy = float(track.last_detected_xywhr[0]), float(track.last_detected_xywhr[1])
+                    cx, cy = float(history[-1][0]), float(history[-1][1])
                 except (TypeError, IndexError):
                     cx, cy = (None, None)
             else:
                 cx, cy = (None, None)
 
             # if cfg.DEEPSORT.USE_OPTIMIZATION and self.MAX_ID_POOL>0:
-            if detected and track.last_detected_xywhr is not None:
+            if detected and history:
                 try:
-                    w, h, angle = (float(track.last_detected_xywhr[2]), float(track.last_detected_xywhr[3]),
-                                   float(track.last_detected_xywhr[4]))
+                    w, h, angle = (float(history[-1][2]), float(history[-1][3]), float(history[-1][4]))
                     confidence = float(track.last_confidence) if track.last_confidence is not None else None
                 except (TypeError, IndexError):
                     w, h, angle, confidence = (None, None, None, None)
@@ -175,6 +177,13 @@ class TrackerOBB:
 
         # clear buffer
         self._csv_buffer = []
+
+    def _record_track_detection(self, track, measurement, detection):
+        track.position_history.append(np.asarray(measurement, dtype=float).copy())
+        try:
+            track.last_confidence = detection.confidence
+        except Exception:
+            track.last_confidence = None
 
     def _match(self, detections):
         def gated_metric(tracks, dets, track_indices, detection_indices):
@@ -234,9 +243,7 @@ class TrackerOBB:
         new_track = TrackOBB(
             mean, covariance, self._next_id, self.n_init, self.max_age,
             detection.feature, self.frame_id)
-        # set last detected info on the newly created track
-        new_track.last_detected_xywhr = xywhr
-        new_track.last_confidence = detection.confidence
+        self._record_track_detection(new_track, xywhr, detection)
         self.tracks.append(new_track)
         self._next_id += 1
 
@@ -420,9 +427,7 @@ class TrackerOBB:
             # No old track to merge; just use the reuse_id directly
             new_track.track_id = reuse_id
 
-        # set last detected info on the newly created track
-        new_track.last_detected_xywhr = xywhr
-        new_track.last_confidence = detection.confidence
+        self._record_track_detection(new_track, xywhr, detection)
         self.tracks.append(new_track)
         self._next_id += 1
 
@@ -448,18 +453,10 @@ class TrackerOBB:
 
         for i, unmatched_track in enumerate(unmatched_tracks):
             # Last position of unmatched track
-            unmatched_history = unmatched_track.get_position_history()
-            if unmatched_history:
-                unmatched_center = unmatched_history[-1][:2]  # cx, cy of last position
-            else:
-                unmatched_center = unmatched_track.get_detection_center()  # fallback
+            unmatched_center = self._track_last_detection_center(unmatched_track)
             for j, new_track in enumerate(new_tracks):
                 # First position of new track
-                history = new_track.get_position_history()
-                if history:
-                    new_center = history[0][:2]  # cx, cy of first position
-                else:
-                    new_center = new_track.to_xywhr()[:2]  # fallback
+                new_center = self._track_first_detection_center(new_track)
                 distance = np.linalg.norm(unmatched_center - new_center)
                 cost_matrix[i, j] = distance
 
@@ -478,6 +475,65 @@ class TrackerOBB:
                 new_track.track_id = old_track.track_id
                 old_track.state = TrackState.Deleted
                 self.tracks.remove(old_track)
+
+    def _reidentify_tracks_MAX_ID_POOL(self):
+        """Reconnect overflow new tracks back to older tracks inside the ID pool."""
+        max_id_pool = int(self.MAX_ID_POOL)
+        if max_id_pool <= 0:
+            return
+
+        new_tracks = [
+            track for track in self.tracks
+            if track.track_id > max_id_pool
+            and 3 <= track.age <= 100
+            and not track.is_deleted()
+        ]
+        if not new_tracks:
+            return
+
+        unmatched_tracks = [
+            track for track in self.tracks
+            if 1 <= track.track_id <= max_id_pool
+            and track.time_since_update > 1
+            and track not in new_tracks
+        ]
+        if not unmatched_tracks:
+            return
+
+        cost_matrix = np.full((len(unmatched_tracks), len(new_tracks)), np.inf)
+        for i, unmatched_track in enumerate(unmatched_tracks):
+            unmatched_center = self._track_last_detection_center(unmatched_track)
+            for j, new_track in enumerate(new_tracks):
+                new_center = self._track_first_detection_center(new_track)
+                cost_matrix[i, j] = np.linalg.norm(unmatched_center - new_center)
+
+        row_ind, col_ind = linear_sum_assignment(cost_matrix)
+        for row_index, col_index in zip(row_ind, col_ind):
+            if cost_matrix[row_index, col_index] >= self.reconnection_distance_threshold:
+                continue
+
+            old_track = unmatched_tracks[row_index]
+            new_track = new_tracks[col_index]
+            print(f"Re-identifying track {new_track.track_id} as {old_track.track_id}")
+
+            old_track.merge_with(new_track)
+            new_track.track_id = old_track.track_id
+            old_track.state = TrackState.Deleted
+
+            if old_track in self.tracks:
+                self.tracks.remove(old_track)
+
+    def _track_last_detection_center(self, track):
+        history = track.get_position_history()
+        if history:
+            return np.asarray(history[-1][:2], dtype=float)
+        return np.asarray(track.to_xywhr()[:2], dtype=float)
+
+    def _track_first_detection_center(self, track):
+        history = track.get_position_history()
+        if history:
+            return np.asarray(history[0][:2], dtype=float)
+        return np.asarray(track.to_xywhr()[:2], dtype=float)
 
     def _reidentify_tracks_by_ReID(self):
         """

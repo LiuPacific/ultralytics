@@ -25,9 +25,9 @@ model: auto # (str) ReID model name/path; "auto" uses detector features if avail
 BotSORT:
   DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold6_10min/weights/last.pt"
   MAX_FRAME: 20000
-  TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold6_10min/hbb_l_10hold6_botsort_track.csv"
+  TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold6_10min/hbb_l_10hold6_botsort_track_100.csv"
   VIDEO_PATH: D:/chicken_project/video_reid_obb/sick_20251217T000000Z_20251217T003000Z.mkv
-  RESULT_PATH: "E:/temp/hbb_l_10hold6_botsort_track.mp4"
+  RESULT_PATH: "E:/temp/hbb_l_10hold6_botsort_track_100.mp4"
   IMG_SIZE: 1280
   NMS_THRESHOLD: 0.8
   MAX_ID_POOL: 15

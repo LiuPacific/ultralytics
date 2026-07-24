@@ -1,13 +1,13 @@
 DEEPSORT:
   DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/obb_l_hold3_10min/weights/last.pt"
-  REID_CKPT: "C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/hara_reid/.run/without_hold3/best_osnet.pth"
+  REID_CKPT: "C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/hara_reid/.run0/without_hold3/best_osnet.pth"
   MAX_DIST: 0.2
   MIN_CONFIDENCE: 0.3
   NMS_THRESHOLD: 0.8
   MAX_IOU_DISTANCE: 0.7
   N_INIT: 3
   NN_BUDGET: 100
-  MAX_ID_POOL: 0
+  MAX_ID_POOL: 15
   RECONNECTION_DISTANCE_THRESHOLD: 200
   REUSE_ID_ASSIGNMENT_DISTANCE_THRESHOLD: 200
   USE_REID: True

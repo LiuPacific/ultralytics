@@ -17,6 +17,7 @@ DEEPSORT:
   TRACK_RECONNECTION_ON: True
   RECONNECTION_DISTANCE_THRESHOLD: 200
   REUSE_ID_ASSIGNMENT_DISTANCE_THRESHOLD: 200
+  MAX_ID_POOL: 15
   MAX_FRAME: 20000
   TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold3_10min/hbb_l_10hold3_track.csv"
   VIDEO_PATH: D:/chicken_project/video_reid_obb/mock_20251007T000000Z_20251007T010000Z.mkv

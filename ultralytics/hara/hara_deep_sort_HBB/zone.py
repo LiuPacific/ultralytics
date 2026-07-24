@@ -44,7 +44,7 @@ def drawAndFillPolygon(image, polygonPoints, fillColor):
 
     return overlaidImage
 
-# 指定敏感区域的多边形顶点坐标
+# Polygon vertices for the monitored area.
 polygonPoints = [[710, 200], [1110, 200], [810, 400], [410, 400]]
 color_light_yellow = (0, 155, 255)   # Light yellow color
 
@@ -64,7 +64,7 @@ if __name__ == '__main__':
         if not ret:
             break
 
-        # Draw the boundary monitoring area 绘制敏感区域
+        # Draw the boundary monitoring area.
         frame = drawAndFillPolygon(frame, polygonPoints, color_light_yellow)
 
         # Update the tracker and get the bounding boxes of the persons

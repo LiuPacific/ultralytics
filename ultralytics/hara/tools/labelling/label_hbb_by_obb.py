@@ -218,9 +218,9 @@ def main():
 
     # if folder_mode:
     results, warnings = label_hbb_folder_by_obb(
-        hbb_folder=r"D:\chicken_project\experiment5reid\reid_hbb_training\20251007T000000Z_20251007T010000Z_RGB_mock 76-90",
-        obb_folder=r"D:\chicken_project\experiment5reid\reid_obb_training\20251007T000000Z_20251007T010000Z_RGB_mock 76-90",
-        output_folder=r"D:\chicken_project\experiment5reid\reid_hbb_training\20251007T000000Z_20251007T010000Z_RGB_mock 76-90",
+        hbb_folder=r"D:\chicken_project\experiment5reid\reid_hbb_training\20251217T000000Z_20251217T003000Z_RGB_mock 46-60",
+        obb_folder=r"D:\chicken_project\experiment5reid\reid_obb_training\20251217T000000Z_20251217T003000Z_RGB_mock 46-60",
+        output_folder=r"D:\chicken_project\experiment5reid\reid_hbb_training\20251217T000000Z_20251217T003000Z_RGB_mock 46-60",
         recursive=False,
         expected_chicken_count=15,
     )

@@ -165,7 +165,10 @@ class HaraBOTSORT(BOTSORT):
 
         if self.runtime_cfg.get("USE_OPTIMIZATION", False):
             if self.runtime_cfg.get("TRACK_RECONNECTION_ON", False):
-                self._reidentify_tracks()
+                if self._max_id_pool() > 0:
+                    self._reidentify_tracks_MAX_ID_POOL()
+                else:
+                    self._reidentify_tracks()
 
         return np.asarray([x.result for x in self.tracked_stracks if x.is_activated], dtype=np.float32)
 
@@ -187,13 +190,9 @@ class HaraBOTSORT(BOTSORT):
         cost_matrix = np.full((len(unmatched_tracks), len(new_tracks)), np.inf, dtype=float)
 
         for i, unmatched_track in enumerate(unmatched_tracks):
-            unmatched_center = self._track_center(unmatched_track)
+            unmatched_center = self._track_last_detection_center(unmatched_track)
             for j, new_track in enumerate(new_tracks):
-                history = self.position_history.get(new_track.track_id)
-                if history:
-                    new_center = history[0][:2]
-                else:
-                    new_center = self._track_center(new_track)
+                new_center = self._track_first_detection_center(new_track)
                 cost_matrix[i, j] = np.linalg.norm(unmatched_center - new_center)
 
         matches, _, _ = matching.linear_assignment(cost_matrix, thresh=reconnection_distance_threshold)
@@ -211,14 +210,77 @@ class HaraBOTSORT(BOTSORT):
             self.removed_stracks = [track for track in self.removed_stracks if track.track_id != old_track_id]
             old_track.mark_removed()
 
+    def _reidentify_tracks_MAX_ID_POOL(self):
+        """Reconnect overflow fresh tracks back to older lost/removed tracks inside the fixed ID pool."""
+        max_id_pool = self._max_id_pool()
+        if max_id_pool <= 0:
+            return
+
+        # Tracks above MAX_ID_POOL are temporary overflow identities. Only consider
+        # young tracks so a new detection has a few frames of history but has not
+        # been allowed to become a long-lived ID outside the fixed pool.
+        new_tracks = [
+            track for track in self.tracked_stracks
+            if track.track_id > max_id_pool
+            and 3 <= self._track_age(track) <= 100
+        ]
+        if not new_tracks:
+            return
+
+        active_ids = {track.track_id for track in self.tracked_stracks}
+        # Only inactive tracks that still belong to the configured pool can be
+        # reused. Active IDs are excluded in _reconnection_candidates() to avoid
+        # assigning the same pool ID to two live tracks.
+        unmatched_tracks = [
+            track for track in self._reconnection_candidates(active_ids)
+            if 1 <= track.track_id <= max_id_pool
+        ]
+        if not unmatched_tracks:
+            return
+
+        reconnection_distance_threshold = self.runtime_cfg.get("RECONNECTION_DISTANCE_THRESHOLD", 200)
+        cost_matrix = np.full((len(unmatched_tracks), len(new_tracks)), np.inf, dtype=float)
+
+        # Match each inactive pool track's last known center to each overflow
+        # track's first observed center. Using the first center avoids bias from
+        # the overflow track drifting after the original ID was lost.
+        for i, unmatched_track in enumerate(unmatched_tracks):
+            unmatched_center = self._track_last_detection_center(unmatched_track)
+            for j, new_track in enumerate(new_tracks):
+                new_center = self._track_first_detection_center(new_track)
+                cost_matrix[i, j] = np.linalg.norm(unmatched_center - new_center)
+
+        matches, _, _ = matching.linear_assignment(cost_matrix, thresh=reconnection_distance_threshold)
+        for row_index, col_index in matches:
+            old_track = unmatched_tracks[int(row_index)]
+            new_track = new_tracks[int(col_index)]
+            old_track_id = old_track.track_id
+            new_track_id = new_track.track_id
+
+            # Keep the stable pool ID and merge the overflow track's history so
+            # downstream consumers see one continuous trajectory.
+            new_track.track_id = old_track_id
+            self._merge_position_history(old_track_id, new_track_id)
+            new_track.start_frame = old_track.start_frame
+            new_track.tracklet_len += getattr(old_track, "tracklet_len", 0)
+            self.lost_stracks = [track for track in self.lost_stracks if track.track_id != old_track_id]
+            self.removed_stracks = [track for track in self.removed_stracks if track.track_id != old_track_id]
+            old_track.mark_removed()
+
     def _reconnection_candidates(self, active_ids):
+        """Return inactive tracks that are safe to use as reconnection targets."""
         candidates = []
         seen_ids = set()
         for track in [*self.lost_stracks, *self.removed_stracks]:
+            # A track can appear in both lost_stracks and removed_stracks, and an
+            # ID that is currently active must not be reused for reconnection.
             if track.track_id in seen_ids or track.track_id in active_ids:
                 continue
+            # Only retired tracker states are valid reconnection sources.
             if track.state not in {TrackState.Lost, TrackState.Removed}:
                 continue
+            # Give the normal BOT-SORT update a frame to recover newly lost tracks
+            # before treating them as candidates for explicit ID reassignment.
             if self.frame_id - track.frame_id <= 1:
                 continue
             candidates.append(track)
@@ -228,13 +290,25 @@ class HaraBOTSORT(BOTSORT):
     def _track_age(self, track):
         return self.frame_id - track.start_frame + 1
 
-    def _track_center(self, track):
+    def _track_last_detection_center(self, track):
+        return self._track_history_center(track, -1)
+
+    def _track_first_detection_center(self, track):
+        return self._track_history_center(track, 0)
+
+    def _track_history_center(self, track, index):
         track_id = self._track_id(track)
         if track_id is not None:
             history = self.position_history.get(track_id)
             if history:
-                return np.asarray(history[-1], dtype=float)
+                return np.asarray(history[index], dtype=float)
         return np.asarray(track.xywh[:2], dtype=float)
+
+    def _track_center(self, track):
+        return self._track_last_detection_center(track)
+
+    def _max_id_pool(self):
+        return int(self.runtime_cfg.get("MAX_ID_POOL", 0))
 
     def _record_detection(self, track, detection):
         track_id = self._track_id(track)

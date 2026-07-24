@@ -3,9 +3,9 @@ import json
 import os
 
 # Change this to your folder path
-folder = Path(r"D:\chicken_project\experiment6report\10-min-hbb\10_mock_76-90")
+folder = Path(r"D:\chicken_project\experiment6report\10-min-hbb\12_mock_46-60")
 
-prefix = "10_mock_76-90"
+prefix = "12_mock_46-60"
 
 # Step 1: Update imagePath inside JSON files
 for json_file in folder.glob("*.json"):

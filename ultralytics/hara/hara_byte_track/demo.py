@@ -176,65 +176,65 @@ def start(show_window=True):
         cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    cfg_path = "config/hara_bytetrack.yaml"
+    # cfg_path = "config/hara_bytetrack.yaml"
+    # cfg.merge_from_file(cfg_path)
+    # cfg.setdefault("cfg_path", cfg_path)
+    # start()
+
+    # HBB10
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold1_bytetrack.yaml"
     cfg.merge_from_file(cfg_path)
     cfg.setdefault("cfg_path", cfg_path)
-    start()
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold2_bytetrack.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold3_bytetrack.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold4_bytetrack.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold5_bytetrack.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold6_bytetrack.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
 
-    # # HBB10
-    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold1_bytetrack.yaml"
-    # cfg.merge_from_file(cfg_path)
-    # cfg.setdefault("cfg_path", cfg_path)
-    # start(show_window=False)
-    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold2_bytetrack.yaml"
-    # cfg.merge_from_file(cfg_path)
-    # cfg.setdefault("cfg_path", cfg_path)
-    # start(show_window=False)
-    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold3_bytetrack.yaml"
-    # cfg.merge_from_file(cfg_path)
-    # cfg.setdefault("cfg_path", cfg_path)
-    # start(show_window=False)
-    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold4_bytetrack.yaml"
-    # cfg.merge_from_file(cfg_path)
-    # cfg.setdefault("cfg_path", cfg_path)
-    # start(show_window=False)
-    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold5_bytetrack.yaml"
-    # cfg.merge_from_file(cfg_path)
-    # cfg.setdefault("cfg_path", cfg_path)
-    # start(show_window=False)
-    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min\hold6_bytetrack.yaml"
-    # cfg.merge_from_file(cfg_path)
-    # cfg.setdefault("cfg_path", cfg_path)
-    # start(show_window=False)
-    #
-    # # Detection
-    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold1_bytetrack.yaml"
-    # cfg.merge_from_file(cfg_path)
-    # cfg.setdefault("cfg_path", cfg_path)
-    # start(show_window=False)
-    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold2_bytetrack.yaml"
-    # cfg.merge_from_file(cfg_path)
-    # cfg.setdefault("cfg_path", cfg_path)
-    # start(show_window=False)
-    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold3_bytetrack.yaml"
-    # cfg.merge_from_file(cfg_path)
-    # cfg.setdefault("cfg_path", cfg_path)
-    # start(show_window=False)
-    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold4_bytetrack.yaml"
-    # cfg.merge_from_file(cfg_path)
-    # cfg.setdefault("cfg_path", cfg_path)
-    # start(show_window=False)
-    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold5_bytetrack.yaml"
-    # cfg.merge_from_file(cfg_path)
-    # cfg.setdefault("cfg_path", cfg_path)
-    # start(show_window=False)
-    # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold6_bytetrack.yaml"
-    # cfg.merge_from_file(cfg_path)
-    # cfg.setdefault("cfg_path", cfg_path)
-    # start(show_window=False)
-    #
-    #
-    #
+    # Detection
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold1_bytetrack.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold2_bytetrack.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold3_bytetrack.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold4_bytetrack.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold5_bytetrack.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+    cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection\hold6_bytetrack.yaml"
+    cfg.merge_from_file(cfg_path)
+    cfg.setdefault("cfg_path", cfg_path)
+    start(show_window=False)
+
+
+    # track
     # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_track\hold1_bytetrack.yaml"
     # cfg.merge_from_file(cfg_path)
     # cfg.setdefault("cfg_path", cfg_path)
@@ -261,7 +261,7 @@ if __name__ == '__main__':
     # start(show_window=False)
     #
     #
-    #
+    # # detection track
     # cfg_path = r"C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\hara_report\large_model\HBB10min_detection_track\hold1_bytetrack.yaml"
     # cfg.merge_from_file(cfg_path)
     # cfg.setdefault("cfg_path", cfg_path)

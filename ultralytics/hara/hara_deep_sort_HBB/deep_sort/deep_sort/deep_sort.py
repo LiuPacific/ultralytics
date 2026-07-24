@@ -6,26 +6,28 @@ from .sort.nn_matching import NearestNeighborDistanceMetric
 from .sort.preprocessing import non_max_suppression
 from .sort.detection import Detection
 from .sort.tracker import Tracker
+from ultralytics.hara.hara_reid import features_extractor
 
-__all__ = ['DeepSort']  # __all__ 提供了暴露接口用的”白名单“
+__all__ = ['DeepSort']  # __all__ defines the public API exported by this module.
 
 
 class DeepSort(object):
     def __init__(self, model_path, max_dist=0.2, min_confidence=0.3, nms_max_overlap=1.0, max_iou_distance=0.7,
                  max_age=70, n_init=3, nn_budget=100, use_cuda=True,
                  use_reid=False, tracking_csv_path=None):
-        self.min_confidence = min_confidence  # 检测结果置信度阈值
-        self.nms_max_overlap = nms_max_overlap  # 非极大抑制阈值，设置为1代表不进行抑制
+        self.min_confidence = min_confidence  # Detection confidence threshold.
+        self.nms_max_overlap = nms_max_overlap  # NMS threshold; 1 disables suppression.
         self.use_reid = use_reid
         if use_reid:
-            self.extractor = Extractor(model_path, use_cuda=use_cuda)  # 用于提取一个batch图片对应的特征
+            self.extractor = features_extractor.ChickenFeatureExtractor(model_path)
 
-        max_cosine_distance = max_dist  # 最大余弦距离，用于级联匹配，如果大于该阈值，则忽略
-        nn_budget = 100  # 每个类别gallery最多的外观描述子的个数，如果超过，删除旧的
-        # NearestNeighborDistanceMetric 最近邻距离度量
-        # 对于每个目标，返回到目前为止已观察到的任何样本的最近距离（欧式或余弦）。
-        # 由距离度量方法构造一个 Tracker。
-        # 第一个参数可选'cosine' or 'euclidean'
+        max_cosine_distance = max_dist  # Maximum cosine distance for cascade matching; larger costs are ignored.
+        nn_budget = 100  # Maximum gallery features per class; older features are removed when this is exceeded.
+        # NearestNeighborDistanceMetric is a nearest-neighbor distance metric.
+        # For each target, it returns the nearest distance to any observed sample
+        # using either Euclidean or cosine distance.
+        # Construct a Tracker from this distance metric.
+        # The first argument can be either 'cosine' or 'euclidean'.
         metric = NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
         self.tracker = Tracker(metric, max_iou_distance=max_iou_distance, max_age=max_age, n_init=n_init,
                                tracking_csv_path=tracking_csv_path)
@@ -43,8 +45,8 @@ class DeepSort(object):
                           conf > self.min_confidence]
 
         # update tracker
-        self.tracker.predict()  # 将跟踪状态分布向前传播一步
-        self.tracker.update(detections)  # 执行测量更新和跟踪管理
+        self.tracker.predict()  # Propagate track state distributions one step forward.
+        self.tracker.update(detections)  # Run measurement updates and track management.
 
         # output bbox identities
         outputs = []
@@ -65,7 +67,7 @@ class DeepSort(object):
     Thanks JieChen91@github.com for reporting this bug!
     """
 
-    # 将bbox的[x,y,w,h] 转换成[t,l,w,h]
+    # Convert bbox from [x, y, w, h] to [top-left x, top-left y, w, h].
     @staticmethod
     def _xywh_to_tlwh(bbox_xywh):
         if isinstance(bbox_xywh, np.ndarray):
@@ -76,8 +78,8 @@ class DeepSort(object):
         bbox_tlwh[:, 1] = bbox_xywh[:, 1] - bbox_xywh[:, 3] / 2.
         return bbox_tlwh
 
-    # 将bbox的[x,y,w,h] 转换成[x1,y1,x2,y2]
-    # 某些数据集例如 pascal_voc 的标注方式是采用[x，y，w，h]
+    # Convert bbox from [x, y, w, h] to [x1, y1, x2, y2].
+    # Some datasets, such as Pascal VOC, use [x, y, w, h] annotations.
     """Convert [x y w h] box format to [x1 y1 x2 y2] format."""
 
     def _xywh_to_xyxy(self, bbox_xywh):
@@ -110,15 +112,15 @@ class DeepSort(object):
         h = int(y2 - y1)
         return t, l, w, h
 
-    # 获取抠图部分的特征
+    # Extract features from cropped image regions.
     def _get_features(self, bbox_xywh, ori_img):
         im_crops = []
         for box in bbox_xywh:
             x1, y1, x2, y2 = self._xywh_to_xyxy(box)
-            im = ori_img[y1:y2, x1:x2]  # 抠图部分
-            im_crops.append(im)
+            im = ori_img[y1:y2, x1:x2]  # Cropped image region.
+            im_crops.append(im.copy())
         if im_crops:
-            features = self.extractor(im_crops)  # 对抠图部分提取特征
+            features = self.extractor.extract_numpy_BGR(im_crops, len(im_crops))
         else:
             features = np.array([])
         return features

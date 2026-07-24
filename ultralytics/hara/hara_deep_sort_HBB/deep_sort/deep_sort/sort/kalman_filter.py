@@ -7,8 +7,6 @@ import scipy.linalg
 Table for the 0.95 quantile of the chi-square distribution with N degrees of
 freedom (contains values for N=1, ..., 9). Taken from MATLAB/Octave's chi2inv
 function and used as Mahalanobis gating threshold.
-预定义的字典 `chi2inv95`包含了自由度为N的卡方分布的0.95分位数。
-这个字典被用作更新滤波器步骤中门限的阈值（即排除离群的测量值）。
 """
 chi2inv95 = {
     1: 3.8415,
@@ -22,9 +20,9 @@ chi2inv95 = {
     9: 16.919}
 
 '''
-卡尔曼滤波分为两个阶段：
-(1) 预测track在下一时刻的位置，
-(2) 基于detection来更新预测的位置。
+Kalman filtering has two phases:
+(1) Predict the track position at the next time step.
+(2) Update the predicted position using the detection.
 '''
 class KalmanFilter(object):
     """
@@ -41,11 +39,6 @@ class KalmanFilter(object):
     (x, y, a, h) is taken as direct observation of the state space (linear
     observation model).
 
-    对于每个轨迹，由一个 KalmanFilter 预测状态分布。每个轨迹记录自己的均值和方差作为滤波器输入。
-
-    8维状态空间[x, y, a, h, vx, vy, va, vh]包含边界框中心位置(x, y)，宽高比a，高度h和它们各自的速度。
-    物体运动遵循恒速模型。 边界框位置(x, y, a, h)被视为状态空间的直接观察（线性观察模型）
-
     """
 
     def __init__(self):
@@ -60,7 +53,8 @@ class KalmanFilter(object):
         # Motion and observation uncertainty are chosen relative to the current
         # state estimate. These weights control the amount of uncertainty in
         # the model. This is a bit hacky.
-        # 依据当前状态估计（高度）选择运动和观测不确定性。这些权重控制模型中的不确定性。
+        # Choose motion and observation uncertainty relative to the current
+        # state estimate (height). These weights control model uncertainty.
         self._std_weight_position = 1. / 20
         self._std_weight_velocity = 1. / 160
 
@@ -88,7 +82,7 @@ class KalmanFilter(object):
         # Translates slice objects to concatenation along the first axis
         mean = np.r_[mean_pos, mean_vel]
 
-        # 由测量初始化均值向量（8维）和协方差矩阵（8x8维）
+        # Initialize the mean vector (8D) and covariance matrix (8x8) from the measurement.
         std = [
             2 * self._std_weight_position * measurement[3],
             2 * self._std_weight_position * measurement[3],
@@ -120,7 +114,7 @@ class KalmanFilter(object):
             state. Unobserved velocities are initialized to 0 mean.
 
         """
-        #卡尔曼滤波器由目标上一时刻的均值和协方差进行预测。
+        # Predict from the object's previous mean and covariance.
         std_pos = [
             self._std_weight_position * mean[3],
             self._std_weight_position * mean[3],
@@ -132,18 +126,20 @@ class KalmanFilter(object):
             1e-5,
             self._std_weight_velocity * mean[3]]
        
-        # 初始化噪声矩阵Q；np.r_ 按列连接两个矩阵
-        # motion_cov是过程噪声 W_k的 协方差矩阵Qk 
+        # Initialize noise matrix Q; np.r_ concatenates arrays along the first axis.
+        # motion_cov is the covariance matrix Qk for process noise W_k.
         motion_cov = np.diag(np.square(np.r_[std_pos, std_vel]))
 
         # Update time state x' = Fx (1)
-        # x为track在t-1时刻的均值，F称为状态转移矩阵，该公式预测t时刻的x'
-        # self._motion_mat为F_k是作用在 x_{k-1}上的状态变换模型
+        # x is the track mean at t-1. F is the state transition matrix, and this
+        # equation predicts x' at time t.
+        # self._motion_mat is F_k, the state transform applied to x_{k-1}.
         mean = np.dot(self._motion_mat, mean)
         # Calculate error covariance P' = FPF^T+Q (2)
-        # P为track在t-1时刻的协方差，Q为系统的噪声矩阵，代表整个系统的可靠程度，一般初始化为很小的值，
-        # 该公式预测t时刻的P'
-        # covariance为P_{k|k} ，后验估计误差协方差矩阵，度量估计值的精确程度
+        # P is the track covariance at t-1. Q is the system noise matrix, which
+        # represents system reliability and is usually initialized with small values.
+        # This equation predicts P' at time t.
+        # covariance is P_{k|k}, the posterior estimation error covariance matrix.
         covariance = np.linalg.multi_dot((
             self._motion_mat, covariance, self._motion_mat.T)) + motion_cov
 
@@ -151,7 +147,6 @@ class KalmanFilter(object):
 
     def project(self, mean, covariance):
         """Project state distribution to measurement space.
-        投影状态分布到测量空间
 
         Parameters
         ----------
@@ -159,42 +154,35 @@ class KalmanFilter(object):
             The state's mean vector (8 dimensional array).
         covariance : ndarray
             The state's covariance matrix (8x8 dimensional).
-
-       mean：ndarray，状态的平均向量（8维数组）。
-       covariance：ndarray，状态的协方差矩阵（8x8维）。
-
         Returns
         -------
         (ndarray, ndarray)
             Returns the projected mean and covariance matrix of the given state
             estimate.
-
-       返回（ndarray，ndarray），返回给定状态估计的投影平均值和协方差矩阵
-
         """
-        # 在公式4中，R为检测器的噪声矩阵，它是一个4x4的对角矩阵，
-        # 对角线上的值分别为中心点两个坐标以及宽高的噪声，
-        # 以任意值初始化，一般设置宽高的噪声大于中心点的噪声，
-        # 该公式先将协方差矩阵P'投影到检测空间，然后再加上噪声矩阵R；
+        # In equation 4, R is the detector noise matrix. It is a 4x4 diagonal
+        # matrix whose diagonal values are the noise terms for the center
+        # coordinates and width/height. Width/height noise is usually set larger
+        # than center-point noise. The equation projects P' into detection space
+        # and then adds the noise matrix R.
         std = [
             self._std_weight_position * mean[3],
             self._std_weight_position * mean[3],
             1e-1,
             self._std_weight_position * mean[3]]
             
-        # R为测量过程中噪声的协方差；初始化噪声矩阵R
+        # R is the measurement noise covariance; initialize the noise matrix R.
         innovation_cov = np.diag(np.square(std))
 
-        # 将均值向量投影到检测空间，即 Hx'
+        # Project the mean vector into detection space, i.e. Hx'.
         mean = np.dot(self._update_mat, mean)
-        # 将协方差矩阵投影到检测空间，即 HP'H^T
+        # Project the covariance matrix into detection space, i.e. HP'H^T.
         covariance = np.linalg.multi_dot((
             self._update_mat, covariance, self._update_mat.T))
-        return mean, covariance + innovation_cov # 公式(4)
+        return mean, covariance + innovation_cov # Equation (4).
 
     def update(self, mean, covariance, measurement):
         """Run Kalman filter correction step.
-        通过估计值和观测值估计最新结果
 
         Parameters
         ----------
@@ -213,28 +201,30 @@ class KalmanFilter(object):
             Returns the measurement-corrected state distribution.
 
         """
-        # 将均值和协方差投影到检测空间，得到 Hx'和S
+        # Project mean and covariance into detection space to obtain Hx' and S.
         projected_mean, projected_cov = self.project(mean, covariance)
 
-        # 矩阵分解
+        # Matrix factorization.
         chol_factor, lower = scipy.linalg.cho_factor(
             projected_cov, lower=True, check_finite=False)
-        # 计算卡尔曼增益K；相当于求解公式(5)
-        # 公式5计算卡尔曼增益K，卡尔曼增益用于估计误差的重要程度
-        # 求解卡尔曼滤波增益K 用到了cholesky矩阵分解加快求解；
-        # 公式5的右边有一个S的逆，如果S矩阵很大，S的逆求解消耗时间太大，
-        # 所以代码中把公式两边同时乘上S，右边的S*S的逆变成了单位矩阵，转化成AX=B形式求解。
+        # Compute Kalman gain K; this solves equation (5).
+        # The Kalman gain controls the importance of the estimation error.
+        # Cholesky factorization speeds up solving K. Equation (5) contains S
+        # inverse on the right side; when S is large, solving the inverse is
+        # expensive, so the implementation rewrites the problem as AX = B.
         kalman_gain = scipy.linalg.cho_solve(
             (chol_factor, lower), np.dot(covariance, self._update_mat.T).T,
             check_finite=False).T
         # y = z - Hx' (3)
-        # 在公式3中，z为detection的均值向量，不包含速度变化值，即z=[cx, cy, r, h]，
-        # H称为测量矩阵，它将track的均值向量x'投影到检测空间，该公式计算detection和track的均值误差
+        # In equation 3, z is the detection mean vector without velocity terms:
+        # z = [cx, cy, r, h]. H is the measurement matrix; it projects the track
+        # mean vector x' into detection space and computes the detection-track
+        # mean error.
         innovation = measurement - projected_mean
 
-        # 更新后的均值向量 x = x' + Ky (6)
+        # Updated mean vector x = x' + Ky (6).
         new_mean = mean + np.dot(innovation, kalman_gain.T)
-        # 更新后的协方差矩阵 P = (I - KH)P' (7)
+        # Updated covariance matrix P = (I - KH)P' (7).
         new_covariance = covariance - np.linalg.multi_dot((
             kalman_gain, projected_cov, kalman_gain.T))
         return new_mean, new_covariance
@@ -251,19 +241,15 @@ class KalmanFilter(object):
         ----------
         mean : ndarray
             Mean vector over the state distribution (8 dimensional).
-            状态分布上的平均向量（8维）
         covariance : ndarray
             Covariance of the state distribution (8x8 dimensional).
-            状态分布的协方差（8x8维）
         measurements : ndarray
             An Nx4 dimensional matrix of N measurements, each in
             format (x, y, a, h) where (x, y) is the bounding box center
             position, a the aspect ratio, and h the height.
-            N 个测量的 N×4维矩阵，每个矩阵的格式为（x，y，a，h），其中（x，y）是边界框中心位置，宽高比和h高度。
         only_position : Optional[bool]
             If True, distance computation is done with respect to the bounding
             box center position only.
-             如果为True，则只计算边界框中心位置
 
         Returns
         -------
@@ -271,7 +257,6 @@ class KalmanFilter(object):
             Returns an array of length N, where the i-th element contains the
             squared Mahalanobis distance between (mean, covariance) and
             `measurements[i]`.
-       返回一个长度为N的数组，其中第i个元素包含（mean，covariance）和measurements [i]之间的平方Mahalanobis距离
 
         """
         mean, covariance = self.project(mean, covariance)

@@ -28,13 +28,10 @@ class Tracker:
     ----------
     metric : nn_matching.NearestNeighborDistanceMetric
         The distance metric used for measurement to track association.
-        测量与轨迹关联的距离度量
     max_age : int
         Maximum number of missed misses before a track is deleted.
-        删除轨迹前的最大未命中数
     n_init : int
         Number of frames that a track remains in initialization phase.
-        确认轨迹前的连续检测次数。如果前n_init帧内发生未命中，则将轨迹状态设置为Deleted
     kf : kalman_filter.KalmanFilter
         A Kalman filter to filter target trajectories in image space.
     tracks : List[Track]
@@ -59,8 +56,8 @@ class Tracker:
             from kalman_filter import  KalmanFilter
             self.kf = KalmanFilter()
 
-        self.tracks = []   # 保存一个轨迹列表，用于保存一系列轨迹
-        self._next_id = 1  # 下一个分配的轨迹id
+        self.tracks = []   # List of tracks.
+        self._next_id = 1  # Next track ID to assign.
         # CSV logging buffer and configuration
         self.tracking_csv_path = tracking_csv_path
         if self.tracking_csv_path and os.path.exists(self.tracking_csv_path):
@@ -72,7 +69,6 @@ class Tracker:
 
     def predict(self):
         """Propagate track state distributions one time step forward.
-        将跟踪状态分布向前传播一步
 
         This function should be called once every time step, before `update`.
         """
@@ -81,7 +77,6 @@ class Tracker:
 
     def update(self, detections):
         """Perform measurement update and track management.
-        执行测量更新和轨迹管理
 
         Parameters
         ----------
@@ -101,18 +96,18 @@ class Tracker:
 
         # Update track set.
         
-        # 1. 针对匹配上的结果
+        # 1. Handle matched results.
         for track_idx, detection_idx in matches:
-            # 更新tracks中相应的detection
+            # Update the corresponding detection in tracks.
             self.tracks[track_idx].update(
                 self.kf, detections[detection_idx])
         
-        # 2. 针对未匹配的track, 调用mark_missed进行标记
-        # track失配时，若Tentative则删除；若update时间很久也删除
+        # 2. Mark unmatched tracks as missed.
+        # If a track misses while Tentative, delete it; also delete stale tracks.
         for track_idx in unmatched_tracks:
             self.tracks[track_idx].mark_missed()
         
-        # 3. 针对未匹配的detection， detection失配，进行初始化
+        # 3. Initialize tracks for unmatched detections.
         for detection_idx in unmatched_detections:
             if cfg.DEEPSORT.get("USE_OPTIMIZATION", False) and cfg.DEEPSORT.get("REUSE_ID", False):
                 self._initiate_track_MAX_ID_POOL(
@@ -132,21 +127,24 @@ class Tracker:
                 # Try to reconnect a fresh replacement track to an older lost one.
                 # This is a lightweight spatial re-identification step and runs
                 # after normal association has already finished.
-                self._reidentify_tracks()
+                if self.MAX_ID_POOL > 0:
+                    self._reidentify_tracks_MAX_ID_POOL()
+                else:
+                    self._reidentify_tracks()
 
         # Update distance metric.
         active_targets = [t.track_id for t in self.tracks if t.is_confirmed()]
         features, targets = [], []
         for track in self.tracks:
-            # 获取所有Confirmed状态的track id
+            # Get all confirmed track IDs.
             if not track.is_confirmed():
                 continue
-            features += track.features # 将Confirmed状态的track的features添加到features列表
-            # 获取每个feature对应的track_id
+            features += track.features # Add features from confirmed tracks to the features list.
+            # Get the track_id corresponding to each feature.
             targets += [track.track_id for _ in track.features]
             track.features = []
 
-        # 距离度量中的特征集更新
+        # Update the feature set in the distance metric.
         if cfg.DEEPSORT.get("USE_REID", False):
             self.metric.partial_fit(
                 np.asarray(features), np.asarray(targets), active_targets)
@@ -177,17 +175,20 @@ class Tracker:
             tid = int(track.track_id)
             detected = True  # By definition, we only record detected tracks
 
-            # Get center and dimensions from last detected xyah
-            if track.last_detected_xyah is not None:
-                try:
-                    # xyah format: x, y, aspect_ratio, height
-                    x, y, a, h = float(track.last_detected_xyah[0]), float(track.last_detected_xyah[1]), \
-                                 float(track.last_detected_xyah[2]), float(track.last_detected_xyah[3])
-                    w = a * h  # width = aspect_ratio * height
-                    confidence = float(track.last_confidence) if track.last_confidence is not None else None
-                except (TypeError, IndexError):
-                    continue
-            else:
+            history = track.get_position_history()
+            if not history:
+                continue
+            try:
+                # xyah format: x, y, aspect_ratio, height
+                x, y, a, h = (
+                    float(history[-1][0]),
+                    float(history[-1][1]),
+                    float(history[-1][2]),
+                    float(history[-1][3]),
+                )
+                w = a * h  # width = aspect_ratio * height
+                confidence = float(track.last_confidence) if track.last_confidence is not None else None
+            except (TypeError, IndexError):
                 continue
 
             # For HBB (horizontal bounding box), no rotation angle
@@ -222,6 +223,13 @@ class Tracker:
         # clear buffer
         self._csv_buffer = []
 
+    def _record_track_detection(self, track, measurement, detection):
+        track.position_history.append(np.asarray(measurement, dtype=float).copy())
+        try:
+            track.last_confidence = detection.confidence
+        except Exception:
+            track.last_confidence = None
+
     def _match(self, detections):
 
         def gated_metric(tracks, dets, track_indices, detection_indices):
@@ -232,7 +240,7 @@ class Tracker:
             if features[0] is not None:
                 cost_matrix = self.metric.distance(features, targets)
 
-            # 计算门控后的成本矩阵（代价矩阵）
+            # Compute the gated cost matrix.
             cost_matrix = linear_assignment.gate_cost_matrix(
                 self.kf, cost_matrix, tracks, dets, track_indices,
                 detection_indices)
@@ -240,56 +248,51 @@ class Tracker:
             return cost_matrix
 
         # Split track set into confirmed and unconfirmed tracks.
-        # 区分开confirmed tracks和unconfirmed tracks
+        # Separate confirmed and unconfirmed tracks.
         confirmed_tracks = [
             i for i, t in enumerate(self.tracks) if t.is_confirmed()]
         unconfirmed_tracks = [
             i for i, t in enumerate(self.tracks) if not t.is_confirmed()]
 
         # Associate confirmed tracks using appearance features.
-        # 对确定态的轨迹进行级联匹配，得到匹配的tracks、不匹配的tracks、不匹配的detections
-        # matching_cascade 根据特征将检测框匹配到确认的轨迹。
-        # 传入门控后的成本矩阵
+        # Run cascade matching on confirmed tracks and return matched tracks,
+        # unmatched tracks, and unmatched detections.
+        # matching_cascade matches detection boxes to confirmed tracks by feature
+        # using the gated cost matrix.
         matches_a, unmatched_tracks_a, unmatched_detections = \
             linear_assignment.matching_cascade(
                 gated_metric, self.metric.matching_threshold, self.max_age,
                 self.tracks, detections, confirmed_tracks)
 
         # Associate remaining tracks together with unconfirmed tracks using IOU.        
-        # 将未确定态的轨迹和刚刚没有匹配上的轨迹组合为 iou_track_candidates 
-        # 并进行基于IoU的匹配
+        # Combine unconfirmed tracks and tracks that just failed to match into
+        # iou_track_candidates, then run IoU-based matching.
         iou_track_candidates = unconfirmed_tracks + [
             k for k in unmatched_tracks_a if
-            self.tracks[k].time_since_update == 1] # 刚刚没有匹配上的轨迹
+            self.tracks[k].time_since_update == 1] # Tracks that just failed to match.
         unmatched_tracks_a = [
             k for k in unmatched_tracks_a if
-            self.tracks[k].time_since_update != 1] # 并非刚刚没有匹配上的轨迹
-        # 对级联匹配中还没有匹配成功的目标再进行IoU匹配
-        # min_cost_matching 使用匈牙利算法解决线性分配问题。
-        # 传入 iou_cost，尝试关联剩余的轨迹与未确认的轨迹。
+            self.tracks[k].time_since_update != 1] # Tracks that did not just fail to match.
+        # Run IoU matching for targets that did not match in cascade matching.
+        # min_cost_matching solves the linear assignment problem with the
+        # Hungarian algorithm. It uses iou_cost to associate remaining and
+        # unconfirmed tracks.
         matches_b, unmatched_tracks_b, unmatched_detections = \
             linear_assignment.min_cost_matching(
                 iou_matching.iou_cost, self.max_iou_distance, self.tracks,
                 detections, iou_track_candidates, unmatched_detections)
 
-        matches = matches_a + matches_b # 组合两部分匹配 
+        matches = matches_a + matches_b # Combine the two matching stages.
         unmatched_tracks = list(set(unmatched_tracks_a + unmatched_tracks_b))
         return matches, unmatched_tracks, unmatched_detections
 
     def _initiate_track(self, detection):
-        mean, covariance = self.kf.initiate(detection.to_xyah())
+        measurement = detection.to_xyah()
+        mean, covariance = self.kf.initiate(measurement)
         new_track = Track(
             mean, covariance, self._next_id, self.n_init, self.max_age,
             detection.feature)
-        # set last detected info on the newly created track for CSV logging
-        try:
-            new_track.last_detected_xyah = detection.to_xyah()
-        except Exception:
-            new_track.last_detected_xyah = None
-        try:
-            new_track.last_confidence = detection.confidence
-        except Exception:
-            new_track.last_confidence = None
+        self._record_track_detection(new_track, measurement, detection)
         self.tracks.append(new_track)
         # hara change starts;
         if self._next_id >=16:
@@ -339,8 +342,6 @@ class Tracker:
             history = track.get_position_history()
             if history:
                 last_center = np.asarray(history[-1][:2], dtype=float)
-            elif track.last_detected_xyah is not None:
-                last_center = np.asarray(track.last_detected_xyah[:2], dtype=float)
             else:
                 last_center = np.asarray(track.mean[:2], dtype=float)
 
@@ -385,13 +386,7 @@ class Tracker:
         else:
             new_track.track_id = reuse_id
 
-        # Preserve the detection metadata used by CSV logging and any later
-        # reconnection steps.
-        new_track.last_detected_xyah = measurement
-        try:
-            new_track.last_confidence = detection.confidence
-        except Exception:
-            new_track.last_confidence = None
+        self._record_track_detection(new_track, measurement, detection)
 
         self.tracks.append(new_track)
         self._next_id += 1
@@ -424,21 +419,10 @@ class Tracker:
         cost_matrix = np.full((len(unmatched_tracks), len(new_tracks)), np.inf, dtype=float)
 
         for i, unmatched_track in enumerate(unmatched_tracks):
-            unmatched_history = unmatched_track.get_position_history()
-            if unmatched_history:
-                unmatched_center = np.asarray(unmatched_history[-1][:2], dtype=float)
-            else:
-                unmatched_center = np.asarray(unmatched_track.get_detection_center(), dtype=float)
+            unmatched_center = self._track_last_detection_center(unmatched_track)
 
             for j, new_track in enumerate(new_tracks):
-                new_history = new_track.get_position_history()
-                if new_history:
-                    new_center = np.asarray(new_history[0][:2], dtype=float)
-                elif new_track.last_detected_xyah is not None:
-                    new_center = np.asarray(new_track.last_detected_xyah[:2], dtype=float)
-                else:
-                    new_center = np.asarray(new_track.get_detection_center(), dtype=float)
-
+                new_center = self._track_first_detection_center(new_track)
                 cost_matrix[i, j] = np.linalg.norm(unmatched_center - new_center)
 
         # Use Hungarian algorithm to find optimal assignment
@@ -460,3 +444,72 @@ class Tracker:
 
             if old_track in self.tracks:
                 self.tracks.remove(old_track)
+
+    def _reidentify_tracks_MAX_ID_POOL(self):
+        """Reconnect overflow new tracks back to older tracks inside the ID pool.
+
+        This keeps the optimization behavior of `_reidentify_tracks`, but
+        applies the fixed-ID-pool constraint:
+        - new replacement tracks must have `track_id > MAX_ID_POOL`;
+        - old candidate tracks must have `track_id` in `1..MAX_ID_POOL`;
+        - accepted matches inherit the old in-pool identity.
+        """
+        max_id_pool = int(self.MAX_ID_POOL)
+        if max_id_pool <= 0:
+            print("max id pool is {}".format(max_id_pool))
+            return
+
+        new_tracks = [
+            track for track in self.tracks
+            if track.track_id > max_id_pool
+            and 3 <= track.age <= 100
+            and not track.is_deleted()
+        ]
+        if not new_tracks:
+            return
+
+        unmatched_tracks = [
+            track for track in self.tracks
+            if 1 <= track.track_id <= max_id_pool
+            and track.time_since_update > 1
+            and track not in new_tracks
+        ]
+        if not unmatched_tracks:
+            return
+
+        reconnection_distance_threshold = cfg.DEEPSORT.get("RECONNECTION_DISTANCE_THRESHOLD", 200)
+        cost_matrix = np.full((len(unmatched_tracks), len(new_tracks)), np.inf, dtype=float)
+
+        for i, unmatched_track in enumerate(unmatched_tracks):
+            unmatched_center = self._track_last_detection_center(unmatched_track)
+            for j, new_track in enumerate(new_tracks):
+                new_center = self._track_first_detection_center(new_track)
+                cost_matrix[i, j] = np.linalg.norm(unmatched_center - new_center)
+
+        row_ind, col_ind = linear_sum_assignment(cost_matrix)
+
+        for row_index, col_index in zip(row_ind, col_ind):
+            if cost_matrix[row_index, col_index] >= reconnection_distance_threshold:
+                continue
+
+            old_track = unmatched_tracks[row_index]
+            new_track = new_tracks[col_index]
+
+            old_track.merge_with(new_track)
+            new_track.track_id = old_track.track_id
+            old_track.state = TrackState.Deleted
+
+            if old_track in self.tracks:
+                self.tracks.remove(old_track)
+
+    def _track_last_detection_center(self, track):
+        history = track.get_position_history()
+        if history:
+            return np.asarray(history[-1][:2], dtype=float)
+        return np.asarray(track.mean[:2], dtype=float)
+
+    def _track_first_detection_center(self, track):
+        history = track.get_position_history()
+        if history:
+            return np.asarray(history[0][:2], dtype=float)
+        return np.asarray(track.mean[:2], dtype=float)
