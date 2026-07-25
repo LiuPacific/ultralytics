@@ -1,0 +1,38 @@
+# Ultralytics 🚀 AGPL-3.0 License - https://ultralytics.com/license
+
+# BoT-SORT tracker defaults for mode="track"
+# Docs: https://docs.ultralytics.com/modes/track/
+
+tracker_type: hara_botsort # (str) Registered Hara BoT-SORT backend
+track_high_thresh: 0.25 # (float) First-stage match threshold; raise for cleaner tracks, lower to keep more
+track_low_thresh: 0.1 # (float) Second-stage threshold for low-score matches; balances recovery vs drift
+new_track_thresh: 0.25 # (float) Start a new track if no match ≥ this; higher reduces false tracks
+#track_buffer: 30 # (int) Frames to keep lost tracks alive; higher handles occlusion, increases ID switches risk
+track_buffer: 300
+match_thresh: 0.8 # (float) Association similarity threshold (IoU/cost); tune with detector quality
+fuse_score: True # (bool) Fuse detection score with motion/IoU for matching; stabilizes weak detections
+
+# BoT-SORT specifics
+#gmc_method: sparseOptFlow # (str) Global motion compensation: sparseOptFlow|orb|sift|ecc|none; helps moving camera scenes
+gmc_method: none
+
+# ReID model related thresh
+proximity_thresh: 0.5 # (float) Min IoU to consider tracks proximate for ReID; higher is stricter
+appearance_thresh: 0.8 # (float) Min appearance similarity for ReID; raise to avoid identity swaps
+with_reid: False # (bool) Enable ReID model use; needs extra model and compute
+model: auto # (str) ReID model name/path; "auto" uses detector features if available
+
+BotSORT:
+  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold3_10min/weights/last.pt"
+  MAX_FRAME: 20000
+  TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/hbb_l_hold3_10min/hbb_l_10hold3_botsort.csv"
+  VIDEO_PATH: D:/chicken_project/video_reid_obb/mock_20251007T000000Z_20251007T010000Z.mkv
+  RESULT_PATH: "E:/temp/hbb_l_10hold3_botsort.mp4"
+  IMG_SIZE: 1280
+  NMS_THRESHOLD: 0.8
+  MAX_ID_POOL: 15
+  USE_OPTIMIZATION: False
+  DETECTION_OPTIMIZATION_ON: False
+  TRACK_RECONNECTION_ON: False
+  RECONNECTION_DISTANCE_THRESHOLD: 200
+  FRAME_MEMORY_LENGTH: 5

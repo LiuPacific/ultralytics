@@ -10,8 +10,9 @@ import yaml
 from PIL import Image, ImageOps
 import cv2
 
+# r"^id_(?P<chicken_id>\d+)_(?P<month>\d+)_(?P<modality>RGB|T|Thermal|thermal)_(?P<group>sick|mock)_(?P<frame>.+)\.(png|jpg|jpeg)$",
 FILENAME_RE = re.compile(
-    r"^id_(?P<chicken_id>\d+)_(?P<month>\d+)_(?P<modality>RGB|T|Thermal|thermal)_(?P<group>sick|mock)_(?P<frame>.+)\.(png|jpg|jpeg)$",
+    r"^id_(?P<chicken_id>\d+)_(?P<month>\d+)_(?P<group>sick|mock)(.+)\.(png|jpg|jpeg)$",
     re.IGNORECASE,
 )
 
@@ -36,7 +37,7 @@ def parse_chicken_filename(path: str) -> Optional[Dict]:
     d = m.groupdict()
     d["chicken_id"] = int(d["chicken_id"])
     d["month"] = int(d["month"])
-    d["modality"] = d["modality"].upper()
+    # d["modality"] = d["modality"].upper()
     d["group"] = d["group"].lower()
     return d
 

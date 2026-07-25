@@ -21,6 +21,53 @@ chi2inv95 = {
     9: 16.919}
 
 
+chi2inv95 = {
+    1: 3.8415,
+    2: 5.9915,
+    3: 7.8147,
+    4: 9.4877,
+    5: 11.070,
+    6: 12.592,
+    7: 14.067,
+    8: 15.507,
+    9: 16.919}
+
+chi2inv70 = {
+    1: 1.0742,
+    2: 2.4079,
+    3: 3.6649,
+    4: 4.8784,
+    5: 6.0644,
+    6: 7.2311,
+    7: 8.3834,
+    8: 9.5245,
+    9: 10.6564
+}
+
+chi2inv60 = {
+    1: 0.7083,
+    2: 1.8326,
+    3: 2.9462,
+    4: 4.0446,
+    5: 5.1319,
+    6: 6.2108,
+    7: 7.2832,
+    8: 8.3505,
+    9: 9.4136
+}
+
+chi2inv50 = {
+    1: 0.4549,
+    2: 1.3863,
+    3: 2.3660,
+    4: 3.3567,
+    5: 4.3515,
+    6: 5.3481,
+    7: 6.3458,
+    8: 7.3441,
+    9: 8.3428
+}
+
 class KalmanFilterOBB(object):
     """
     Extended Kalman filter for tracking oriented bounding boxes (OBB) in image space.
@@ -52,6 +99,7 @@ class KalmanFilterOBB(object):
         self._std_weight_position = 1. / 20
         self._std_weight_velocity = 1. / 160
         self._std_weight_angle = 1. / 180  # Additional weight for angle uncertainty
+
     def initiate(self, measurement):
         """Create track from unassociated measurement.
 

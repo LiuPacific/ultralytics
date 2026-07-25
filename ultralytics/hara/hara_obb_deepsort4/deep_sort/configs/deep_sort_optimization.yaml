@@ -1,0 +1,20 @@
+DEEPSORT:
+  REID_CKPT: ""
+  #  REID_CKPT: "deep_sort/deep_sort/deep/checkpoint/ckpt_person.t7"
+  #  REID_CKPT: "C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/hara_reid/outputs/best_osnet.pth"
+  MAX_DIST: 0.2
+  MIN_CONFIDENCE: 0.3
+  NMS_MAX_OVERLAP: 0.5
+  MAX_IOU_DISTANCE: 0.7
+  N_INIT: 3
+  NN_BUDGET: 100
+  MAX_ID_POOL: 15
+  RECONNECTION_DISTANCE_THRESHOLD: 200
+  REUSE_ID_ASSIGNMENT_DISTANCE_THRESHOLD: 200
+  USE_REID: False
+  USE_ROTATED_FEATURES: True
+  #  USE_OPTIMIZATION: True
+  #  MAX_AGE: 30
+  USE_OPTIMIZATION: False
+  MAX_AGE: 70
+  TRACKING_CSV_PATH: tracking_output1.csv

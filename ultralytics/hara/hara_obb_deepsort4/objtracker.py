@@ -1,4 +1,4 @@
-from deep_sort.utils.parser import get_config
+
 import torch
 import cv2
 import numpy as np
@@ -7,63 +7,79 @@ from ultralytics.hara.hara_obb_deepsort4.deep_sort.deep_sort.deep_sort_obb impor
 from ultralytics.hara.hara_obb_deepsort4.obj_obb_detector import ObbDetector
 from deep_sort.deep_sort.sort import obb_utils
 
-cfg = get_config()
-cfg.merge_from_file("deep_sort/configs/deep_sort.yaml")
-
-# deepsort = DeepSort(cfg.DEEPSORT.REID_CKPT,
-#                     max_dist=cfg.DEEPSORT.MAX_DIST, min_confidence=cfg.DEEPSORT.MIN_CONFIDENCE,
-#                     nms_max_overlap=cfg.DEEPSORT.NMS_MAX_OVERLAP, max_iou_distance=cfg.DEEPSORT.MAX_IOU_DISTANCE,
-#                     max_age=cfg.DEEPSORT.MAX_AGE, n_init=cfg.DEEPSORT.N_INIT, nn_budget=cfg.DEEPSORT.NN_BUDGET,
-#                     use_cuda=True)
-deepsort_obb = DeepSORTOBB(cfg.DEEPSORT.REID_CKPT,
-                           max_dist=cfg.DEEPSORT.MAX_DIST, min_confidence=cfg.DEEPSORT.MIN_CONFIDENCE,
-                           nms_max_overlap=cfg.DEEPSORT.NMS_MAX_OVERLAP, max_iou_distance=cfg.DEEPSORT.MAX_IOU_DISTANCE,
-                           max_age=cfg.DEEPSORT.MAX_AGE, n_init=cfg.DEEPSORT.N_INIT, nn_budget=cfg.DEEPSORT.NN_BUDGET,
-                           use_cuda=True)
 
 
-
-
-def update(target_detector: ObbDetector, image):
-    obb_detections = target_detector.detect(image)
+def update(target_detector: ObbDetector, image, deepsort_obb: DeepSORTOBB):
+    selected_detections,pred_boxes = target_detector.detect(image)
     xyxyxyxy_list = []
     xywhr_list = []
     conf_list = []
     tracks2draw = []
-    if len(obb_detections):
+
+    if len(selected_detections):
         # Adapt detections to deep sort input format
-        for detection in obb_detections:
+        for detection in selected_detections:
             xyxyxyxy, xywhr, label, conf = detection
             xyxyxyxy_list.append(xyxyxyxy)
             xywhr_list.append(xywhr)
             conf_list.append(conf)
 
         # Pass detections to deepsort
-        tracks_detected = deepsort_obb.update(xyxyxyxy_list,xywhr_list, conf_list, image)
+        tracks_detected = deepsort_obb.update(xyxyxyxy_list, xywhr_list, conf_list, image)
 
         for track_detected in list(tracks_detected):
             """
             track_detected: x y w h r track_id, [[xywhr],[xywhr]...[new xywhr]]"""
-            x,y,w,h,r, track_id, track_history_positions= track_detected
-            xyxyxyxy = obb_utils.xywhr_to_xyxyxyxy(x,y,w,h,r)
+            x, y, w, h, r, track_id, track_history_positions = track_detected
+            xyxyxyxy = obb_utils.xywhr_to_xyxyxyxy(x, y, w, h, r)
             tracks2draw.append(
-                (xyxyxyxy, '', track_id, track_history_positions) # xyxyxyxy, class_id, track_id
+                (xyxyxyxy, '', track_id, track_history_positions)  # xyxyxyxy, class_id, track_id
             )
-    image = plot_all_detections(image, obb_detections)
-    image = draw_trail(image, tracks2draw)
+    image = plot_all_detections(image, pred_boxes)
     image = plot_bboxes(image, tracks2draw)
+    image = draw_trail(image, tracks2draw)
     return image, tracks2draw
 
-# TODO hara: track length
-def draw_trail(image, track2draw, trail_length=630):
-    for track2draw in track2draw:
+
+# Dark BGR colors for around 15 tracks
+DARK_COLORS = [
+    (0, 0, 139),  # dark red
+    (0, 100, 0),  # dark green
+    (139, 0, 0),  # dark blue
+    (0, 140, 140),  # dark yellow/cyan-like
+    (139, 0, 139),  # dark magenta
+    (139, 139, 0),  # dark cyan
+    (0, 69, 139),  # dark orange
+    (75, 0, 130),  # indigo
+    (47, 79, 79),  # dark slate gray
+    (85, 107, 47),  # dark olive green
+    (128, 0, 0),  # navy
+    (0, 128, 128),  # teal
+    (72, 61, 139),  # dark slate blue
+    (34, 139, 34),  # forest green
+    (25, 25, 112),  # midnight blue
+]
+
+
+def draw_trail(image, tracks2draw, trail_length=630):
+    for track2draw in tracks2draw:
         track_history_positions = track2draw[3]
-        if len(track_history_positions) > 1:
-            for i in range(1, len(track_history_positions)):
-                cv2.line(image, (int(track_history_positions[i-1][0]), int(track_history_positions[i-1][1])),
-                         (int(track_history_positions[i][0]), int(track_history_positions[i][1])),
-                         (255, 0, 0), thickness=3)
+        track_id = track2draw[2]
+
+        if len(track_history_positions) == 0:
+            return image
+
+        # use only recent trail points.
+        if len(track_history_positions) > trail_length:
+            track_history_positions = track_history_positions[-trail_length:]
+        # assign a different color to each track:
+        for i in range(1, len(track_history_positions)):
+            pt1 = (int(track_history_positions[i - 1][0]), int(track_history_positions[i - 1][1]))
+            pt2 = (int(track_history_positions[i][0]), int(track_history_positions[i][1]))
+            cv2.line(image, pt1, pt2, DARK_COLORS[track_id % len(DARK_COLORS)], thickness=3)
+
     return image
+
 
 def plot_all_detections(image, obb_detections, line_thickness=None):
     # Plots one bounding box on image img
@@ -96,6 +112,7 @@ def plot_all_detections(image, obb_detections, line_thickness=None):
 
     return image
 
+
 # plot bboxes that are in the tracker
 def plot_bboxes(image, bboxes2draw, line_thickness=None):
     """
@@ -106,7 +123,7 @@ def plot_bboxes(image, bboxes2draw, line_thickness=None):
     """
     tl = 5  # line/font thickness
     color = (0, 0, 256)
-    for (xyxyxyxy, cls_id, track_id, _) in bboxes2draw:
+    for (xyxyxyxy, _, track_id, _) in bboxes2draw:
         # Draw OBB as polygon
         pts = np.array(xyxyxyxy, np.int32).reshape((-1, 1, 2))
         cv2.polylines(image, [pts], True, color, thickness=tl, lineType=cv2.LINE_AA)
@@ -120,9 +137,6 @@ def plot_bboxes(image, bboxes2draw, line_thickness=None):
                     [0, 255, 0], thickness=tf, lineType=cv2.LINE_AA)
 
     return image
-
-
-
 
 # plot bbox with line restriction check. When the detection is out of the line, it will show different color.
 # def plot_bboxes(image, bboxes, line_thickness=None):

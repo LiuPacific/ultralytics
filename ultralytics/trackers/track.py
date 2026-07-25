@@ -10,9 +10,16 @@ from ultralytics.utils.checks import check_yaml
 
 from .bot_sort import BOTSORT
 from .byte_tracker import BYTETracker
+from ultralytics.hara.hara_bot_sort.tracker.hara_bot_sort import HaraBOTSORT
+from ultralytics.hara.hara_byte_track.tracker.hara_byte_tracker import HaraBYTETracker
 
 # A mapping of tracker types to corresponding tracker classes
-TRACKER_MAP = {"bytetrack": BYTETracker, "botsort": BOTSORT}
+TRACKER_MAP = {
+    "bytetrack": BYTETracker,
+    "botsort": BOTSORT,
+    "hara_bytetrack": HaraBYTETracker,
+    "hara_botsort": HaraBOTSORT,
+}
 
 
 def on_predict_start(predictor: object, persist: bool = False) -> None:
@@ -36,13 +43,15 @@ def on_predict_start(predictor: object, persist: bool = False) -> None:
     tracker = check_yaml(predictor.args.tracker)
     cfg = IterableSimpleNamespace(**YAML.load(tracker))
 
-    if cfg.tracker_type not in {"bytetrack", "botsort"}:
-        raise AssertionError(f"Only 'bytetrack' and 'botsort' are supported for now, but got '{cfg.tracker_type}'")
+    if cfg.tracker_type not in TRACKER_MAP:
+        raise AssertionError(
+            f"Only {', '.join(sorted(TRACKER_MAP))} are supported for now, but got '{cfg.tracker_type}'"
+        )
 
     predictor._feats = None  # reset in case used earlier
     if hasattr(predictor, "_hook"):
         predictor._hook.remove()
-    if cfg.tracker_type == "botsort" and cfg.with_reid and cfg.model == "auto":
+    if cfg.tracker_type in {"botsort", "hara_botsort"} and cfg.with_reid and cfg.model == "auto":
         from ultralytics.nn.modules.head import Detect
 
         if not (

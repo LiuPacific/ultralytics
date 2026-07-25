@@ -1,0 +1,26 @@
+DEEPSORT:
+  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/obb_l_hold3_10min/weights/last.pt"
+  REID_CKPT: "C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/hara_reid/.run0/without_hold3/best_osnet.pth"
+  MAX_DIST: 0.2
+  MIN_CONFIDENCE: 0.3
+  NMS_THRESHOLD: 0.8
+  MAX_IOU_DISTANCE: 0.7
+  N_INIT: 3
+  NN_BUDGET: 100
+  MAX_ID_POOL: 15
+  RECONNECTION_DISTANCE_THRESHOLD: 200
+  REUSE_ID_ASSIGNMENT_DISTANCE_THRESHOLD: 200
+  USE_REID: True
+  USE_ROTATED_FEATURES: True
+  USE_OPTIMIZATION: True
+  REUSE_ID: False # use_optimization & reuse_id to turn on it.
+  DETECTION_OPTIMIZATION_ON: True
+  TRACK_RECONNECTION_ON: True
+  MAX_AGE: 30
+#  MAX_IOU_DISTANCE: 0.8
+  #  USE_OPTIMIZATION: False
+  #  MAX_AGE: 30
+  TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/obb_l_hold3_10min/obb_l_10hold3_detection_track_reid.csv"
+  VIDEO_PATH: D:/chicken_project/video_reid_obb/mock_20251007T000000Z_20251007T010000Z.mkv
+  RESULT_PATH: "E:/temp/obb_l_10hold3_detection_track_reid.mp4"
+  MAX_FRAME: 20000

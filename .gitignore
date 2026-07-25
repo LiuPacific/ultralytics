@@ -222,3 +222,8 @@ results.csv
 **/.weights/
 **/.temp/
 .cap
+.run
+.run0
+.run*
+.tracking_figures
+.test

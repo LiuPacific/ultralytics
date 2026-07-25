@@ -1,23 +1,22 @@
 import torch
+from sympy import false
+
 from ultralytics import YOLO
 import numpy as np
 import numpy as np
 from scipy.optimize import linear_sum_assignment
+from ultralytics.hara.hara_obb_deepsort4.deep_sort.configs.common_cfg import cfg
 
-# OBJ_LIST = ['person', 'car', 'bus', 'truck']
-# DETECTOR_PATH = r'G:\project_chicken\code\experiment_deepSORT\weights\yolov8s.pt'
+# OBJ_LIST = ['person', 'chicken']
 OBJ_LIST = ['chicken']
-# DETECTOR_PATH = r'/ultralytics/hara/weights/yolov8m-obb-chicken-0401.pt'
-# DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolov8m-obb-chicken-0426.pt'
-# DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolov8m-obb-chicken-0520.pt'
-DETECTOR_PATH = r'C:\Users\tliu25\workspace\ultralytics\ultralytics\hara\weights\yolo11l-obb-chicken-0528.pt'
+
 
 class baseDet(object):
     def __init__(self):
         self.img_size = 1280
         self.conf = 0.25
         # self.iou = 0.70
-        self.iou = 0.80
+        self.nms_iou = cfg.DEEPSORT.get("NMS_THRESHOLD", 0.7)
 
     def init_model(self):
         raise EOFError("Undefined model type.")
@@ -38,7 +37,7 @@ class ObbDetector(baseDet):
         self.frame_memory_length = 5
 
     def init_model(self):
-        self.weights = DETECTOR_PATH
+        self.weights = cfg.DEEPSORT.DETECTION_MODEL_PATH
         self.device = 0 if torch.cuda.is_available() else 'cpu'
         self.model = YOLO(self.weights)
         self.m = self.model
@@ -56,7 +55,7 @@ class ObbDetector(baseDet):
     def _filter_by_area(self, xywhr, min_area=20000, max_area=120000):
         """Filter bbox based on area constraints."""
         # area = self._calculate_bbox_area(xyxyxyxy)
-        area = xywhr[2]*xywhr[3]
+        area = xywhr[2] * xywhr[3]
         if min_area <= area <= max_area:
             return True
         return False
@@ -68,17 +67,16 @@ class ObbDetector(baseDet):
             self.bbox_history.pop(0)
         self.bbox_history.append(pred_boxes)
 
-
-    def detect(self, im):
+    def detect(self, im, x_min=270, x_max=1900, y_min=100, y_max=1600):
         res = self.model.predict(im, imgsz=self.img_size, conf=self.conf,
-                                     iou=self.iou, device=self.device)
+                                 iou=self.nms_iou, device=self.device)
 
-        obb_xyxyxyxy = res[0].obb.xyxyxyxy.cpu().numpy()   # shape: (N, 4, 2)
-        obb_xywhr = res[0].obb.xywhr.cpu().numpy()           # shape: (N, 5)
-        obb_conf = res[0].obb.conf.cpu().numpy()           # shape: (N,)
-        obb_cls = res[0].obb.cls.cpu().numpy().astype(int) # shape: (N,)
+        obb_xyxyxyxy = res[0].obb.xyxyxyxy.cpu().numpy()  # shape: (N, 4, 2)
+        obb_xywhr = res[0].obb.xywhr.cpu().numpy()  # shape: (N, 5)
+        obb_conf = res[0].obb.conf.cpu().numpy()  # shape: (N,)
+        obb_cls = res[0].obb.cls.cpu().numpy().astype(int)  # shape: (N,)
         pred_boxes = []
-        for xyxyxyxy, xywhr, conf, cls_id in zip(obb_xyxyxyxy,obb_xywhr, obb_conf,obb_cls):
+        for xyxyxyxy, xywhr, conf, cls_id in zip(obb_xyxyxyxy, obb_xywhr, obb_conf, obb_cls):
             # bbox = np.array(xyxyxyxy, dtype=np.int32).reshape((-1,1,2))
             xyxyxyxy = np.array(xyxyxyxy, dtype=np.int32)
             xywhr = np.array([int(xywhr[0]), int(xywhr[1]), int(xywhr[2]), int(xywhr[3]), xywhr[4]])
@@ -88,7 +86,7 @@ class ObbDetector(baseDet):
 
             # Filter by the pen boundary
             # if not (470 <= xywhr[0] <= 1900 and 670 <= xywhr[1] <= 1600):
-            if  (xywhr[0] >  2000) or xywhr[0]<150:
+            if (xywhr[0] > x_max) or xywhr[0] < x_min or xywhr[1] > y_max or xywhr[1] < y_min:
                 continue
 
             # Filter by bbox area (min: 13000, max: 120000 pixels)
@@ -99,23 +97,25 @@ class ObbDetector(baseDet):
             )
 
         # If there are more than 15 detections, we can apply a selection strategy here (e.g., based on confidence or spatial distribution)
-        if len(pred_boxes)>15 and len(self.bbox_history) > 0 and len(self.bbox_history[-1])==15:
-            prev_points = np.array([[box[1][0],box[1][1]] for box in self.bbox_history[-1]])  # shape: (15, 2)
-            curr_points = np.array([[box[1][0], box[1][1]] for box in pred_boxes])  # shape: (m, 2)
-            curr_scores = np.array([box[3] for box in pred_boxes])  # shape: (m,)
-            _,_,_,selected_indices = select_15_points_by_distance_and_confidence(
-                prev_points, curr_points, curr_scores, alpha_distance=0.7, alpha_score=0.3,
-                x_min=470, x_max=1900, y_min=670, y_max=1600
-            )
-            # Update pred_boxes to only include the selected points
-            pred_boxes = [pred_boxes[i] for i in selected_indices]
-        else:
-            print(f"Current frame has {len(pred_boxes)} detections, which is not more than 15 or no previous frame with 15 detections to compare with. Skipping selection step.")
+        selected_detections = pred_boxes
+        if cfg.DEEPSORT.USE_OPTIMIZATION and cfg.DEEPSORT.get("DETECTION_OPTIMIZATION_ON", True):
+            if len(pred_boxes) > cfg.DEEPSORT.MAX_ID_POOL and len(self.bbox_history) > 0 and len(self.bbox_history[-1]) == cfg.DEEPSORT.MAX_ID_POOL:
+                prev_points = np.array([[box[1][0], box[1][1]] for box in self.bbox_history[-1]])  # shape: (15, 2)
+                curr_points = np.array([[box[1][0], box[1][1]] for box in pred_boxes])  # shape: (m, 2)
+                curr_scores = np.array([box[3] for box in pred_boxes])  # shape: (m,)
+                _, _, _, selected_indices = select_15_points_by_distance_and_confidence(
+                    prev_points, curr_points, curr_scores, alpha_distance=0.7, alpha_score=0.3,
+                    x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max
+                )
+                # Update pred_boxes to only include the selected points
+                selected_detections = [pred_boxes[i] for i in selected_indices]
+            else:
+                print(
+                    f"Current frame has {len(pred_boxes)} detections, which is not more than 15 or no previous frame with 15 detections to compare with. Skipping selection step.")
+            self._update_frame_memory(selected_detections)
 
         # Update frame memory with current detections
-        self._update_frame_memory(pred_boxes)
-
-        return pred_boxes
+        return selected_detections, pred_boxes
 
 
 def select_15_points_by_distance_and_confidence(
@@ -217,5 +217,3 @@ def select_15_points_by_distance_and_confidence(
         )
 
     return selected_points, selected_scores, matched_pairs, curr_indices
-
-
