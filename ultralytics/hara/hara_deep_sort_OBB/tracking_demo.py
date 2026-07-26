@@ -4,8 +4,8 @@ import yaml
 from datetime import datetime
 from obj_obb_detector import ObbDetector
 import objtracker
-from ultralytics.hara.hara_obb_deepsort4.deep_sort.configs.common_cfg import cfg
-from ultralytics.hara.hara_obb_deepsort4.deep_sort.deep_sort.deep_sort_obb import DeepSORTOBB
+from ultralytics.hara.hara_deep_sort_OBB.deep_sort.configs.common_cfg import cfg
+from ultralytics.hara.hara_deep_sort_OBB.deep_sort.deep_sort.deep_sort_obb import DeepSORTOBB
 from pathlib import Path
 
 

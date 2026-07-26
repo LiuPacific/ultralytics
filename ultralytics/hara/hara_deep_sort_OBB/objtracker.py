@@ -3,8 +3,8 @@ import torch
 import cv2
 import numpy as np
 
-from ultralytics.hara.hara_obb_deepsort4.deep_sort.deep_sort.deep_sort_obb import DeepSORTOBB
-from ultralytics.hara.hara_obb_deepsort4.obj_obb_detector import ObbDetector
+from ultralytics.hara.hara_deep_sort_OBB.deep_sort.deep_sort.deep_sort_obb import DeepSORTOBB
+from ultralytics.hara.hara_deep_sort_OBB.obj_obb_detector import ObbDetector
 from deep_sort.deep_sort.sort import obb_utils
 
 

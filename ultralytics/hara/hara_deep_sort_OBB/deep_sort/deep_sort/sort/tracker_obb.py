@@ -7,7 +7,7 @@ from .track_obb import TrackOBB, TrackState
 from .linear_assignment_obb import gate_cost_matrix_obb, matching_cascade, min_cost_matching
 from scipy.optimize import linear_sum_assignment
 from sklearn.metrics.pairwise import cosine_distances
-from ultralytics.hara.hara_obb_deepsort4.deep_sort.configs.common_cfg import cfg
+from ultralytics.hara.hara_deep_sort_OBB.deep_sort.configs.common_cfg import cfg
 
 
 class TrackerOBB:

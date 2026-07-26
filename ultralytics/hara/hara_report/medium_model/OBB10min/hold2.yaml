@@ -1,0 +1,16 @@
+path: D:\chicken_project\experiment6report\10-min-obb-id0
+train:
+  - 08_mock_1-15-masked
+  - 10_mock_76-90-masked
+  - 10_sick_31-45-masked
+  - 12_mock_46-60-masked
+  - 12_sick_61-75-masked
+val:
+  - 08_sick_16-30-masked
+test:
+# yolo train data=C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/hara_deep_sort_HBB/chicken_hbb.yaml model=C:/Users/tliu25/workspace/ultralytics/ultralytics/hara/weights/yolo11l.pt epochs=200 imgsz=1280 batch=12 workers=4 name=yolov11l-hbb-chicken-0614-half
+
+names:
+  0: chicken
+
+
