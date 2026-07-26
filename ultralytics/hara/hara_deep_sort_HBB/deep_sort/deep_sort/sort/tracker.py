@@ -58,6 +58,9 @@ class Tracker:
 
         self.tracks = []   # List of tracks.
         self._next_id = 1  # Next track ID to assign.
+        self.reconnection_id_pool = {}
+        self.reconnection_pool_min_track_age = 100
+        self.reconnection_pool_expiration_frames = 5000
         # CSV logging buffer and configuration
         self.tracking_csv_path = tracking_csv_path
         if self.tracking_csv_path and os.path.exists(self.tracking_csv_path):
@@ -86,6 +89,10 @@ class Tracker:
         """
         # Increment global frame counter
         self.frame_id += 1
+        use_optimization = cfg.DEEPSORT.get("USE_OPTIMIZATION", False)
+        track_reconnection_on = (
+            use_optimization and cfg.DEEPSORT.get("TRACK_RECONNECTION_ON", True)
+        )
 
         if self.frame_id >= 200 and self.frame_id <= 204:
             print("---")
@@ -109,28 +116,26 @@ class Tracker:
         
         # 3. Initialize tracks for unmatched detections.
         for detection_idx in unmatched_detections:
-            if cfg.DEEPSORT.get("USE_OPTIMIZATION", False) and cfg.DEEPSORT.get("REUSE_ID", False):
-                self._initiate_track_MAX_ID_POOL(
-                    detections[detection_idx],
-                    MAX_ID_POOL=self.MAX_ID_POOL,
-                )
-            else:
-                self._initiate_track(detections[detection_idx])
+            self._initiate_track(detections[detection_idx])
+            # if cfg.DEEPSORT.get("USE_OPTIMIZATION", False) and cfg.DEEPSORT.get("REUSE_ID", False):
+            #     self._initiate_track_MAX_ID_POOL(
+            #         detections[detection_idx],
+            #         MAX_ID_POOL=self.MAX_ID_POOL,
+            #     )
+            # else:
+            #     self._initiate_track(detections[detection_idx])
 
-        # If MAX_ID_POOL is 0, use original behavior (delete tracks after max_age)
-        # if not cfg.DEEPSORT.USE_OPTIMIZATION or self.MAX_ID_POOL == 0 or not cfg.DEEPSORT.get("REUSE_ID", False):
-        if not cfg.DEEPSORT.USE_OPTIMIZATION:
+        if track_reconnection_on:
+            self._update_reconnection_id_pool()
+
+        # Dynamic reconnection keeps historical tracks in reconnection_id_pool,
+        # so deleted tracks do not need to remain in the active tracker list.
+        if track_reconnection_on or not use_optimization:
             self.tracks = [t for t in self.tracks if not t.is_deleted()]
 
-        if cfg.DEEPSORT.get("USE_OPTIMIZATION", False):
-            if cfg.DEEPSORT.get("TRACK_RECONNECTION_ON", True):
-                # Try to reconnect a fresh replacement track to an older lost one.
-                # This is a lightweight spatial re-identification step and runs
-                # after normal association has already finished.
-                if self.MAX_ID_POOL > 0:
-                    self._reidentify_tracks_MAX_ID_POOL()
-                else:
-                    self._reidentify_tracks()
+        if use_optimization:
+            if track_reconnection_on:
+                self._reidentify_tracks_dynamic_id_pool()
 
         # Update distance metric.
         active_targets = [t.track_id for t in self.tracks if t.is_confirmed()]
@@ -445,42 +450,59 @@ class Tracker:
             if old_track in self.tracks:
                 self.tracks.remove(old_track)
 
-    def _reidentify_tracks_MAX_ID_POOL(self):
-        """Reconnect overflow new tracks back to older tracks inside the ID pool.
+    def _update_reconnection_id_pool(self):
+        """Add mature detected tracks to the pool, refresh them, and remove expired IDs."""
+        for track in self.tracks:
+            if track.time_since_update != 0 or track.is_deleted():
+                continue
 
-        This keeps the optimization behavior of `_reidentify_tracks`, but
-        applies the fixed-ID-pool constraint:
-        - new replacement tracks must have `track_id > MAX_ID_POOL`;
-        - old candidate tracks must have `track_id` in `1..MAX_ID_POOL`;
-        - accepted matches inherit the old in-pool identity.
-        """
-        max_id_pool = int(self.MAX_ID_POOL)
-        if max_id_pool <= 0:
-            print("max id pool is {}".format(max_id_pool))
+            track_id = int(track.track_id)
+            if (
+                track.age > self.reconnection_pool_min_track_age
+                or track_id in self.reconnection_id_pool
+            ):
+                self.reconnection_id_pool[track_id] = {
+                    "track": track,
+                    "last_seen_frame": self.frame_id,
+                }
+
+        expired_ids = [
+            track_id
+            for track_id, pool_entry in self.reconnection_id_pool.items()
+            if self.frame_id - pool_entry["last_seen_frame"] > self.reconnection_pool_expiration_frames
+        ]
+        for track_id in expired_ids:
+            del self.reconnection_id_pool[track_id]
+
+    def _reidentify_tracks_dynamic_id_pool(self):
+        """Reconnect young tracks to unmatched IDs from the dynamic reconnection pool."""
+        if not self.reconnection_id_pool:
             return
 
+        pool_ids = set(self.reconnection_id_pool)
         new_tracks = [
             track for track in self.tracks
-            if track.track_id > max_id_pool
+            if track.track_id not in pool_ids
             and 3 <= track.age <= 100
+            and track.time_since_update == 0
             and not track.is_deleted()
         ]
         if not new_tracks:
             return
 
-        unmatched_tracks = [
-            track for track in self.tracks
-            if 1 <= track.track_id <= max_id_pool
-            and track.time_since_update > 1
-            and track not in new_tracks
+        unmatched_pool_entries = [
+            (track_id, pool_entry)
+            for track_id, pool_entry in self.reconnection_id_pool.items()
+            if self.frame_id - pool_entry["last_seen_frame"] > 1
         ]
-        if not unmatched_tracks:
+        if not unmatched_pool_entries:
             return
 
         reconnection_distance_threshold = cfg.DEEPSORT.get("RECONNECTION_DISTANCE_THRESHOLD", 200)
-        cost_matrix = np.full((len(unmatched_tracks), len(new_tracks)), np.inf, dtype=float)
+        cost_matrix = np.full((len(unmatched_pool_entries), len(new_tracks)), np.inf, dtype=float)
 
-        for i, unmatched_track in enumerate(unmatched_tracks):
+        for i, (_, pool_entry) in enumerate(unmatched_pool_entries):
+            unmatched_track = pool_entry["track"]
             unmatched_center = self._track_last_detection_center(unmatched_track)
             for j, new_track in enumerate(new_tracks):
                 new_center = self._track_first_detection_center(new_track)
@@ -492,15 +514,21 @@ class Tracker:
             if cost_matrix[row_index, col_index] >= reconnection_distance_threshold:
                 continue
 
-            old_track = unmatched_tracks[row_index]
+            old_track_id, pool_entry = unmatched_pool_entries[row_index]
+            old_track = pool_entry["track"]
             new_track = new_tracks[col_index]
 
             old_track.merge_with(new_track)
-            new_track.track_id = old_track.track_id
+            new_track.track_id = old_track_id
             old_track.state = TrackState.Deleted
 
             if old_track in self.tracks:
                 self.tracks.remove(old_track)
+
+            self.reconnection_id_pool[old_track_id] = {
+                "track": new_track,
+                "last_seen_frame": self.frame_id,
+            }
 
     def _track_last_detection_center(self, track):
         history = track.get_position_history()

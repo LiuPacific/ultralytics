@@ -31,6 +31,9 @@ class HaraBYTETracker(BYTETracker):
         self.detection_optimization_target = None
         self.position_history_length = self.runtime_cfg.get("POSITION_HISTORY_LENGTH", 300)
         self.position_history = {}
+        self.reconnection_id_pool = {}
+        self.reconnection_pool_min_track_age = 100
+        self.reconnection_pool_expiration_frames = 5000
         self.detection_region = (
             self.runtime_cfg.get("DETECTION_REGION_X_MIN", 270),
             self.runtime_cfg.get("DETECTION_REGION_X_MAX", 1900),
@@ -168,10 +171,8 @@ class HaraBYTETracker(BYTETracker):
 
         if self.runtime_cfg.get("USE_OPTIMIZATION", False):
             if self.runtime_cfg.get("TRACK_RECONNECTION_ON", False):
-                if self._max_id_pool() > 0:
-                    self._reidentify_tracks_MAX_ID_POOL()
-                else:
-                    self._reidentify_tracks()
+                self._update_reconnection_id_pool()
+                self._reidentify_tracks_dynamic_id_pool()
 
         return np.asarray([x.result for x in self.tracked_stracks if x.is_activated], dtype=np.float32)
 
@@ -213,32 +214,58 @@ class HaraBYTETracker(BYTETracker):
             self.removed_stracks = [track for track in self.removed_stracks if track.track_id != old_track_id]
             old_track.mark_removed()
 
-    def _reidentify_tracks_MAX_ID_POOL(self):
-        """Reconnect overflow fresh tracks back to older lost/removed tracks inside the fixed ID pool."""
-        max_id_pool = self._max_id_pool()
-        if max_id_pool <= 0:
+    def _update_reconnection_id_pool(self):
+        """Add mature detected tracks to the pool, refresh them, and remove expired IDs."""
+        for track in self.tracked_stracks:
+            if track.frame_id != self.frame_id:
+                continue
+
+            track_id = int(track.track_id)
+            if (
+                self._track_age(track) > self.reconnection_pool_min_track_age
+                or track_id in self.reconnection_id_pool
+            ):
+                self.reconnection_id_pool[track_id] = {
+                    "track": track,
+                    "last_seen_frame": self.frame_id,
+                }
+
+        expired_ids = [
+            track_id
+            for track_id, pool_entry in self.reconnection_id_pool.items()
+            if self.frame_id - pool_entry["last_seen_frame"] > self.reconnection_pool_expiration_frames
+        ]
+        for track_id in expired_ids:
+            del self.reconnection_id_pool[track_id]
+
+    def _reidentify_tracks_dynamic_id_pool(self):
+        """Reconnect young tracks to unmatched IDs from the dynamic reconnection pool."""
+        if not self.reconnection_id_pool:
             return
 
+        pool_ids = set(self.reconnection_id_pool)
         new_tracks = [
             track for track in self.tracked_stracks
-            if track.track_id > max_id_pool
+            if track.track_id not in pool_ids
             and 3 <= self._track_age(track) <= 100
+            and track.frame_id == self.frame_id
         ]
         if not new_tracks:
             return
 
-        active_ids = {track.track_id for track in self.tracked_stracks}
-        unmatched_tracks = [
-            track for track in self._reconnection_candidates(active_ids)
-            if 1 <= track.track_id <= max_id_pool
+        unmatched_pool_entries = [
+            (track_id, pool_entry)
+            for track_id, pool_entry in self.reconnection_id_pool.items()
+            if self.frame_id - pool_entry["last_seen_frame"] > 1
         ]
-        if not unmatched_tracks:
+        if not unmatched_pool_entries:
             return
 
         reconnection_distance_threshold = self.runtime_cfg.get("RECONNECTION_DISTANCE_THRESHOLD", 200)
-        cost_matrix = np.full((len(unmatched_tracks), len(new_tracks)), np.inf, dtype=float)
+        cost_matrix = np.full((len(unmatched_pool_entries), len(new_tracks)), np.inf, dtype=float)
 
-        for i, unmatched_track in enumerate(unmatched_tracks):
+        for i, (_, pool_entry) in enumerate(unmatched_pool_entries):
+            unmatched_track = pool_entry["track"]
             unmatched_center = self._track_last_detection_center(unmatched_track)
             for j, new_track in enumerate(new_tracks):
                 new_center = self._track_first_detection_center(new_track)
@@ -246,9 +273,9 @@ class HaraBYTETracker(BYTETracker):
 
         matches, _, _ = matching.linear_assignment(cost_matrix, thresh=reconnection_distance_threshold)
         for row_index, col_index in matches:
-            old_track = unmatched_tracks[int(row_index)]
+            old_track_id, pool_entry = unmatched_pool_entries[int(row_index)]
+            old_track = pool_entry["track"]
             new_track = new_tracks[int(col_index)]
-            old_track_id = old_track.track_id
             new_track_id = new_track.track_id
 
             new_track.track_id = old_track_id
@@ -258,6 +285,10 @@ class HaraBYTETracker(BYTETracker):
             self.lost_stracks = [track for track in self.lost_stracks if track.track_id != old_track_id]
             self.removed_stracks = [track for track in self.removed_stracks if track.track_id != old_track_id]
             old_track.mark_removed()
+            self.reconnection_id_pool[old_track_id] = {
+                "track": new_track,
+                "last_seen_frame": self.frame_id,
+            }
 
     def _reconnection_candidates(self, active_ids):
         candidates = []
