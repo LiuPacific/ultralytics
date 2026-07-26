@@ -1,5 +1,5 @@
 DEEPSORT:
-  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/obb_hold1_10min/weights/last.pt"
+  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running_14/obb_l_hold1_10min/weights/last.pt"
   REID_CKPT: ""
   MAX_DIST: 0.2
   MIN_CONFIDENCE: 0.3
@@ -13,7 +13,7 @@ DEEPSORT:
   USE_REID: False
   USE_ROTATED_FEATURES: True
   USE_OPTIMIZATION: True
-  REUSE_ID: True # use_optimization & reuse_id to turn on it.
+  REUSE_ID: False # use_optimization & reuse_id to turn on it.
   DETECTION_OPTIMIZATION_ON: True
   TRACK_RECONNECTION_ON: False
   MAX_AGE: 30
@@ -21,6 +21,6 @@ DEEPSORT:
 #  USE_OPTIMIZATION: False
 #  MAX_AGE: 30
   TRACKING_CSV_PATH: "b.csv"
-  VIDEO_PATH: D:/chicken_project/video_reid_obb/mock_20250826T000000Z_20250826T002000Z.mkv
+  VIDEO_PATH: D:/chicken_project/video_reid_obb/1.mkv
   RESULT_PATH: "b.mp4"
   MAX_FRAME: 20000

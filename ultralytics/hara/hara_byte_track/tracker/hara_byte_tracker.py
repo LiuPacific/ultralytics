@@ -18,11 +18,17 @@ class HaraBYTETracker(BYTETracker):
     `BYTETracker` implementation.
     """
 
+    DETECTION_COUNT_SAMPLE_INTERVAL = 15
+    DETECTION_COUNT_STABILITY_WINDOW = 3
+
     def __init__(self, args: Any):
         super().__init__(args)
         self.runtime_cfg = cfg.get("ByteTrack", {})
         self.bbox_history = []
         self.frame_memory_length = self.runtime_cfg.get("FRAME_MEMORY_LENGTH", 5)
+        self.detection_frame_count = 0
+        self.detection_count_history = []
+        self.detection_optimization_target = None
         self.position_history_length = self.runtime_cfg.get("POSITION_HISTORY_LENGTH", 300)
         self.position_history = {}
         self.detection_region = (
@@ -354,39 +360,59 @@ class HaraBYTETracker(BYTETracker):
     def _apply_detection_optimization(self, results, img: np.ndarray | None = None, feats=None):
         selected_results = results
         selected_feats = feats
-        max_id_pool = self.runtime_cfg.get("MAX_ID_POOL", 15)
+        self._update_detection_optimization_target(len(results))
+        target_count = self.detection_optimization_target
 
         if (
-            len(results) > max_id_pool
+            target_count is not None
+            and len(results) > target_count
             and len(self.bbox_history) > 0
-            and len(self.bbox_history[-1]) == max_id_pool
+            and len(self.bbox_history[-1]) == target_count
         ):
-            prev_points = np.array([self._bbox_center(box) for box in self.bbox_history[-1]], dtype=float)
-            curr_xywh = np.asarray(results.xywh, dtype=float)
+            prev_points = np.array(
+                [self._bbox_center(box) for box in self.bbox_history[-1]], dtype=float
+            ).reshape(-1, 2)
+            curr_xywh = np.asarray(self._to_numpy(results.xywh), dtype=float)
             curr_points = curr_xywh[:, :2]
-            curr_scores = np.asarray(results.conf, dtype=float)
+            curr_scores = np.asarray(self._to_numpy(results.conf), dtype=float)
+            x_min, x_max, y_min, y_max = self.detection_region
 
             _, _, _, selected_indices = select_points_by_distance_and_confidence(
                 prev_points=prev_points,
                 curr_points=curr_points,
                 curr_scores=curr_scores,
-                target_count=max_id_pool,
                 alpha_distance=0.7,
                 alpha_score=0.3,
-                x_max=self._image_x_max(results, img),
-                y_max=self._image_y_max(results, img),
+                x_min=x_min,
+                x_max=x_max,
+                y_min=y_min,
+                y_max=y_max,
             )
             selected_indices = [int(i) for i in selected_indices]
             selected_results = results[selected_indices]
             selected_feats = self._slice_feats(feats, selected_indices)
-        else:
-            print(
-                f"Current frame has {len(results)} detections, which is not more than {max_id_pool} "
-                f"or no previous frame with {max_id_pool} detections to compare with. Skipping selection step."
-            )
-        self._update_frame_memory(np.asarray(selected_results.xywh, dtype=float))
+        self._update_frame_memory(np.asarray(self._to_numpy(selected_results.xywh), dtype=float))
 
         return selected_results, selected_feats
+
+    def _update_detection_optimization_target(self, detection_count):
+        """Sample the detection count and update the target after a stable sample window."""
+        self.detection_frame_count += 1
+        if self.detection_frame_count % self.DETECTION_COUNT_SAMPLE_INTERVAL != 0:
+            return
+
+        self.detection_count_history.append(detection_count)
+        if len(self.detection_count_history) > self.DETECTION_COUNT_STABILITY_WINDOW:
+            self.detection_count_history.pop(0)
+
+        if (
+            len(self.detection_count_history) == self.DETECTION_COUNT_STABILITY_WINDOW
+            and len(set(self.detection_count_history)) == 1
+        ):
+            new_target = self.detection_count_history[0]
+            if new_target != self.detection_optimization_target:
+                self.detection_optimization_target = new_target
+                print(f"Detection optimization target updated to {new_target}.")
 
     def _update_frame_memory(self, xywh_boxes):
         if len(self.bbox_history) >= self.frame_memory_length:
@@ -419,7 +445,6 @@ def select_points_by_distance_and_confidence(
     prev_points,
     curr_points,
     curr_scores,
-    target_count=15,
     alpha_distance=0.7,
     alpha_score=0.3,
     x_min=470,
@@ -431,8 +456,8 @@ def select_points_by_distance_and_confidence(
     curr_points = np.asarray(curr_points, dtype=float)
     curr_scores = np.asarray(curr_scores, dtype=float)
 
-    if prev_points.shape != (target_count, 2):
-        raise ValueError(f"prev_points must have shape ({target_count}, 2).")
+    if prev_points.ndim != 2 or prev_points.shape[1] != 2:
+        raise ValueError("prev_points must have shape (n, 2).")
 
     if curr_points.ndim != 2 or curr_points.shape[1] != 2:
         raise ValueError("curr_points must have shape (m, 2).")
@@ -440,8 +465,11 @@ def select_points_by_distance_and_confidence(
     if curr_scores.shape[0] != curr_points.shape[0]:
         raise ValueError("curr_scores length must match curr_points length.")
 
+    target_count = prev_points.shape[0]
     if curr_points.shape[0] < target_count:
-        raise ValueError(f"curr_points must contain at least {target_count} points.")
+        raise ValueError("curr_points must contain at least as many points as prev_points.")
+    if target_count == 0:
+        return curr_points[:0], curr_scores[:0], [], np.empty(0, dtype=int)
 
     d_max = np.sqrt((x_max - x_min) ** 2 + (y_max - y_min) ** 2)
     diff = prev_points[:, None, :] - curr_points[None, :, :]

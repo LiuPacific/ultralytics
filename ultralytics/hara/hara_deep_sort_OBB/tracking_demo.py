@@ -115,7 +115,7 @@ def start(show_window=True):
         cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    cfg.merge_from_file("deep_sort/configs/deep_sort.yaml")
+    # cfg.merge_from_file("deep_sort/configs/deep_sort.yaml")
     cfg.merge_from_file("deep_sort/configs/hold1_tracking_det.yaml")
     start(show_window=True)
 

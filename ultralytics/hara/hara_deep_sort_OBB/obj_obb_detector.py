@@ -29,7 +29,7 @@ class baseDet(object):
 
 
 class ObbDetector(baseDet):
-    DETECTION_COUNT_SAMPLE_INTERVAL = 30
+    DETECTION_COUNT_SAMPLE_INTERVAL = 15
     DETECTION_COUNT_STABILITY_WINDOW = 3
 
     def __init__(self):
@@ -92,7 +92,25 @@ class ObbDetector(baseDet):
                 self.detection_optimization_target = new_target
                 print(f"Detection optimization target updated to {new_target}.")
 
+    @staticmethod
+    def _blackout_outside_detection_region(im, x_min, x_max, y_min, y_max):
+        """Return an image with pixels outside the inclusive detection region set to black."""
+        if not isinstance(im, np.ndarray) or im.ndim < 2:
+            raise ValueError("im must be a NumPy image with at least two dimensions.")
+
+        height, width = im.shape[:2]
+        x_start = max(0, min(int(x_min), width))
+        x_stop = max(0, min(int(x_max) + 1, width))
+        y_start = max(0, min(int(y_min), height))
+        y_stop = max(0, min(int(y_max) + 1, height))
+
+        masked_im = np.zeros_like(im)
+        if x_start < x_stop and y_start < y_stop:
+            masked_im[y_start:y_stop, x_start:x_stop] = im[y_start:y_stop, x_start:x_stop]
+        return masked_im
+
     def detect(self, im, x_min=270, x_max=1900, y_min=100, y_max=1600):
+        im = self._blackout_outside_detection_region(im, x_min, x_max, y_min, y_max)
         res = self.model.predict(im, imgsz=self.img_size, conf=self.conf,
                                  iou=self.nms_iou, device=self.device)
 

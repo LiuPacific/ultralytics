@@ -2,6 +2,7 @@ import csv
 import os
 
 import cv2
+import numpy as np
 import torch
 from ultralytics import YOLO
 
@@ -51,10 +52,34 @@ class yolov11Tracker(baseTracker):
         self.m = self.model
         self.names = self.model.module.names if hasattr(self.model, 'module') else self.model.names
 
+    @staticmethod
+    def _blackout_outside_detection_region(im, x_min, x_max, y_min, y_max):
+        """Return an image with pixels outside the inclusive detection region set to black."""
+        if not isinstance(im, np.ndarray) or im.ndim < 2:
+            raise ValueError("im must be a NumPy image with at least two dimensions.")
+
+        height, width = im.shape[:2]
+        x_start = max(0, min(int(x_min), width))
+        x_stop = max(0, min(int(x_max) + 1, width))
+        y_start = max(0, min(int(y_min), height))
+        y_stop = max(0, min(int(y_max) + 1, height))
+
+        masked_im = np.zeros_like(im)
+        if x_start < x_stop and y_start < y_stop:
+            masked_im[y_start:y_stop, x_start:x_stop] = im[y_start:y_stop, x_start:x_stop]
+        return masked_im
+
     def track(self, im):
         self.frame_id += 1
-        res = self.model.track(
+        masked_im = self._blackout_outside_detection_region(
             im,
+            self.runtime_cfg.get("DETECTION_REGION_X_MIN", 270),
+            self.runtime_cfg.get("DETECTION_REGION_X_MAX", 1900),
+            self.runtime_cfg.get("DETECTION_REGION_Y_MIN", 100),
+            self.runtime_cfg.get("DETECTION_REGION_Y_MAX", 1600),
+        )
+        res = self.model.track(
+            masked_im,
             # tracker="byte_track/hara_bytetrack.yaml",
             tracker=cfg.get("cfg_path"),
             persist=True,
