@@ -57,7 +57,7 @@ class HaraBOTSORT(BOTSORT):
         lost_stracks = []
         removed_stracks = []
 
-        results, feats = self._filter_detections_by_region(results, feats)
+        # results, feats = self._filter_detections_by_region(results, feats)
 
         # hara detection optimization
         if self.runtime_cfg.get("USE_OPTIMIZATION", False) and self.runtime_cfg.get("DETECTION_OPTIMIZATION_ON", False):

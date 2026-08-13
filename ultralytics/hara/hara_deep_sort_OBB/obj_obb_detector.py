@@ -129,12 +129,12 @@ class ObbDetector(baseDet):
 
             # Filter by the pen boundary
             # if not (470 <= xywhr[0] <= 1900 and 670 <= xywhr[1] <= 1600):
-            if (xywhr[0] > x_max) or xywhr[0] < x_min or xywhr[1] > y_max or xywhr[1] < y_min:
-                continue
+            # if (xywhr[0] > x_max) or xywhr[0] < x_min or xywhr[1] > y_max or xywhr[1] < y_min:
+            #     continue
 
             # Filter by bbox area (min: 13000, max: 120000 pixels)
-            if not self._filter_by_area(xywhr):
-                continue
+            # if not self._filter_by_area(xywhr):
+            #     continue
             pred_boxes.append(
                 (xyxyxyxy, xywhr, lbl, conf)
             )

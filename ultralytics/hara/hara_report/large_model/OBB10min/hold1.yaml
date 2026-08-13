@@ -1,12 +1,12 @@
 path: D:\chicken_project\experiment6report\10-min-obb-id0
 train:
-  - 08_sick_16-30
-  - 10_mock_76-90
-  - 10_sick_31-45
-  - 12_mock_46-60
-  - 12_sick_61-75
+  - 08_sick_16-30-masked
+  - 10_mock_76-90-masked
+  - 10_sick_31-45-masked
+  - 12_mock_46-60-masked
+  - 12_sick_61-75-masked
 val:
-  - 08_mock_1-15
+  - 08_mock_1-15-masked
 test:
 
 names:

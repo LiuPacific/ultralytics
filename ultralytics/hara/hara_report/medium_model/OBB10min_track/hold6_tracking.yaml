@@ -1,0 +1,26 @@
+DEEPSORT:
+  DETECTION_MODEL_PATH: "D:/chicken_project/experiment6report/running/obb_m_hold6_10min/weights/last.pt"
+  REID_CKPT: ""
+  MAX_DIST: 0.2
+  MIN_CONFIDENCE: 0.3
+  NMS_THRESHOLD: 0.8
+  MAX_IOU_DISTANCE: 0.7
+  N_INIT: 3
+  NN_BUDGET: 100
+  MAX_ID_POOL: 15
+  RECONNECTION_DISTANCE_THRESHOLD: 200
+  REUSE_ID_ASSIGNMENT_DISTANCE_THRESHOLD: 200
+  USE_REID: False
+  USE_ROTATED_FEATURES: True
+  USE_OPTIMIZATION: True
+  REUSE_ID: False # use_optimization & reuse_id to turn on it.
+  DETECTION_OPTIMIZATION_ON: False
+  TRACK_RECONNECTION_ON: True
+  MAX_AGE: 30
+#  MAX_IOU_DISTANCE: 0.8
+  #  USE_OPTIMIZATION: False
+  #  MAX_AGE: 30
+  TRACKING_CSV_PATH: "D:/chicken_project/experiment6report/running/obb_m_hold6_10min/obb_m_10hold6_track.csv"
+  VIDEO_PATH: D:/chicken_project/video_reid_obb/6.mkv
+  RESULT_PATH: "E:/temp/obb_m_10hold6_track.mp4"
+  MAX_FRAME: 20000

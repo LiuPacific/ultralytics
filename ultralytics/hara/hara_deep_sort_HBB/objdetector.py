@@ -128,18 +128,18 @@ class Detector( baseDet):
 
             # Filter by the pen boundary
             # if not (470 <= xywhr[0] <= 1900 and 670 <= xywhr[1] <= 1600):
-            if (x2 > x_max) or x1 < x_min or y1 > y_max or y2 < y_min:
-                continue
+            # if (x2 > x_max) or x1 < x_min or y1 > y_max or y2 < y_min:
+            #     continue
 
 
-            xywh = [
-                int((x1 + x2) / 2),
-                int((y1 + y2) / 2),
-                int(x2 - x1),
-                int(y2 - y1),
-            ]
-            if not self._filter_by_area(xywh):
-                continue
+            # xywh = [
+            #     int((x1 + x2) / 2),
+            #     int((y1 + y2) / 2),
+            #     int(x2 - x1),
+            #     int(y2 - y1),
+            # ]
+            # if not self._filter_by_area(xywh):
+            #     continue
             pred_boxes.append(
                  (x1, y1, x2, y2, lbl, confidence))
 
